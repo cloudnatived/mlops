@@ -97,8 +97,6 @@ Forecast: {period['detailedForecast']}
 if __name__ == "__main__":
     # Initialize and run the server
     mcp.run(transport=‘stdio’)  # transport为stdio，标识MCP Server与Cline交互方式为stido
-![图片](https://github.com/user-attachments/assets/09cfdcca-3027-4579-8c34-3af0f718febf)
-
 
 
 ```
