@@ -49,8 +49,7 @@ root@y248:/Data/BBC/nccl# ls -l build/pkg/deb/libnccl*
 -rw-r--r-- 1 root root 115853160 Apr 16 23:20 build/pkg/deb/libnccl2_2.26.2-1+cuda12.4_amd64.deb
 -rw-r--r-- 1 root root 118245864 Apr 16 23:20 build/pkg/deb/libnccl-dev_2.26.2-1+cuda12.4_amd64.deb
 ![图片](https://github.com/user-attachments/assets/986e6b8a-687d-4ee5-a86d-2417f1dabb8d)
-
-
+############################################################################################################################
 # NCCL-TEST
 https://github.com/NVIDIA/nccl-tests
 
@@ -59,8 +58,17 @@ https://github.com/NVIDIA/nccl-tests
 NCCL 测试依赖于 MPI 在多个进程上工作，因此需要多个节点。如果要使用 MPI 支持编译测试，则需要设置 MPI=1 并将 MPI_HOME 设置为 MPI 的安装路径。
 make MPI=1 MPI_HOME=/path/to/mpi CUDA_HOME=/path/to/cuda NCCL_HOME=/path/to/nccl
 
+# 编译支持mpi的test
+make MPI=1 MPI_HOME=/usr/lib/x86_64-linux-gnu/openmpi
+
+make CUDA_HOME=/usr/local/cuda NCCL_HOME=/usr/local/lib/python3.10/dist-packages/nvidia/nccl -lnccl  # /usr/local/lib/python3.10/dist-packages/nvidia/nccl 这个目录一直没找到，也没安装好这个库。
+
+
 root@y248:/Data/BBC/nccl-tests# ls build/*
 all_gather_perf  all_reduce_perf  alltoall_perf  broadcast_perf  gather_perf  hypercube_perf  reduce_perf  reduce_scatter_perf  scatter_perf  sendrecv_perf
+
+
+
 
 # NCCL测试
 输入如下命令测试NCCL和NCCL-test有没有安装好。
@@ -72,14 +80,23 @@ all_gather_perf  all_reduce_perf  alltoall_perf  broadcast_perf  gather_perf  hy
 -g 参与通信的GPU数量
 
 # 安装openmpi，
-apt-get install openmpi-bin openmpi-doc libopenmpi-dev
+apt-get update
+apt-get install infiniband-diags ibverbs-utils libibverbs-dev libfabric1 libfabric-dev libpsm2-dev -y
+apt-get install openmpi-bin openmpi-common libopenmpi-dev libgtk2.0-dev
+apt-get install librdmacm-dev libpsm2-dev
+
+
 运行以下命令,这里对应双机4卡，注意np后面的进程数*单个节点gpu数（-g 指定）=总的gpu数量，即之前提到的等式
-总的ranks数量（即CUDA设备数，也是总的gpu数量）=（进程数）*（线程数）*（每个线程的GPU数）。mpirun -np 2 -pernode \
+总的ranks数量（即CUDA设备数，也是总的gpu数量）=（进程数）*（线程数）*（每个线程的GPU数）。
+mpirun -np 2 -pernode \
 --allow-run-as-root \
 -hostfile \
 -mca btl_tcp_if_include eno2  \
 -x NCCL_SOCKET_IFNAME=eno2  \
 ./build/all_reduce_perf -b 8 -e 128M -f 2 -g 2 -c 0
+
+# apt-get install mpich
+
 
 
 ```
