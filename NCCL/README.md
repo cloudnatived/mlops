@@ -202,7 +202,32 @@ mpirun -np 2 -pernode \
 -x CUDA_VISIBLE_DEVICES=0,1 \
 ./build/all_reduce_perf -b 8 -e 128M -f 2 -g 2 -c 0
 
-多机多卡运行nccl-tests和channel获取    https://zhuanlan.zhihu.com/p/682530828
+多机多卡运行nccl-tests和channel获取    https://zhuanlan.zhihu.com/p/682530828    Mr.King
+
+
+
+
 ############################################################################################################################
+
+
+nvcc slzg-nccl-reduce.cu -o slzg-nccl-reduce -lnccl
+
+nvcc slzg-nccl-reducempi.cu -o slzg-nccl-reducempi -lnccl -lmpi -L /usr/lib/x86_64-linux-gnu/openmpi/lib/ -I /usr/lib/x86_64-linux-gnu/openmpi/include/  #编译通过
+执行命令为：mpiexec -n 4 ./reducempi
+
+nvcc slzg-nccl-softmax.cu -o slzg-nccl-softmax -lnccl -lmpi -L /usr/lib/x86_64-linux-gnu/openmpi/lib/ -I /usr/lib/x86_64-linux-gnu/openmpi/include/     #编译通过
+
+nvcc slzg-nccl-jacobi.cu -o slzg-nccl-jacobi -lnccl -lmpi
+执行命令为：mpiexec -n 2 ./jslzg-nccl-jacobi，表示使用nranks=2个进程
+
+nvcc slzg-nccl-mpi-jacobi.cu -o slzg-nccl-mpi-jacobi -lnccl -lmpi -L /usr/lib/x86_64-linux-gnu/openmpi/lib/ -I /usr/lib/x86_64-linux-gnu/openmpi/include/
+
+nvcc slzg-nccl-overlay.cu -o slzg-nccl-overlay.cu -lnccl -lmpi
+
+英伟达平台NCCL详细解读和代码介绍    https://zhuanlan.zhihu.com/p/686621494    森林之光
+############################################################################################################################
+
+
+
 
 ```
