@@ -1,3 +1,9 @@
+#!/usr/bin/python3
+# -*- coding: UTF-8 -*-
+# Copyright (c) PLUMgrid, Inc.
+# Licensed under the Apache License, Version 2.0 (the "License")
+# 22-Apr-2025
+
 import ctypes
 so_file = "/lib/x86_64-linux-gnu/libnccl.so.2"
 nccl = ctypes.CDLL(so_file)
