@@ -1,4 +1,4 @@
-
+```
 https://developer.nvidia.com/nccl/nccl-download
 
 Download NCCL 2.26.2, for CUDA 12.8, March 13th, 2025
@@ -39,3 +39,4 @@ $ sudo apt-get update
 
 
 make CUDA_HOME=/usr/local/cuda NCCL_HOME=/usr/local/lib/python3.10/dist-packages/nvidia/nccl -lnccl
+```
