@@ -51,7 +51,7 @@ root@y248:/Data/BBC/nccl# ls -l build/pkg/deb/libnccl*
 ![图片](https://github.com/user-attachments/assets/986e6b8a-687d-4ee5-a86d-2417f1dabb8d)
 
 
-NCCL-TEST
+# NCCL-TEST
 https://github.com/NVIDIA/nccl-tests
 
 如果 CUDA 未安装在 /usr/local/cuda 中，您可以指定 CUDA_HOME。同样，如果 NCCL 未安装在 /usr 中，则可以指定 NCCL_HOME。
@@ -62,7 +62,7 @@ make MPI=1 MPI_HOME=/path/to/mpi CUDA_HOME=/path/to/cuda NCCL_HOME=/path/to/nccl
 root@y248:/Data/BBC/nccl-tests# ls build/*
 all_gather_perf  all_reduce_perf  alltoall_perf  broadcast_perf  gather_perf  hypercube_perf  reduce_perf  reduce_scatter_perf  scatter_perf  sendrecv_perf
 
-NCCL测试
+# NCCL测试
 输入如下命令测试NCCL和NCCL-test有没有安装好。
  ./build/all_reduce_perf -b 8 -e 128M -f 2 -g 1
 参数说明
@@ -71,7 +71,7 @@ NCCL测试
 -f 乘法因子（数据量按几倍增加）
 -g 参与通信的GPU数量
 
-安装openmpi，
+# 安装openmpi，
 apt-get install openmpi-bin openmpi-doc libopenmpi-dev
 运行以下命令,这里对应双机4卡，注意np后面的进程数*单个节点gpu数（-g 指定）=总的gpu数量，即之前提到的等式
 总的ranks数量（即CUDA设备数，也是总的gpu数量）=（进程数）*（线程数）*（每个线程的GPU数）。mpirun -np 2 -pernode \
