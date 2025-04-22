@@ -1,7 +1,25 @@
 
+编写MCP weather server的代码示例：
+https://github.com/cloudnatived/yx/blob/main/WEATHER/weather.py
+
+使用uv新建一个weather的项目
+uv init weather
+
+建立虚拟环境，以确保不会影响主机的环境
+uv venv
+source .venv/bin/activate
+
+安装httpx依赖
+uv add "mcp[cli]“ httpx
+
+
+
 
     weather.py：一个示例 MCP Server，可用于天气预告和天气预警，代码主要来自 MCP 官方示例。
     mcp_logger.py：用于记录 MCP Server 的输入输出，并把记录内容放到 mcp_io.log 上面，该代码主要由 Gemini 2.5 Pro 编写。
+
+
+
 ```
 from typing import Any
 import httpx
