@@ -50,6 +50,7 @@ test_loader = torch.utils.data.DataLoader(
                                        (0.1307,), (0.3081,))
                                ])),
     batch_size=batch_size_test, shuffle=True)
+```
 运行上面的程序后，会自动将数据集下载到目录下的data文件夹。
 
 
