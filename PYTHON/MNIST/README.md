@@ -16,7 +16,7 @@ from torch.utils.data import DataLoader
 
 准备数据集
 导入就绪后，我们可以继续准备将要使用的数据。但在那之前，我们将定义超参数，我们将使用的实验。在这里，epoch的数量定义了我们将循环整个训练数据集的次数，而learning_rate和momentum是我们稍后将使用的优化器的超参数。
-``
+```
 n_epochs = 3
 batch_size_train = 64
 batch_size_test = 1000
@@ -25,7 +25,7 @@ momentum = 0.5
 log_interval = 10
 random_seed = 1
 torch.manual_seed(random_seed)
-``
+```
 
 对于可重复的实验，必须为任何使用随机数产生的东西设置随机种子——如numpy和random!
 
