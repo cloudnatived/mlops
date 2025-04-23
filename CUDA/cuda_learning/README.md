@@ -110,3 +110,29 @@ python3 setup.py install
 执行：
 python run_time.py --compiler setup
 ```
+
+
+CMAKE 编译调用
+最后就是cmake编译的方式了，要编写一个CMakeLists.txt文件，需要关注的几个点在于：依赖库的匹配、编译过程及软连接的建立。
+
+```
+//cpp端用的是TORCH_LIBRARY进行封装：
+TORCH_LIBRARY(add2, m) {
+    m.def("torch_launch_add2", torch_launch_add2);
+}
+
+//最后会在build目录下生成一个libadd2.so，通过如下方式在python端调用：
+import torch
+torch.ops.load_library("build/libadd2.so")
+torch.ops.add2.torch_launch_add2(c, a, b, n)
+
+
+编译：
+mkdir build
+cd build
+cmake ..
+make
+
+执行：
+python3 run_time.py --compiler cmake
+```
