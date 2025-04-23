@@ -55,12 +55,15 @@ xhh_model.py
 xhh_test.py
 xhh_train.py
 
-
+#下载数据集
 pip3 install torchvision model
 python3 download_data.py
 
+#模型训练
+python3 xhh-train.py
 
-
+#模型测试
+python3 xhh-test.py
 
 
 ```
