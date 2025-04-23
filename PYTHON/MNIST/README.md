@@ -50,10 +50,10 @@ test_loader = torch.utils.data.DataLoader(
 CPU运行，三层神经网络训练手写数字识别
 ```
 
-download_data.py
-model.py
-test.py
-train.py
+xhh_download_data.py
+xhh_model.py
+xhh_test.py
+xhh_train.py
 
 
 pip3 install torchvision model
