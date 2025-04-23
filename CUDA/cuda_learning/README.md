@@ -29,6 +29,7 @@ CUDA（一）：CUDA 编程基础
 
 算子构建
 实现如下所示，其中 MatAdd 是 kernel 函数，运行在GPU端，而launch_add2是CPU端的执行函数，调用kernel，它是异步的，调用完之后控制权立刻返回给CPU。
+kernel/add2_kernel.cu
 ```
 __global__ void MatAdd(float* c,
                             const float* a,
@@ -55,6 +56,7 @@ void launch_add2(float* c,
 
 Torch C++ 封装
 CUDA 的 kernel 函数 PyTorch 并不能直接调用，还需要提供一个接口，这个功能在 add2_ops.cpp 中实现
+kernel/add2_ops.cpp
 ```
 #include <torch/extension.h>
 #include "add2.h"
@@ -101,3 +103,10 @@ cuda_module = load(name="add2",
                            verbose=True)
 ```
 
+
+```
+编译：
+python3 setup.py install
+执行：
+python run_time.py --compiler setup
+```
