@@ -55,7 +55,7 @@ void launch_add2(float* c,
 }
 ```
 
-Torch C++ 封装
+Torch C++ 封装  
 CUDA 的 kernel 函数 PyTorch 并不能直接调用，还需要提供一个接口，这个功能在 add2_ops.cpp 中实现
 kernel/add2_ops.cpp
 ```
@@ -90,7 +90,7 @@ Torch 使用CUDA 算子 主要分为三个步骤：
 然后编写torch cpp函数建立PyTorch和CUDA之间的联系，用pybind11封装。
 最后用PyTorch的cpp扩展库进行编译和调用。
 
-编译及调用方法
+编译及调用方法  
 JIT 编译调用
 
 just-in-time(JIT, 即时编译)，即 python 代码运行的时候再去编译cpp和cuda文件。
@@ -113,7 +113,7 @@ python run_time.py --compiler setup
 ```
 
 
-CMAKE 编译调用
+CMAKE 编译调用  
 最后就是cmake编译的方式了，要编写一个CMakeLists.txt文件，需要关注的几个点在于：依赖库的匹配、编译过程及软连接的建立。
 
 ```
