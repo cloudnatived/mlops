@@ -116,6 +116,19 @@ CMAKE 编译调用
 最后就是cmake编译的方式了，要编写一个CMakeLists.txt文件，需要关注的几个点在于：依赖库的匹配、编译过程及软连接的建立。
 
 ```
+/etc/profile 添加环境变量
+export PATH=/usr/local/cuda/bin${PATH:+:${PATH}}
+export LD_LIBRARY_PATH=/usr/local/cuda/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+
+export PATH=$PATH:/usr/local/cuda/bin
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64:/usr/lib/x86_64-linux-gnu
+export LIBRARY_PATH=$LIBRARY_PATH:/usr/local/cuda/lib64
+
+export C_INCLUDE_PATH=/usr/include/python3.10:$C_INCLUDE_PATH
+export CPLUS_INCLUDE_PATH=/usr/include/python3.10:$CPLUS_INCLUDE_PATH
+
+
+
 //cpp端用的是TORCH_LIBRARY进行封装：
 TORCH_LIBRARY(add2, m) {
     m.def("torch_launch_add2", torch_launch_add2);
