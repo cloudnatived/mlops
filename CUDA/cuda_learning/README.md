@@ -25,7 +25,7 @@ learning how CUDA works
 
 
 ## CUDA（一）：CUDA 编程基础
-01_cuda_op/
+01_cuda_op/  
 实践：PyTorch自定义CUDA算子.
 
 算子构建
