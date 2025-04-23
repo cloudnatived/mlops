@@ -47,4 +47,20 @@ test_loader = torch.utils.data.DataLoader(
 
 
 # mnist_network
-三层神经网络训练手写数字识别。
+CPU运行，三层神经网络训练手写数字识别
+```
+
+download_data.py
+model.py
+test.py
+train.py
+
+
+pip3 install torchvision model
+python3 download_data.py
+
+
+
+
+
+```
