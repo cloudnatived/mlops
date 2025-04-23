@@ -43,3 +43,8 @@ test_loader = torch.utils.data.DataLoader(
                                ])),
     batch_size=batch_size_test, shuffle=True)
 运行上面的程序后，会自动将数据集下载到目录下的data文件夹。下载过程可能有点烦，经常卡住不动，只能多来几遍。完成后就是这样了：
+
+
+
+# mnist_network
+三层神经网络训练手写数字识别。
