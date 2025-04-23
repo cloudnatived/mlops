@@ -1,7 +1,6 @@
 # cuda_learning
 learning how CUDA works
 
-
 ## project list:
 - custom op [Done]
     - [CUDA 编程基础]
@@ -23,3 +22,82 @@ learning how CUDA works
     
 - CUDA mode lectures 
 - DeepSeek infra cases
+
+
+CUDA（一）：CUDA 编程基础
+实践：PyTorch自定义CUDA算子.
+
+算子构建
+实现如下所示，其中 MatAdd 是 kernel 函数，运行在GPU端，而launch_add2是CPU端的执行函数，调用kernel，它是异步的，调用完之后控制权立刻返回给CPU。
+```
+__global__ void MatAdd(float* c,
+                            const float* a,
+                            const float* b,
+                            int n)
+{
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    int j = blockIdx.y * blockDim.y + threadIdx.y;
+    int idx = j*n + i;
+    if (i < n && j < n)
+        c[idx] = a[idx] + b[idx];
+}
+
+void launch_add2(float* c,
+                 const float* a,
+                 const float* b,
+                 int n) {
+    dim3 block(16, 16);
+    dim3 grid(n/block.x, n/block.y);
+
+    MatAdd<<<grid, block>>>(c, a, b, n);
+}
+```
+
+Torch C++ 封装
+CUDA 的 kernel 函数 PyTorch 并不能直接调用，还需要提供一个接口，这个功能在 add2_ops.cpp 中实现
+```
+#include <torch/extension.h>
+#include "add2.h"
+
+void torch_launch_add2(torch::Tensor &c,
+                       const torch::Tensor &a,
+                       const torch::Tensor &b,
+                       int64_t n) {
+    launch_add2((float *)c.data_ptr(),
+                (const float *)a.data_ptr(),
+                (const float *)b.data_ptr(),
+                n);
+}
+
+PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
+    m.def("torch_launch_add2",
+          &torch_launch_add2,
+          "add2 kernel warpper");
+}
+
+TORCH_LIBRARY(add2, m) {
+    m.def("torch_launch_add2", torch_launch_add2);
+} 
+```
+torch_launch_add2函数传入的是C++版本的torch tensor，然后转换成C++指针数组，调用CUDA函数launch_add2来执行核函数。这里用 pybind11 来对torch_launch_add2函数进行封装，然后用cmake编译就可以产生python可以调用的.so库。
+
+Torch 使用CUDA 算子 主要分为三个步骤：
+
+先编写CUDA算子和对应的调用函数。
+然后编写torch cpp函数建立PyTorch和CUDA之间的联系，用pybind11封装。
+最后用PyTorch的cpp扩展库进行编译和调用。
+
+编译及调用方法
+JIT 编译调用
+
+just-in-time(JIT, 即时编译)，即 python 代码运行的时候再去编译cpp和cuda文件。
+
+首先需要加载需要即时编译的文件，然后调用接口函数
+```
+from torch.utils.cpp_extension import load
+cuda_module = load(name="add2",
+                           extra_include_paths=["include"],
+                           sources=["kernel/add2_ops.cpp", "kernel/add2_kernel.cu"],
+                           verbose=True)
+```
+
