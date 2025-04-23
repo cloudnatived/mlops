@@ -47,6 +47,8 @@ test_loader = torch.utils.data.DataLoader(
 
 ```
 pip3 install matplotlib
+python3 pytorch_mnist.py
+
 
 ```
 
