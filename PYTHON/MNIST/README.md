@@ -12,7 +12,7 @@ MNIST包含70,000张手写数字图像: 60,000张用于培训，10,000张用于�
 import torch
 import torchvision
 from torch.utils.data import DataLoader
-``
+```
 
 准备数据集
 导入就绪后，我们可以继续准备将要使用的数据。但在那之前，我们将定义超参数，我们将使用的实验。在这里，epoch的数量定义了我们将循环整个训练数据集的次数，而learning_rate和momentum是我们稍后将使用的优化器的超参数。
