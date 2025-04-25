@@ -153,3 +153,26 @@ make;
 执行：
 python3 run_time.py --compiler cmake
 ```
+
+# CUDA（二）：GPU的内存体系及其优化指南
+```
+3 种方式都完成后，我们可以编译运行代码
+
+nvcc reduce_gpu.cu -o reduce
+通过计时函数可以看到，每种方法的完整计算总时间都在 7.5 ms 左右。
+然后通过 nvprof 命令查看GPU各部分的耗时
+nvprof ./reduce
+
+如果要放大访存速度的差别，可以使用双精度，编译方式如下：
+nvcc reduce_gpu.cu -DUSE_DP -o reduce_dp
+此时可以看到全局内存的性能出现了明显下降：
+
+
+
+```
+
+# CUDA（三）：通用矩阵乘法：从入门到熟练
+
+
+
+
