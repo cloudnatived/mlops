@@ -26,7 +26,7 @@ learning how CUDA works
 
 ## CUDA（一）：CUDA 编程基础
 ## 01_cuda_op/  
-实践：PyTorch自定义CUDA算子.
+实践：PyTorch自定义CUDA算子，pytorch构造CUDA算子库扩展。
 
 算子构建
 实现如下所示，其中 MatAdd 是 kernel 函数，运行在GPU端，而launch_add2是CPU端的执行函数，调用kernel，它是异步的，调用完之后控制权立刻返回给CPU。
