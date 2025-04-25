@@ -1,3 +1,5 @@
+https://github.com/ifromeast/cuda_learning/tree/main
+
 # cuda_learning
 learning how CUDA works
 
