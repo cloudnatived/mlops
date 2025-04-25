@@ -174,5 +174,19 @@ nvcc reduce_gpu.cu -DUSE_DP -o reduce_dp
 # CUDA（三）：通用矩阵乘法：从入门到熟练
 
 
+# CUDA（四）：使用 CUDA 实现 Transformer 结构
+```
+python prepro_tinyshakespeare.py
+
+2.2.1 训练过程的实现
+更多的细节请参考github.com/karpathy/llm.c/blob/master/train_gpt2.cu，编译及运行如下：
+make train_gpt2cu
+./train_gpt2cu
+
+2.2.2 使用 cuDNN 模块
+为了获得更好的性能，接下来使用 cuDNN 模块，编译及运行命令如下：
+make train_gpt2cu USE_CUDNN=1
+./train_gpt2cu
 
 
+```
