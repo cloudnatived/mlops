@@ -25,7 +25,7 @@ learning how CUDA works
 
 
 ## CUDA（一）：CUDA 编程基础
-01_cuda_op/  
+## 01_cuda_op/  
 实践：PyTorch自定义CUDA算子.
 
 算子构建
@@ -106,10 +106,13 @@ cuda_module = load(name="add2",
 
 
 ```
+python3 -c "import torch; print(torch.cuda.get_device_capability())"
+export TORCH_CUDA_ARCH_LIST="8.9"
+
 编译：
 python3 setup.py install
 执行：
-python run_time.py --compiler setup
+python3 run_time.py --compiler setup
 ```
 
 
@@ -142,10 +145,10 @@ torch.ops.add2.torch_launch_add2(c, a, b, n)
 
 
 编译：
-mkdir build
-cd build
-cmake ..
-make
+mkdir build;
+cd build;
+cmake ..;
+make;
 
 执行：
 python3 run_time.py --compiler cmake
