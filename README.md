@@ -1,5 +1,7 @@
 # MLOps
 
+
+```
 export PATH=$PATH:/usr/local/cuda/bin export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64
 
 export PATH=$PATH:/usr/include/mpich-3.2-x86_64 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib64/mpich-3.2/lib export LD_LIBRARY_PATH=/usr/lib64/mpich-3.2/lib:$LD_LIBRARY_PATH
@@ -15,3 +17,4 @@ export PATH=$PATH:/usr/include/mpich-3.2-x86_64 export LD_LIBRARY_PATH=$LD_LIBRA
 #jacobi迭代结合NCCL的多卡算法 nvcc nccl-jacobi.cu -o nccl-jacobi -lnccl -lmpi -L /usr/lib64/mpich-3.2/lib/ -I /usr/include/mpich-3.2-x86_64
 
 #nccl-overlay nvcc nccl-overlay.cu -o nccl-overlay -lnccl -lmpi -L /usr/lib64/mpich-3.2/lib/ -I /usr/include/mpich-3.2-x86_64
+```
