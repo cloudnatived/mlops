@@ -1,4 +1,4 @@
-kubespray-2.27.0 部署笔记
+# kubespray-2.27.0 部署笔记
 
 ### 4.1.kubespray-2.27.0 部署笔记
 
@@ -1573,8 +1573,11 @@ spec:
 4.代码和配置调整：根据你的具体模型和训练需求，你可能需要调整训练脚本和DeepSpeed配置。
 示例提供了一个基本的框架，但是，在生产环境中部署分布式训练任务通常需要更多的配置和优化。
 
+Kubeflow的借助TFJob简化了作业的配置。Volcano通过简单的增加一行配置就可以让用户启动组调度、Task-topology等功能来解决死锁、亲和性等问题，在大规模分布式训练情况下，可以有效的缩短整体训练时间。
+总结
+Kubeflow 和 Volcano两个开源项目的结合充分简化和加速了Kubernetes上AI计算进程。当前已经成为越来越多用户的最佳选择，应用于生产环境。
+
+
 参考资料：
-
 基于Kubernetes和DeepSpeed进行分布式训练的实战教程    https://blog.csdn.net/myTomorrow_better/article/details/139515425
-
-
+Kubeflow+Volcano：使用K8s轻松完成AI计算    https://zhuanlan.zhihu.com/p/657157700
