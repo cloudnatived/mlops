@@ -240,8 +240,5 @@ DCGM核心价值：提供从硬件状态到任务粒度的全方位GPU监控，�
 典型场景：性能调优、故障排查、资源调度优化。
 通过DCGM，运维团队可快速定位GPU相关问题，提升集群稳定性和资源利用率。
 
-参考资料：
-GPU监控工具DCGM    https://blog.csdn.net/Franklin7B/article/details/145585589
-
 ```
 
