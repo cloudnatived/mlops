@@ -37,7 +37,6 @@ NVIDIA DCGM（Data Center GPU Manager） 是专为数据中心设计的GPU监控
 
 
 ##### **1. 计算与显存指标**
-
 | 指标               | 含义                          | 典型问题场景                         |
 | ------------------ | ----------------------------- | ------------------------------------ |
 | GPU Utilization    | GPU计算单元利用率（0-100%）   | 低利用率可能表示CPU或IO瓶颈。        |
@@ -47,10 +46,7 @@ NVIDIA DCGM（Data Center GPU Manager） 是专为数据中心设计的GPU监控
 | NVLink Throughput  | NVLink的发送/接收带宽（MB/s） | 多卡训练时通信效率低下。             |
 
 
-
 ##### **2. 硬件状态指标**
-
-
 | **指标**        | **含义**                                                     | **典型问题场景**                     |
 | --------------- | ------------------------------------------------------------ | ------------------------------------ |
 | **Temperature** | GPU核心温度（℃）                                             | 温度过高触发降频，性能下降。         |
@@ -68,33 +64,47 @@ NVIDIA DCGM（Data Center GPU Manager） 是专为数据中心设计的GPU监控
 
 
 
-三、DCGM 的安装与使用
+三、DCGM 的安装与使用    
+
 ```
 1. 安装DCGM
 # Ubuntu/Debian
-apt-get install -y datacenter-gpu-manager
-dcgmi --version
+# 在ubuntu
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb
+dpkg -i cuda-keyring_1.1-1_all.deb
 
-# RHEL/CentOS
-yum install -y datacenter-gpu-manager
-systemctl enable nvidia-dcgm
-systemctl start nvidia-dcgm
+root@y251:/etc/apt/sources.list.d# cat cuda-ubuntu2204-x86_64.list 
+deb [signed-by=/usr/share/keyrings/cuda-archive-keyring.gpg] https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/ /
+
+apt-get update 
+apt-get install -y datacenter-gpu-manager
+# will install datacenter-gpu-manager 1:3.3.9
+
+dcgmi --version
+dcgmi  version: 3.3.9
+
+默认情况下，nv-hostengine 只绑定到 127.0.0.1，因此它不会监听远程连接，也就是说无法从另一台机器获取本机信息。如果你想让它监听远程连接，需要在启动 nv-hostengine 时使用 -b 选项来指定它应该监听连接的 IP 地址。你也可以指定 -b ALL 让它监听所有网络接口上的连接。
+# 停止服务
+systemctl stop nvidia-dcgm
+# 监听所有网络接口
+nv-hostengine  --service-account nvidia-dcgm -b ALL
+#获取其他节点信息
+dcgmi discovery --host 10.112.0.1 -l
 
 2. 常用命令示例
-实时监控GPU指标（每2秒刷新）：
-dcgmi dmon -i 0 -e 203,252 -c 5
+# 实时监控GPU指标（每2秒刷新）：
 # -e 指定指标ID（203=GPU利用率，252=显存使用率）
 # -i 指定GPU索引（0表示第一块GPU）
+dcgmi dmon -i 0 -e 203,252 -c 5
 
-查看GPU健康状态：
-dcgmi health -g 0 -c
+# 查看GPU健康状态：
 # 检查GPU 0的健康状态（-c 表示全面检测）
+dcgmi health -g 0 -c
 
-统计NVLink带宽：
+# 统计NVLink带宽：
+# 显示GPU 0的NVLink状态及带宽
 dcgmi nvlink -i 0 -s
 
-# 显示GPU 0的NVLink状态及带宽
- 
 3. 集成到Prometheus
 部署 DCGM Exporter：
 docker run -d --gpus all --rm -p 9400:9400 nvcr.io/nvidia/k8s/dcgm-exporter:3.3.4-3.1.5-ubuntu22.04
@@ -105,57 +115,49 @@ Prometheus配置添加Job：
         - targets: ['gpu-node:9400']
 
 Grafana仪表盘导入模板（官方模板ID）。
+https://grafana.com/grafana/dashboards/12239-nvidia-dcgm-exporter-dashboard/
 
 四、典型问题排查案例
 案例1：GPU利用率低
-
-    现象：训练任务中GPU利用率长期低于30%。
-    排查步骤：
-        dcgmi dmon 观察 GPU Utilization 和 PCIe Throughput。
-        若PCIe读取带宽高但GPU利用率低，可能是数据预处理（CPU）成为瓶颈。
-        优化方法：增加数据加载线程、启用DALI加速或使用更快的存储。
+现象：训练任务中GPU利用率长期低于30%。
+排查步骤：
+dcgmi dmon 观察 GPU Utilization 和 PCIe Throughput。
+若PCIe读取带宽高但GPU利用率低，可能是数据预处理（CPU）成为瓶颈。
+优化方法：增加数据加载线程、启用DALI加速或使用更快的存储。
 
 案例2：显存不足（OOM）
-
-    现象：任务运行时出现CUDA OOM错误。
-    排查步骤：
-        dcgmi dmon -e 252 监控显存使用峰值。
-        调整Batch Size或使用梯度累积。
-        启用混合精度训练（AMP）减少显存占用。
+现象：任务运行时出现CUDA OOM错误。
+排查步骤：
+dcgmi dmon -e 252 监控显存使用峰值。
+调整Batch Size或使用梯度累积。
+启用混合精度训练（AMP）减少显存占用。
 
 案例3：NVLink带宽低
-
-    现象：多卡训练速度未随GPU数量线性提升。
-    排查步骤：
-        dcgmi nvlink -s 检查NVLink带宽是否达到预期（如A100 NVLink3为600GB/s）。
-        确认拓扑是否对称（nvidia-smi topo -m）。
-        设置NCCL参数：export NCCL_ALGO=Tree。
+现象：多卡训练速度未随GPU数量线性提升。
+排查步骤：
+dcgmi nvlink -s 检查NVLink带宽是否达到预期（如A100 NVLink3为600GB/s）。
+确认拓扑是否对称（nvidia-smi topo -m）。
+设置NCCL参数：export NCCL_ALGO=Tree。
 
 五、DCGM 的高级功能
+策略引擎（Policy Engine）
+自动响应GPU事件（如温度超限时降低功耗）。
+dcgmi policy --group my_policy --set "temperature,action=throttle,threshold=90"
 
-    策略引擎（Policy Engine）
-        自动响应GPU事件（如温度超限时降低功耗）。
+数据记录与回放
+记录历史指标用于事后分析：
+dcgmi recorder --start -f /tmp/gpu_metrics.log
+dcgmi replay -f /tmp/gpu_metrics.log
 
-    dcgmi policy --group my_policy --set "temperature,action=throttle,threshold=90"
-
-    数据记录与回放
-        记录历史指标用于事后分析：
-
-        dcgmi recorder --start -f /tmp/gpu_metrics.log
-        dcgmi replay -f /tmp/gpu_metrics.log
-
-    MIG监控
-        查看MIG实例的资源分配：
-
-        dcgmi mig -i 0 -l
-            1
+MIG监控
+查看MIG实例的资源分配：
+dcgmi mig -i 0 -l
 
 六、总结
-
-    DCGM核心价值：提供从硬件状态到任务粒度的全方位GPU监控，适合数据中心级运维。
-    关键指标：利用率、显存、温度、NVLink/PCIe带宽、ECC/XID错误。
-    典型场景：性能调优、故障排查、资源调度优化。
-    通过DCGM，运维团队可快速定位GPU相关问题，提升集群稳定性和资源利用率。
+DCGM核心价值：提供从硬件状态到任务粒度的全方位GPU监控，适合数据中心级运维。
+关键指标：利用率、显存、温度、NVLink/PCIe带宽、ECC/XID错误。
+典型场景：性能调优、故障排查、资源调度优化。
+通过DCGM，运维团队可快速定位GPU相关问题，提升集群稳定性和资源利用率。
 
 参考资料：
 GPU监控工具DCGM    https://blog.csdn.net/Franklin7B/article/details/145585589
