@@ -343,12 +343,10 @@ CUDA（一）：CUDA 编程基础
 
 
 
-```
-
 
 
 参考资料：
 
 OpenCL安装过程记录    https://zhuanlan.zhihu.com/p/615906584
 一文搞懂OpenCL    https://blog.csdn.net/RuanJian_GC/article/details/132570906
-
+CUDA Library Samples 使用教程    https://blog.csdn.net/gitblog_00134/article/details/142774402
