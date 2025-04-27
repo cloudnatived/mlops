@@ -236,3 +236,7 @@ nvcc slzg-nccl-overlay.cu -o slzg-nccl-overlay.cu -lnccl -lmpi
 
 
 ```
+
+
+参考文档：
+How To Install nvidia-opencl-dev on Ubuntu 22.04    https://installati.one/install-nvidia-opencl-dev-ubuntu-22-04/
