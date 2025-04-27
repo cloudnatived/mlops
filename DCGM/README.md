@@ -105,17 +105,98 @@ dcgmi health -g 0 -c
 # 显示GPU 0的NVLink状态及带宽
 dcgmi nvlink -i 0 -s
 
-3. 集成到Prometheus
+
+2. DCGM-Exporter
+DCGM-Exporter 是一种基于 NVIDIA DCGM 的 Go API 的工具，允许用户收集 GPU 指标并了解工作负载行为或监控集群中的 GPU。DCGM Exporter 是用 Go 编写的，并在 HTTP 端点 （/metrics） 上公开 GPU 指标，用于监控 Prometheus 等解决方案。
 部署 DCGM Exporter：
 docker run -d --gpus all --rm -p 9400:9400 nvcr.io/nvidia/k8s/dcgm-exporter:3.3.4-3.1.5-ubuntu22.04
+docker run -it -d --gpus all --name dcgm -p 9400:9400 nvcr.io/nvidia/k8s/dcgm-exporter:3.3.0-3.2.0-ubuntu22.04 bash
 
-Prometheus配置添加Job：
+进入docker：
+docker start dcgm
+docker exec -it dcgm  bash
+-p 指定端口映射，默认端口号9400，将docker内的9400映射到主机内相同端口，即可在localhost：9400收集到数据，curl your-ip:9400/metrics 或者浏览器打开your-ip:9400/metrics有一系列指标说明成功收集到数据
+-a 指定数据发送的端口
+
+# 查看日志
+cat /var/log/nv-hostengine.log
+更改收集指标
+https://github.com/NVIDIA/dcgm-exporter#changing-metrics
+​github.com/NVIDIA/dcgm-exporter#changing-metrics
+使用 dcgm-exporter，可以通过指定自定义 CSV 文件来配置要收集的字段。你可以在存储库中的 etc/default-counters.csv 下找到默认 CSV 文件，该文件将复制到您的系统或容器上的 /etc/dcgm-exporter/default-counters.csv，还可以使用 -f 选项指定自定义 csv 文件
+
+dcgm-exporter -f /my-counters.csv
+
+Node-Exporter
+Prometheus Node Exporter 公开了各种与硬件和内核相关的指标。
+
+Monitoring Linux host metrics with the Node Exporter | Prometheus
+​prometheus.io/docs/guides/node-exporter/
+
+https://github.com/prometheus/node_exporter/releases/download/v1.8.2/node_exporter-1.8.2.linux-amd64.tar.gz
+tar xvfz node_exporter-1.8.2.linux-amd64.tar.gz
+cd node_exporter-1.8.2.linux-amd64
+./node_exporter
+
+成功启动数据会暴露到9100端口
+curl http://localhost:9100/metrics
+
+3. 集成到Prometheus，Prometheus - From metrics to insight
+Prometheus是一个开源的系统监控和警报工具包， 将其指标作为时间序列数据收集和存储，即指标信息与记录它的时间戳一起存储，以及称为标签的可选键值对。
+下载链接：https://prometheus.io/download/
+wget https://github.com/prometheus/prometheus/releases/download/v2.54.1/prometheus-2.54.1.linux-amd64.tar.gz
+# 解压
+tar -xzf prometheus-2.54.1.linux-amd64.tar.gz
+# 打开
+cd prometheus-2.54.1.linux-amd64.tar.gz
+
+# 修改配置文件prometheus.yml(20250427)
+    - job _name: 'pCGM_exporter'
+      static_configs:
+        - targets: ['localhost:9408','10.112.28.2:9488','10.112.57.233:9480']
+    - job _name: 'node_exporter
+      static_configs:
+        - targets: ['localhost:9108','10.112.28.2:9100','10.112.57.233:9100']
+
+# Prometheus配置添加Job：(20250427-ago)
     - job_name: 'dcgm'
       static_configs:
         - targets: ['gpu-node:9400']
 
+启动服务：
+./prometheus --config.file=./prometheus.yml
+
+#查看收集结果
+浏览器打开your-ip：9090，9090为prometheus的默认端口，点击status-> targets可以查看各个job的工作状态，如图所示，dcgm-exporter在三个节点均正常工作，说明收集到三个节点的信息
+点击graph，勾选use local time，在搜索框内输入要查询的指标，以DCGM_FI_DEV_GPU_TEMP（GPU温度）为例，点击execute查询，table是各个指标的收集结果（文本序列），而graph可以展示一段时间内的变化情况，下图为graph的展示，15min 内的 3个节点共6张GPU的温度变化。
+# 虽然prometheus提供了可视化功能，但是通常与grafana结合来建立更加全面的仪表板
+
+
+选择版本及对应操作系统输入命令即可
+sudo apt-get install -y adduser libfontconfig1 musl
+wget https://dl.grafana.com/enterprise/release/grafana-enterprise_11.2.2_amd64.deb
+dpkg -i grafana-enterprise_11.2.2_amd64.deb
+确保Grafana服务已启动并且设置为开机启动，可以使用systemd来管理Grafana服务
+systemctl daemon-reload
+
+# 设置开机启动
+systemctl enable grafana-server
+systemctl start grafana-server
+
+检查Grafana服务的状态：
+systemctl status grafana-server
+
+浏览器打开 your-ip：3000 进入登录界面，初始用户名与密码均为admin（grafana默认端口号3000）
+导入数据源
+点击 home->connections->data sources ，再选择 右上角 add new data source 添加数据源。
+选择 prometheus ， 输入名字和 server URL 即可，其他根据需求设置
+
+Grafana仪表板展示
 Grafana仪表盘导入模板（官方模板ID）。
 https://grafana.com/grafana/dashboards/12239-nvidia-dcgm-exporter-dashboard/
+
+更多仪表板
+node_exporter 对应的ID 为1860，效果如下：
 
 四、典型问题排查案例
 案例1：GPU利用率低
