@@ -48,19 +48,8 @@ NVIDIA DCGM（Data Center GPU Manager） 是专为数据中心设计的GPU监控
 
 
 
-
-
-
-指标	含义	典型问题场景
-GPU Utilization	GPU计算单元利用率（0-100%）	低利用率可能表示CPU或IO瓶颈。
-Memory Utilization	显存使用率（0-100%）	显存不足会导致OOM（Out Of Memory）。
-FB Used/Free	显存已用/剩余容量（MB/GB）	监控模型训练时的显存占用峰值。
-PCIe Throughput	PCIe接口的读写带宽（MB/s）	带宽不足影响数据加载速度。
-NVLink Throughput	NVLink的发送/接收带宽（MB/s）	多卡训练时通信效率低下。
-
-
-2. 硬件状态指标
-指标	含义	典型问题场景
+##### **2. 硬件状态指标**
+|指标	含义	典型问题场景
 Temperature	GPU核心温度（℃）	温度过高触发降频，性能下降。
 Power Usage	实时功耗（W）及功耗上限（TDP）	功耗超标导致硬件保护性关机。
 ECC Errors	单比特（Correctable）和多比特（Uncorrectable）ECC内存错误计数	ECC错误过多需更换GPU或排查环境干扰。
