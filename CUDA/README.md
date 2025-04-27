@@ -152,28 +152,6 @@ export LIBRARY_PATH=$LIBRARY_PATH:/usr/local/cuda/lib64
 
 source ~/.bashrc  # 立即生效
 
-# cuda-12.4的路径。
-/usr/local/cuda-12.4/
-
-# 下载cuda-samples的对应版本v12.4.1
-https://github.com/NVIDIA/cuda-samples/releases/tag/v12.4.1
-https://github.com/NVIDIA/cuda-samples/archive/refs/tags/v12.4.1.tar.gz
-
-# cuda-samples的v12.4.1编译。
-make
-
-# 运行示例
-Samples/0_Introduction/asyncAPI/asyncAPI 
-Samples/0_Introduction/cudaOpenMP/cudaOpenMP
-Samples/0_Introduction/matrixMul/matrixMul
-
-1. 实用工具：实用工具示例，演示如何查询设备功能并测量 GPU/CPU 带宽。
-2. 概念与技术：演示 CUDA 相关概念和常用问题解决技术的示例。
-3. CUDA 功能：演示 CUDA 功能的示例（协同组、CUDA 动态并行、CUDA 图形等）。
-4. CUDA 库：演示如何使用 CUDA 平台库（NPP、NVJPEG、NVGRAPH cuBLAS、cuFFT、cuSPARSE、cuSOLVER 和 cuRAND）的示例。
-5. 领域特定：特定于领域的示例（图形、金融、图像处理）。
-6. 性能：演示性能优化的示例。
-7. libNVVM：演示如何使用 libNVVVM 和 NVVM IR 的示例。
 ```
 
 
@@ -329,6 +307,31 @@ NVIDIA Nsight Systems (nsys) 是一款功能强大的系统级性能分析工具
 cuda学习日记(6) nsight system / nsight compute    https://zhuanlan.zhihu.com/p/640344249
 NVIDIA Nsight Systems (nsys) 工具使用    https://www.cnblogs.com/menkeyi/p/18791669
 ```
+
+
+## 三. cuda-samples
+# cuda-12.4的路径。
+/usr/local/cuda-12.4/
+
+# 下载cuda-samples的对应版本v12.4.1
+https://github.com/NVIDIA/cuda-samples/releases/tag/v12.4.1
+https://github.com/NVIDIA/cuda-samples/archive/refs/tags/v12.4.1.tar.gz
+
+# cuda-samples的v12.4.1编译。
+make
+
+# 运行示例
+Samples/0_Introduction/asyncAPI/asyncAPI 
+Samples/0_Introduction/cudaOpenMP/cudaOpenMP
+Samples/0_Introduction/matrixMul/matrixMul
+
+1. 实用工具：实用工具示例，演示如何查询设备功能并测量 GPU/CPU 带宽。
+2. 概念与技术：演示 CUDA 相关概念和常用问题解决技术的示例。
+3. CUDA 功能：演示 CUDA 功能的示例（协同组、CUDA 动态并行、CUDA 图形等）。
+4. CUDA 库：演示如何使用 CUDA 平台库（NPP、NVJPEG、NVGRAPH cuBLAS、cuFFT、cuSPARSE、cuSOLVER 和 cuRAND）的示例。
+5. 领域特定：特定于领域的示例（图形、金融、图像处理）。
+6. 性能：演示性能优化的示例。
+7. libNVVM：演示如何使用 libNVVVM 和 NVVM IR 的示例。
 
 
 #############################################################################################
