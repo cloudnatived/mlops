@@ -1,6 +1,14 @@
 
 # CUDA
+CUDA(Compute Unified Device Architecture)：是一种由 NVIDIA 推出的通用并行计算架构，该架构使 GPU 能够解决复杂的计算问题;，它包括编译器(nvcc)、开发工具、运行时库和驱动等模块，是当今最流行的GPU编程环境
+cuDNN：是基于 CUDA 的深度学习 GPU 加速库，支持常见的深度学习计算类型(卷积、下采样、非线性、Softmax 等)
 
+一个基本的 CUDA 程序架构包含 5 个主要方面：
+分配 GPU 内存
+复制 CPU内存数据到 GPU 内存
+激活 CUDA 内核去执行特定程序的计算
+将数据从 GPU 拷贝 到 CPU 中
+删除 GPU 中的数据
 
 ## Nvidia驱动和CUDA toolkit
 ### apt方式，Ubuntu22.04安装Nvidia 550驱动和CUDA toolkit 12.4.1（包括CUDA、NCCL）
@@ -205,19 +213,6 @@ ncu -i ncu_report.ncu-rep --print-details all --print-units auto --print-metric-
 NVIDIA性能分析工具nsight-compute入门    https://zhuanlan.zhihu.com/p/662012270
 NsightComputeProfiling入门    https://blog.csdn.net/m0_61864577/article/details/140618800
 
-#############################################################################################    
-CUDA (Compute Unified Device Architecture)
-
-```
-CUDA(Compute Unified Device Architecture)：是一种由 NVIDIA 推出的通用并行计算架构，该架构使 GPU 能够解决复杂的计算问题;，它包括编译器(nvcc)、开发工具、运行时库和驱动等模块，是当今最流行的GPU编程环境
-cuDNN：是基于 CUDA 的深度学习 GPU 加速库，支持常见的深度学习计算类型(卷积、下采样、非线性、Softmax 等)
-
-一个基本的 CUDA 程序架构包含 5 个主要方面：
-分配 GPU 内存
-复制 CPU内存数据到 GPU 内存
-激活 CUDA 内核去执行特定程序的计算
-将数据从 GPU 拷贝 到 CPU 中
-删除 GPU 中的数据
 ```
 
 ### NVIDIA Nsight Systems
