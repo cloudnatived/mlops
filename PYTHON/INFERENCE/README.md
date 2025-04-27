@@ -9,10 +9,23 @@ modelscope download --model 'iic/nlp_structbert_word-segmentation_chinese-base' 
 python3 -m sglang.check_env
 
 
+```
+SGLang启动
+CUDA_VISIBLE_DEVICES=5,6,7,8 python3 -m sglang.launch_server --model ~/.cache/modelscope/hub/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B/ --tp 4 --host 0.0.0.0 --port 8000
+
+VLLM启动
+CUDA_VISIBLE_DEVICES=5,6,7,8 vllm serve ~/.cache/modelscope/hub/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B/ --tensor-parallel-size 4 --max-model-len 32768 --enforce-eager --served-model-name DeepSeek-R1-Distill-Qwen-32B --host 0.0.0.0
+
+LMDeply启动
+CUDA_VISIBLE_DEVICES=5,6,7,8 lmdeploy serve api_server  ~/.cache/modelscope/hub/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B/ --tp 4 --server-port 8000 --model-name DeepSeek-R1-Distill-Qwen-32B
+
+```
+
 
 ```
 
 # Sglang
+https://docs.sglang.ai/backend/server_arguments.html
 Sglang部署大模型常用参数详解
 ```
 常用启动命令
