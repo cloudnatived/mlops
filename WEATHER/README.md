@@ -1,5 +1,5 @@
 
-编写MCP weather server的代码示例：
+编写MCP weather server的代码示例：    
 https://github.com/cloudnatived/yx/blob/main/WEATHER/weather.py
 
 使用uv新建一个weather的项目
