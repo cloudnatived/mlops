@@ -1,6 +1,6 @@
 ## 用PyTorch实现MNIST手写数字识别
 
-原文链接：https://nextjournal.com/gkoehler/pytorch-mnist
+原文链接：https://nextjournal.com/gkoehler/pytorch-mnist    
 ​​​​​Keras版本：https://blog.csdn.net/sxf1061700625/article/details/117397030
 
 PyTorch中构建一个简单的卷积神经网络，并使用MNIST数据集训练它识别手写数字。在MNIST数据集上训练分类器可以看作是图像识别的“hello world”。
