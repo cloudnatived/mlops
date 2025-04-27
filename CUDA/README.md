@@ -10,7 +10,7 @@ cuDNN：是基于 CUDA 的深度学习 GPU 加速库，支持常见的深度学�
 将数据从 GPU 拷贝 到 CPU 中
 删除 GPU 中的数据
 
-## Nvidia驱动和CUDA toolkit
+## 一. Nvidia卡驱动和CUDA toolkit
 ### apt方式，Ubuntu22.04安装Nvidia 550驱动和CUDA toolkit 12.4.1（包括CUDA、NCCL）
 
 ```
@@ -178,7 +178,8 @@ Samples/0_Introduction/matrixMul/matrixMul
 
 
     
-## CUDA自带的命令行工具
+## 二.CUDA toolkit中的命令行工具
+### CUDA自带的命令行工具
 ### NVIDIA NVIDIA-smi
 **NVIDIA-smi**：这是NVIDIA提供的命令行工具，用于监控GPU的实时状态。它能够显示GPU利用率、显存使用情况、温度、功耗等关键指标。
 **DCGM（Data Center GPU Manager）**：对于数据中心环境，DCGM提供了更高级的监控和管理功能，支持大规模GPU集群的监控和自动化管理。
