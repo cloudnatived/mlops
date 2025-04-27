@@ -49,19 +49,28 @@ NVIDIA DCGM（Data Center GPU Manager） 是专为数据中心设计的GPU监控
 
 
 ##### **2. 硬件状态指标**
-|指标	含义	典型问题场景
-Temperature	GPU核心温度（℃）	温度过高触发降频，性能下降。
-Power Usage	实时功耗（W）及功耗上限（TDP）	功耗超标导致硬件保护性关机。
-ECC Errors	单比特（Correctable）和多比特（Uncorrectable）ECC内存错误计数	ECC错误过多需更换GPU或排查环境干扰。
-XID Errors	GPU硬件错误代码（如XID 43表示显存错误）	根据XID代码定位硬件故障类型。
-3. 任务与进程级指标
-指标	含义	典型问题场景
-Process Utilization	各进程的GPU计算和显存使用情况	识别异常占用GPU的僵尸进程。
-Compute PID	占用GPU计算资源的进程ID	强制终止失控任务。
-GPU Shared Resources	MIG模式下各GPU实例的资源分配（如计算切片、显存切片）	资源分配不均导致任务排队。
-三、DCGM 的安装与使用
-1. 安装DCGM
 
+
+| **指标**        | **含义**                                                     | **典型问题场景**                     |
+| --------------- | ------------------------------------------------------------ | ------------------------------------ |
+| **Temperature** | GPU核心温度（℃）                                             | 温度过高触发降频，性能下降。         |
+| **Power Usage** | 实时功耗（W）及功耗上限（TDP）                               | 功耗超标导致硬件保护性关机。         |
+| **ECC Errors**  | 单比特（Correctable）和多比特（Uncorrectable）ECC内存错误计数 | ECC错误过多需更换GPU或排查环境干扰。 |
+| **XID Errors**  | GPU硬件错误代码（如XID 43表示显存错误）                      | 根据XID代码定位硬件故障类型。        |
+
+
+##### **3. 任务与进程级指标**
+| **指标**                 | **含义**                                             | **典型问题场景**            |
+| ------------------------ | ---------------------------------------------------- | --------------------------- |
+| **Process Utilization**  | 各进程的GPU计算和显存使用情况                        | 识别异常占用GPU的僵尸进程。 |
+| **Compute PID**          | 占用GPU计算资源的进程ID                              | 强制终止失控任务。          |
+| **GPU Shared Resources** | MIG模式下各GPU实例的资源分配（如计算切片、显存切片） | 资源分配不均导致任务排队。  |
+
+
+
+三、DCGM 的安装与使用
+```
+1. 安装DCGM
 # Ubuntu/Debian
 apt-get install -y datacenter-gpu-manager
 dcgmi --version
@@ -71,57 +80,31 @@ yum install -y datacenter-gpu-manager
 systemctl enable nvidia-dcgm
 systemctl start nvidia-dcgm
 
-    1
-    2
-    3
-    4
-    5
-    6
-    7
-    8
-
 2. 常用命令示例
+实时监控GPU指标（每2秒刷新）：
+dcgmi dmon -i 0 -e 203,252 -c 5
+# -e 指定指标ID（203=GPU利用率，252=显存使用率）
+# -i 指定GPU索引（0表示第一块GPU）
 
-    实时监控GPU指标（每2秒刷新）：
+查看GPU健康状态：
+dcgmi health -g 0 -c
+# 检查GPU 0的健康状态（-c 表示全面检测）
 
-    dcgmi dmon -i 0 -e 203,252 -c 5
-    # -e 指定指标ID（203=GPU利用率，252=显存使用率）
-    # -i 指定GPU索引（0表示第一块GPU）
-        1
-        2
-        3
+统计NVLink带宽：
+dcgmi nvlink -i 0 -s
 
-    查看GPU健康状态：
-
-    dcgmi health -g 0 -c
-    # 检查GPU 0的健康状态（-c 表示全面检测）
-        1
-        2
-
-    统计NVLink带宽：
-
-    dcgmi nvlink -i 0 -s
-    # 显示GPU 0的NVLink状态及带宽
-        1
-        2
-
+# 显示GPU 0的NVLink状态及带宽
+ 
 3. 集成到Prometheus
+部署 DCGM Exporter：
+docker run -d --gpus all --rm -p 9400:9400 nvcr.io/nvidia/k8s/dcgm-exporter:3.3.4-3.1.5-ubuntu22.04
 
-    部署 DCGM Exporter：
-
-    docker run -d --gpus all --rm -p 9400:9400 nvcr.io/nvidia/k8s/dcgm-exporter:3.3.4-3.1.5-ubuntu22.04
-        1
-
-    Prometheus配置添加Job：
-
+Prometheus配置添加Job：
     - job_name: 'dcgm'
       static_configs:
         - targets: ['gpu-node:9400']
-        1
-        2
-        3
 
-    Grafana仪表盘导入模板（官方模板ID）。
+Grafana仪表盘导入模板（官方模板ID）。
 
 四、典型问题排查案例
 案例1：GPU利用率低
@@ -154,15 +137,12 @@ systemctl start nvidia-dcgm
         自动响应GPU事件（如温度超限时降低功耗）。
 
     dcgmi policy --group my_policy --set "temperature,action=throttle,threshold=90"
-        1
 
     数据记录与回放
         记录历史指标用于事后分析：
 
         dcgmi recorder --start -f /tmp/gpu_metrics.log
         dcgmi replay -f /tmp/gpu_metrics.log
-            1
-            2
 
     MIG监控
         查看MIG实例的资源分配：
@@ -180,4 +160,5 @@ systemctl start nvidia-dcgm
 参考资料：
 GPU监控工具DCGM    https://blog.csdn.net/Franklin7B/article/details/145585589
 
+```
 
