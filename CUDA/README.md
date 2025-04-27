@@ -178,7 +178,7 @@ Samples/0_Introduction/matrixMul/matrixMul
 
 
     
-## 二.CUDA toolkit中的命令行工具
+## 二. CUDA toolkit中的命令行工具
 ### CUDA自带的命令行工具
 ### NVIDIA NVIDIA-smi
 **NVIDIA-smi**：这是NVIDIA提供的命令行工具，用于监控GPU的实时状态。它能够显示GPU利用率、显存使用情况、温度、功耗等关键指标。
