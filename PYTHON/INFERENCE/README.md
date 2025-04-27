@@ -10,6 +10,8 @@ python3 -m sglang.check_env
 
 
 ```
+
+```
 SGLang启动
 CUDA_VISIBLE_DEVICES=5,6,7,8 python3 -m sglang.launch_server --model ~/.cache/modelscope/hub/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B/ --tp 4 --host 0.0.0.0 --port 8000
 
@@ -22,7 +24,7 @@ CUDA_VISIBLE_DEVICES=5,6,7,8 lmdeploy serve api_server  ~/.cache/modelscope/hub/
 ```
 
 
-```
+
 
 # Sglang
 https://docs.sglang.ai/backend/server_arguments.html
