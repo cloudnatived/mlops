@@ -9,7 +9,7 @@ DCGM Exporter       https://github.com/NVIDIA/dcgm-exporter
 
 
 ## GPU监控工具DCGM
-```
+
 NVIDIA DCGM（Data Center GPU Manager） 是专为数据中心设计的GPU监控与管理工具，支持实时监控、性能分析和自动化运维。以下是DCGM的核心功能及其监控的GPU关键指标详解：
 
 一、DCGM 的核心功能
@@ -191,4 +191,4 @@ systemctl start nvidia-dcgm
 参考资料：
 GPU监控工具DCGM    https://blog.csdn.net/Franklin7B/article/details/145585589
 
-```
+
