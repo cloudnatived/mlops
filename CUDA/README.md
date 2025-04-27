@@ -1,7 +1,9 @@
 
-### 2.1.Nvidia驱动和CUDA toolkit
+# CUDA
 
-apt方式，Ubuntu22.04安装Nvidia 550驱动和CUDA toolkit 12.4.1（包括CUDA、NCCL）
+
+## Nvidia驱动和CUDA toolkit
+### apt方式，Ubuntu22.04安装Nvidia 550驱动和CUDA toolkit 12.4.1（包括CUDA、NCCL）
 
 ```
 1. 安装显卡驱动550版本：
@@ -49,9 +51,8 @@ dpkg -l | grep nvidia（如果卸载干净了，这条指令后将无提示。�
 
 
 
-### 2.2.Nvidia驱动和CUDA toolkit的run文件安装
-
-在nvidia.com选择合适版本的Nvidia的driver的run文件安装（（包括驱动、CUDA、NCCL））。
+### Nvidia驱动和CUDA toolkit的run文件安装
+### 在nvidia.com选择合适版本的Nvidia的driver的run文件安装（（包括驱动、CUDA、NCCL））
 
 ```
 https://www.nvidia.cn/drivers/lookup/
@@ -110,7 +111,7 @@ EOF
 # 工作中碰到的实际问题。
 4090卡最低驱动CUDA-12.8，H200最低驱动CUDA-12.6。但是在CUDA-12.6中，有一些NCCL的通讯支持有各种问题。
 ```
-
+    
 ## CUDA的工具包
 ### NVIDIA NVIDIA-smi
 **NVIDIA-smi**：这是NVIDIA提供的命令行工具，用于监控GPU的实时状态。它能够显示GPU利用率、显存使用情况、温度、功耗等关键指标。
@@ -150,14 +151,15 @@ nvidia-smi --query-gpu=utilization.gpu,memory.used --format=csv -i 0
 dcgmi discovery -l
 dcgmi dmon -e 1001 -d 1
 ```
-
+    
 ### NVIDIA Nsight Compute
+```
 Nsight系列工具中的一个组件，专门用于CUDA核函数的性能分析，它是更接近内核的分析。它允许开发人员对 CUDA 核函数进行详细的性能分析，包括核函数的时间分布、内存访问模式、并行性、指令分发等。Nsight Compute提供了许多有用的数据和图形化的界面，帮助开发人员深入理解和优化核函数的性能。
 ncu命令主要分析kernel内部的带宽、活跃线程数、warp利用率等。
 地址：https://developer.nvidia.com/nsight-compute
 DOC：https://developer.nvidia.com/tools-overview/nsight-compute/get-started
 
-# nsight-compute包含在cuda的目录里。
+nsight-compute包含在cuda的目录里。
 /usr/local/cuda-12.4/nsight-compute-2024.1.1/
 
 比较常用的分析：
