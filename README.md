@@ -30,7 +30,8 @@ mpiexec -n 4 ./nccl-reducempi
 nvcc nccl-softmax.cu -o nccl-softmax -lnccl -lmpi -L /usr/lib64/mpich-3.2/lib/ -I /usr/include/mpich-3.2-x86_64
 
 ##Cuda stream #jacobi迭代结合NCCL和MPI的多卡算法
-nvcc nccl-mpi-jacobi.cu -o nccl-mpi-jacobi -lnccl -lmpi -L /usr/lib64/mpich-3.2/lib/ -I /usr/include/mpich-3.2-x86_64 mpiexec -n 2
+nvcc nccl-mpi-jacobi.cu -o nccl-mpi-jacobi -lnccl -lmpi -L /usr/lib64/mpich-3.2/lib/ -I /usr/include/mpich-3.2-x86_64
+mpiexec -n 2
 ./nccl-mpi-jacobi，表示使用nranks=2个进程。
 
 #jacobi迭代结合NCCL的多卡算法
