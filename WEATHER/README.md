@@ -12,7 +12,7 @@ source .venv/bin/activate
 安装httpx依赖
 uv add "mcp[cli]“ httpx
 
-![](IMAGES\MCP-0.png)
+![](IMAGES/MCP-0.png)
 
 
 weather.py：一个示例 MCP Server，可用于天气预告和天气预警，代码主要来自 MCP 官方示例。
