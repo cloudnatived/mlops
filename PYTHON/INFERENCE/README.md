@@ -29,9 +29,11 @@ CUDA_VISIBLE_DEVICES=5,6,7,8 lmdeploy serve api_server  ~/.cache/modelscope/hub/
 
 
 
-# Sglang
-https://docs.sglang.ai/backend/server_arguments.html
-Sglang部署大模型常用参数详解
+## Sglang
+https://docs.sglang.ai/backend/server_arguments.html   
+
+Sglang部署大模型常用参数详解   
+
 ```
 常用启动命令
 要启用多GPU张量并行性，请添加 --tp 2。如果报告错误“这些设备之间不支持对等访问”，请在服务器启动命令中添加 --enable-p2p-check。
@@ -59,7 +61,6 @@ python -m sglang.launch_server --model-path meta-llama/Meta-Llama-3-8B-Instruct 
 python -m sglang.launch_server --model-path meta-llama/Meta-Llama-3-8B-Instruct --tp 4 --dist-init-addr sgl-dev-0:50000 --nnodes 2 --node-rank 1
 
 模型和分词器参数说明：
-
 model_path: 模型存放的路径，该模型将会被加载用于服务。
 tokenizer_path: 默认与model_path相同。这是分词器文件所在的路径。
 tokenizer_mode: 默认为auto模式，具体不同模式可以参考相关文档。
@@ -307,6 +308,6 @@ flashinfer_mla_disable_ragged: 当启用enable_flashinfer_mla时，应使用此�
   --ds-heavy-token-num DS_HEAVY_TOKEN_NUM
                         双重稀疏性注意力中的重型token数量
   --ds-heavy-channel-type DS_HEAVY_CHANNEL_TYPE
-
+```
 
 ```
