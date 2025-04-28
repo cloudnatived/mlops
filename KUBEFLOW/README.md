@@ -348,6 +348,11 @@ Kubernetes各组件参数配置优化建议    https://blog.csdn.net/ywq935/arti
 
 ### 4.2.Kubeflow manifests-1.9.1 部署笔记
 
+
+
+
+![](IMAGES/kubeflow-ecosystem-20250415192618.png)
+
 Kubeflow manifests-1.9.1
 
 
