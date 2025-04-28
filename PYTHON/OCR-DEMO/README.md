@@ -44,7 +44,7 @@ pip3 install packaging
 pip3 install addict
 pip3 install datasets==2.21.0
 pip3 install torch
-pip3 install opencv-python
+pip3 install opencv-python  # 图像预处理工具（transforms 依赖）
 pip3 install gradio
 pip3 install torchvision
 pip3 install simplejson
@@ -58,9 +58,9 @@ tensorflow和keras的对应版本关系，可以参考本文，也可以在Stack
 cat requirement.txt 
 #################################
 transformers>=4.37.0
-modelscope>=1.9.5
-numpy>=1.22.3
-gradio>=4.8.0
+modelscope>=1.9.5  # ModelScope 核心库，支持模型推理和管道操作
+numpy>=1.22.3   # 数值计算基础库
+gradio>=4.8.0  # 交互式 Web 应用框架
 tf_slim==1.1.0
 tensorflow==2.12.0  #否则会出错
 pyclipper==1.3.0.post5
