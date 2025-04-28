@@ -1,4 +1,4 @@
-# table Diffusion文生图
+# Stable Diffusion文生图
   
   
   
