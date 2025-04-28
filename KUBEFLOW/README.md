@@ -1529,7 +1529,7 @@ for epoch in range(10):  # 假设训练10个epoch
 
 
 
-** Kubernetes 部署文件 (deployment.yaml) **
+**Kubernetes 部署文件 (deployment.yaml)**
 
 ```
 deployment.yaml
