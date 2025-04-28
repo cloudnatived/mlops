@@ -1571,18 +1571,17 @@ spec:
 
 
 
-注意事项：
-1.环境变量：在Kubernetes部署中，MASTER_ADDR 和 MASTER_PORT 需要正确设置以确保Pod之间可以通信。在真实的Kubernetes环境中，你可能需要使用服务（Service）来发现其他Pods。
-2.World Size 和 Local Rank：在分布式训练中，WORLD_SIZE 表示总的进程数，而 LOCAL_RANK 表示当前进程的唯一标识符。在Kubernetes中，你可能需要使用更复杂的逻辑来设置这些值，例如通过StatefulSet或Downward API。
-3.GPU资源：在deployment.yaml中，我们请求了每个Pod一个GPU。确保你的Kubernetes集群有足够的GPU资源。
-4.代码和配置调整：根据你的具体模型和训练需求，你可能需要调整训练脚本和DeepSpeed配置。
-示例提供了一个基本的框架，但是，在生产环境中部署分布式训练任务通常需要更多的配置和优化。
+注意事项：  
+1.环境变量：在Kubernetes部署中，MASTER_ADDR 和 MASTER_PORT 需要正确设置以确保Pod之间可以通信。在真实的Kubernetes环境中，你可能需要使用服务（Service）来发现其他Pods。  
+2.World Size 和 Local Rank：在分布式训练中，WORLD_SIZE 表示总的进程数，而 LOCAL_RANK 表示当前进程的唯一标识符。在Kubernetes中，你可能需要使用更复杂的逻辑来设置这些值，例如通过StatefulSet或Downward API。  
+3.GPU资源：在deployment.yaml中，我们请求了每个Pod一个GPU。确保你的Kubernetes集群有足够的GPU资源。  
+4.代码和配置调整：根据你的具体模型和训练需求，你可能需要调整训练脚本和DeepSpeed配置。  
+示例提供了一个基本的框架，但是，在生产环境中部署分布式训练任务通常需要更多的配置和优化。    
+  
+Kubeflow的借助TFJob简化了作业的配置。Volcano通过简单的增加一行配置就可以让用户启动组调度、Task-topology等功能来解决死锁、亲和性等问题，在大规模分布式训练情况下，可以有效的缩短整体训练时间。  
+Kubeflow 和 Volcano两个开源项目的结合充分简化和加速了Kubernetes上AI计算进程。当前已经成为越来越多用户的最佳选择，应用于生产环境。  
 
-Kubeflow的借助TFJob简化了作业的配置。Volcano通过简单的增加一行配置就可以让用户启动组调度、Task-topology等功能来解决死锁、亲和性等问题，在大规模分布式训练情况下，可以有效的缩短整体训练时间。
-总结
-Kubeflow 和 Volcano两个开源项目的结合充分简化和加速了Kubernetes上AI计算进程。当前已经成为越来越多用户的最佳选择，应用于生产环境。
 
-
-参考资料：
-基于Kubernetes和DeepSpeed进行分布式训练的实战教程    https://blog.csdn.net/myTomorrow_better/article/details/139515425
-Kubeflow+Volcano：使用K8s轻松完成AI计算    https://zhuanlan.zhihu.com/p/657157700
+参考资料：  
+基于Kubernetes和DeepSpeed进行分布式训练的实战教程    https://blog.csdn.net/myTomorrow_better/article/details/139515425  
+Kubeflow+Volcano：使用K8s轻松完成AI计算    https://zhuanlan.zhihu.com/p/657157700  
