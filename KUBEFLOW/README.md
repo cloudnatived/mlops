@@ -338,18 +338,18 @@ vim /etc/systemd/system/containerd.service.d/http-proxy.conf;
 
 
 
-kubernetes优化
-参考文档：
-大规模场景下 kubernetes 集群的性能优化    https://zhuanlan.zhihu.com/p/111244925
-Kubernetes：k8s优化大法（江湖失传已久的武林秘籍）    https://www.cnblogs.com/unqiang/p/18360801
-17个应该了解的Kubernetes优化    https://cloud.tencent.com/developer/article/2402219
-如何优化Kubernetes的性能和资源利用率优化    https://blog.csdn.net/u010349629/article/details/130638445
-Kubernetes各组件参数配置优化建议    https://blog.csdn.net/ywq935/article/details/103124541
-
+kubernetes优化  
+参考文档：  
+大规模场景下 kubernetes 集群的性能优化    https://zhuanlan.zhihu.com/p/111244925  
+Kubernetes：k8s优化大法（江湖失传已久的武林秘籍）    https://www.cnblogs.com/unqiang/p/18360801  
+17个应该了解的Kubernetes优化    https://cloud.tencent.com/developer/article/2402219  
+如何优化Kubernetes的性能和资源利用率优化    https://blog.csdn.net/u010349629/article/details/130638445  
+Kubernetes各组件参数配置优化建议    https://blog.csdn.net/ywq935/article/details/103124541  
+  
 ### 4.2.Kubeflow manifests-1.9.1 部署笔记
-
-
-
+  
+  
+  
 
 ![](../IMAGES/kubeflow-ecosystem-20250415192618.png)
 
