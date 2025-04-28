@@ -310,6 +310,7 @@ NVIDIA Nsight Systems (nsys) 工具使用    https://www.cnblogs.com/menkeyi/p/1
 
 
 ## 三. cuda-samples
+cuda-samples每个版本都与CUDA toolkit对应  
 ```
 # cuda-12.4的路径。
 /usr/local/cuda-12.4/
@@ -340,10 +341,62 @@ Samples/0_Introduction/matrixMul/matrixMul
 
 
 ## 四. NVIDIA CUDA Library Samples
+
 NVIDIA CUDA Library Samples 项目是由 NVIDIA 公司开发并开源的，旨在展示如何使用 GPU 加速库进行高性能计算。这些库包括数学运算、图像处理、信号处理、线性代数和压缩等多个领域。项目中的示例代码展示了如何利用这些库来加速各种计算任务。    
 主要的编程语言是 C++ 和 CUDA C/C++，因为这些语言能够充分利用 GPU 的并行计算能力。    
 
+The CUDA Library Samples repository contains various examples that demonstrate the use of GPU-accelerated libraries in CUDA. These libraries enable high-performance computing in a wide range of applications, including math operations, image processing, signal processing, linear algebra, and compression. The samples included cover:
 
+    Math and Image Processing Libraries
+    cuBLAS (Basic Linear Algebra Subprograms)
+    cuTENSOR (Tensor Linear Algebra)
+    cuSPARSE (Sparse Matrix Operations)
+    cuSOLVER (Dense and Sparse Solvers)
+    cuFFT (Fast Fourier Transform)
+    cuRAND (Random Number Generation)
+    NPP (Image and Video Processing)
+    nvJPEG (JPEG Encode/Decode)
+    nvCOMP (Data Compression)
+
+Library Examples
+
+Explore the examples of each CUDA library included in this repository:
+
+    cuBLAS - GPU-accelerated basic linear algebra (BLAS) library
+    cuBLASLt - Lightweight BLAS library
+    cuBLASMp - Multi-process BLAS library
+    cuBLASDx - Device-side BLAS extensions
+    cuDSS - GPU-accelerated linear solvers
+    cuFFT - Fast Fourier Transforms
+    cuFFTMp - Multi-process FFT
+    cuFFTDx - Device-side FFT extensions
+    cuPQC - Post-Quantum Cryptography device library
+    cuRAND - Random number generation
+    cuSOLVER - Dense and sparse direct solvers
+    cuSOLVERMp - Multi-process solvers
+    cuSOLVERSp2cuDSS - Transition example from cuSOLVERSp/Rf to cuDSS
+    cuSPARSE - BLAS for sparse matrices
+    cuSPARSELt - Lightweight BLAS for sparse matrices
+    cuTENSOR - Tensor linear algebra library
+    cuTENSORMg - Multi-GPU tensor linear algebra
+    NPP - GPU-accelerated image, video, and signal processing functions
+    NPP+ - C++ extensions for NPP
+    nvJPEG - High-performance JPEG encode/decode
+    nvJPEG2000 - JPEG2000 encoding/decoding
+    nvTIFF - TIFF encoding/decoding
+    nvCOMP - Data compression and decompression
+
+Each sample provides a practical use case for how to apply these libraries in real-world scenarios, showcasing the power and flexibility of CUDA for a wide variety of computational needs.
+Additional Resources
+
+For more information and documentation on CUDA libraries, please visit:
+
+    CUDA Toolkit Documentation
+    NVIDIA Developer Zone
+    CUDA Samples
+
+
+    
 
 参考资料：
 
