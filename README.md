@@ -224,10 +224,10 @@ a)问题: ARM64上跑报错：ImportError: /lib/aarch64-linux-gnu/libgomp.so.1: 
 LD_LIBRARY_PATH=/usr/local/cuda-9.0/lib64;/usr/local/lib
 
 
-1.3 Keras:
+1.3 Keras:  
 K.batch_dot与dot的区别
-需要注意的是，shape=(n, )的才是一维向量，shape(n,1)已经变成张量了。
-keras.dot实际上并不进行实际的计算，只是在matmul上加了一层封装，用于适配一维dot product和稀疏向量计算时的优化，对nD张量进行相乘的规则进行补充。直接读源码：
+需要注意的是，shape=(n, )的才是一维向量，shape(n,1)已经变成张量了。  
+keras.dot实际上并不进行实际的计算，只是在matmul上加了一层封装，用于适配一维dot product和稀疏向量计算时的优化，对nD张量进行相乘的规则进行补充。直接读源码：  
 ```
 if ndim(x) is not None and (ndim(x) > 2 or ndim(y) > 2):
     # 对`nD`张量进行相乘的规则进行补充
