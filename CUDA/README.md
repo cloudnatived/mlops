@@ -310,6 +310,7 @@ NVIDIA Nsight Systems (nsys) 工具使用    https://www.cnblogs.com/menkeyi/p/1
 
 
 ## 三. cuda-samples
+```
 # cuda-12.4的路径。
 /usr/local/cuda-12.4/
 
@@ -334,15 +335,8 @@ Samples/0_Introduction/matrixMul/matrixMul
 7. libNVVM：演示如何使用 libNVVVM 和 NVVM IR 的示例。
 
 
-#############################################################################################
-CUDA（一）：CUDA 编程基础
-实践：PyTorch自定义CUDA算子
 
-
-#############################################################################################
-
-
-
+```
 
 
 参考资料：
