@@ -45,23 +45,23 @@ nvcc nccl-overlay.cu -o nccl-overlay -lnccl -lmpi -L /usr/lib64/mpich-3.2/lib/ -
 
 ```
 
-AI基础架构的工作经验要能解决问题：
-1. 给出项目所涉及到的模型类型、模型参数、模型场景。要求推算出适配的GPU卡型号、GPU卡数量、所需的交换机路由器、数据中心要求、整体投入、并行方式、优化方法。
-2. 给出GPU服务器数量。要求计算算力，可承载的训练任务。
-3. 参考架构方法、设计方法，不断完善整体架构设计。
-4. 跨职级、跨层级、跨团队、跨角色职位，定位问题根本原因、并解决所有技术和非技术细节问题。
+AI基础架构的工作经验要能解决问题：    
+1. 给出项目所涉及到的模型类型、模型参数、模型场景。要求推算出适配的GPU卡型号、GPU卡数量、所需的交换机路由器、数据中心要求、整体投入、并行方式、优化方法。    
+2. 给出GPU服务器数量。要求计算算力，可承载的训练任务。    
+3. 参考架构方法、设计方法，不断完善整体架构设计。    
+4. 跨职级、跨层级、跨团队、跨角色职位，定位问题根本原因、并解决所有技术和非技术细节问题。    
 
 
 
 MLOps工程的讲解。
 一些商业公司关于MLOps工程的文档举例：
-What Is MLOps?    https://blogs.nvidia.com/blog/what-is-mlops/
-什么是 MLOps？    https://www.ibm.com/cn-zh/topics/mlops
-什么是 MLOps？    https://aws.amazon.com/cn/what-is/mlops/
-ML：MLOps系列讲解之《MLOps的定义与发展—你为什么可能想使用机器学习》解读    https://developer.aliyun.com/article/988593
-亚马逊 SageMaker AI 开发人员指南    https://docs.aws.amazon.com/zh_cn/sagemaker/latest/dg/how-it-works-training.html
-适用于 MLOps 的 Amazon SageMaker    https://aws.amazon.com/cn/sagemaker-ai/mlops/
-阿里云人工智能平台PAI    https://help.aliyun.com/zh/pai/getting-started/getting-started
+What Is MLOps?    https://blogs.nvidia.com/blog/what-is-mlops/    
+什么是 MLOps？    https://www.ibm.com/cn-zh/topics/mlops    
+什么是 MLOps？    https://aws.amazon.com/cn/what-is/mlops/    
+ML：MLOps系列讲解之《MLOps的定义与发展—你为什么可能想使用机器学习》解读    https://developer.aliyun.com/article/988593    
+亚马逊 SageMaker AI 开发人员指南    https://docs.aws.amazon.com/zh_cn/sagemaker/latest/dg/how-it-works-training.html    
+适用于 MLOps 的 Amazon SageMaker    https://aws.amazon.com/cn/sagemaker-ai/mlops/    
+阿里云人工智能平台PAI    https://help.aliyun.com/zh/pai/getting-started/getting-started    
 
 
 
