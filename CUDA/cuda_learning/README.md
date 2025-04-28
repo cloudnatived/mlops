@@ -173,7 +173,7 @@ nvcc reduce_gpu.cu -DUSE_DP -o reduce_dp
 
 ```
 
-# CUDA（三）：通用矩阵乘法：从入门到熟练
+# CUDA（三）：通用矩阵乘法，从入门到熟练
 
 
 # CUDA（四）：使用 CUDA 实现 Transformer 结构
