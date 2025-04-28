@@ -352,6 +352,7 @@ BN层具有加速训练速度，有效防止梯度消失与梯度爆炸，具有
 （1）Grid Search：网格搜索，在所有候选的参数选择中，通过循环遍历，尝试每一种可能性，表现最好的参数就是最终的结果。其原理就像是在数组里找最大值。缺点是太费时间了，特别像神经网络，一般尝试不了太多的参数组合。    
 （2）Random Search：经验上，Random Search比Gird Search更有效。实际操作的时候，一般也是先用Gird Search的方法，得到所有候选参数，然后每次从中随机选择进行训练。另外Random Search往往会和由粗到细的调参策略结合使用，即在效果比较好的参数附近进行更加精细的搜索。    
 （3）Bayesian Optimization：贝叶斯优化，考虑到了不同参数对应的 实验结果值，因此更节省时间，贝叶斯调参比Grid Search迭代次数少， 速度快；而且其针对非凸问题依然稳健。    
+
 参数随机初始化与数据预处理：    
 参数初始化很重要，它决定了模型的训练速度与是否可以躲开局部极小。relu激活函数初始化推荐使用He normal，tanh初始化推荐使用Glorot normal，其中Glorot normal也称作Xavier normal初始化；数据预处理方法一般也就采用数据归一化即可。    
 “Xavier”初始化方法是一种很有效的神经网络初始化方法，方法来源于2010年的一篇论文《Understanding the difficulty of training deep feedforward neural networks》。    
