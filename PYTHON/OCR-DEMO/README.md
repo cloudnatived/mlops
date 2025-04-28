@@ -25,22 +25,34 @@ OCR模型发展历史介绍可以参考：OCR文字识别方法综述-阿里云�
 ConvNextViT模型原理介绍：主要还是基于ConvTrans + CTC的框架
 读光OCR系列模型中涉及的ConvNextViT模型，主要包括三个主要部分，Convolutional Backbone提取图像视觉特征，ConvTransformer Blocks用于对视觉特征进行上下文建模，最后连接CTC loss进行识别解码以及网络梯度优化。识别模型结构如下图
 
+这些模型会保存在：
+/root/.cache/modelscope/hub/models/damo/
+drwxr-xr-x 3 root root 4096  4月 28 19:08 cv_convnextTiny_ocr-recognition-document_damo/
+drwxr-xr-x 3 root root 4096  4月 28 19:06 cv_convnextTiny_ocr-recognition-general_damo/
+drwxr-xr-x 3 root root 4096  4月 28 19:07 cv_convnextTiny_ocr-recognition-handwritten_damo/
+drwxr-xr-x 3 root root 4096  4月 28 19:10 cv_convnextTiny_ocr-recognition-licenseplate_damo/
+drwxr-xr-x 3 root root 4096  4月 28 19:09 cv_convnextTiny_ocr-recognition-scene_damo/
+drwxr-xr-x 3 root root 4096  4月 28 19:05 cv_resnet18_license-plate-detection_damo/
+drwxr-xr-x 4 root root 4096  4月 28 17:55 cv_resnet18_ocr-detection-line-level_damo/
+
 
 2. 环境依赖
 requirement.txt，版本依赖不对可能会导致各种报错，
 tensorflow和keras的对应版本关系，可以参考本文，也可以在Stack Overflow上搜搜solution
+
+cat requirement.txt 
 #################################
-python==3.8
 transformers>=4.37.0
 modelscope>=1.9.5
 numpy>=1.22.3
 gradio>=4.8.0
 tf_slim==1.1.0
-tensorflow==2.12.0
+tensorflow==2.12.0  #否则会出错
 pyclipper==1.3.0.post5
 shapely==2.0.3
 keras==2.12.0
 typing_extensions==4.10.0
+datasets==2.21.0   #否则会出错
 #################################
 
 然后，OCR文字识别这个应用场景下，没有GPU也是OK的，但如果你装了GPU版本的tensorflow代码会默认在GPU上运行。这些依赖都搞定以后，咱们就可以通过下面这部分的代码自验，并且开始下载对应的ConvNextViT模型了
@@ -229,13 +241,12 @@ demo.launch()
 
 # 端口转发/SSH隧道
 （本地执行）ssh -L 9000:127.0.0.1:7860 用户ID@远程机器IP
-然后本地访问 http://127.0.0.1:9000/ 即可！
+访问 http://127.0.0.1:9000/ 
 
 
 
 三、效果展示
-好啦，如此一来，一个本地的OCR文字识别应用就构建完毕啦！随便传张图看看效果：
-
+本地的OCR文字识别应用就构建完毕啦！随便传张图看看效果：
 
 通用场景
 
