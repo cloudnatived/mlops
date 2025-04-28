@@ -335,62 +335,58 @@ keras.batch_dot函数源码分析
 ReLU为什么比Sigmoid效果好_algorithm_image的博客-CSDN博客_relu对模型的影响
 ​blog.csdn.net/algorithm_image/article/details/78042429
 
-学习率设定：
-一般学习率从0.1或0.01开始尝试。学习率设置太大会导致训练十分不稳定，甚至出现Nan，设置太小会导致损失下降太慢。学习率一般要随着训练进行衰减。衰减系数设0.1，0.3，0.5均可，衰减时机，可以是验证集准确率不再上升时，或固定训练多少个周期以后自动进行衰减。
-防止过拟合：
-一般常用的防止过拟合方法有使用L1正则项、L2正则项、dropout、提前终止、数据集扩充等。如果模型在训练集上表现比较好但在测试集上表现欠佳可以选择增大L1或L2正则的惩罚力度（L2正则经验上首选1.0，超过10很少见），或增大dropout的随机失活概率（经验首选0.5）；或者当随着训练的持续在测试集上不增反降时，使用提前终止训练的方法。当然最有效的还是增大训练集的规模，实在难以获得新数据也可以使用数据集增强的方法，比如CV任务可以对数据集进行裁剪、翻转、平移等方法进行数据集增强，这种方法往往都会提高最后模型的测试精度。
-优化器选择：
-如果数据是稀疏的，就用自适应方法，即 Adagrad, Adadelta, RMSprop, Adam。整体来讲，Adam 是最好的选择。SGD 虽然能达到极小值，但是比其它算法用的时间长，而且可能会被困在鞍点。如果需要更快的收敛，或者是训练更深更复杂的神经网络，需要用一种自适应的算法。
-残差块与BN层：
-如果你希望训练一个更深更复杂的网络，那么残差块绝对是一个重要的组件，它可以让你的网络训练的更深。
-BN层具有加速训练速度，有效防止梯度消失与梯度爆炸，具有防止过拟合的效果，所以构建网络时最好要加上这个组件。
-自动调参方法：
-（1）Grid Search：网格搜索，在所有候选的参数选择中，通过循环遍历，尝试每一种可能性，表现最好的参数就是最终的结果。其原理就像是在数组里找最大值。缺点是太费时间了，特别像神经网络，一般尝试不了太多的参数组合。
-（2）Random Search：经验上，Random Search比Gird Search更有效。实际操作的时候，一般也是先用Gird Search的方法，得到所有候选参数，然后每次从中随机选择进行训练。另外Random Search往往会和由粗到细的调参策略结合使用，即在效果比较好的参数附近进行更加精细的搜索。
-（3）Bayesian Optimization：贝叶斯优化，考虑到了不同参数对应的 实验结果值，因此更节省时间，贝叶斯调参比Grid Search迭代次数少， 速度快；而且其针对非凸问题依然稳健。
-参数随机初始化与数据预处理：
-参数初始化很重要，它决定了模型的训练速度与是否可以躲开局部极小。relu激活函数初始化推荐使用He normal，tanh初始化推荐使用Glorot normal，其中Glorot normal也称作Xavier normal初始化；数据预处理方法一般也就采用数据归一化即可。
-“Xavier”初始化方法是一种很有效的神经网络初始化方法，方法来源于2010年的一篇论文《Understanding the difficulty of training deep feedforward neural networks》。
+学习率设定：    
+一般学习率从0.1或0.01开始尝试。学习率设置太大会导致训练十分不稳定，甚至出现Nan，设置太小会导致损失下降太慢。学习率一般要随着训练进行衰减。衰减系数设0.1，0.3，0.5均可，衰减时机，可以是验证集准确率不再上升时，或固定训练多少个周期以后自动进行衰减。    
+防止过拟合：    
+一般常用的防止过拟合方法有使用L1正则项、L2正则项、dropout、提前终止、数据集扩充等。如果模型在训练集上表现比较好但在测试集上表现欠佳可以选择增大L1或L2正则的惩罚力度（L2正则经验上首选1.0，超过10很少见），或增大dropout的随机失活概率（经验首选0.5）；或者当随着训练的持续在测试集上不增反降时，使用提前终止训练的方法。当然最有效的还是增大训练集的规模，实在难以获得新数据也可以使用数据集增强的方法，比如CV任务可以对数据集进行裁剪、翻转、平移等方法进行数据集增强，这种方法往往都会提高最后模型的测试精度。    
+优化器选择：    
+如果数据是稀疏的，就用自适应方法，即 Adagrad, Adadelta, RMSprop, Adam。整体来讲，Adam 是最好的选择。SGD 虽然能达到极小值，但是比其它算法用的时间长，而且可能会被困在鞍点。如果需要更快的收敛，或者是训练更深更复杂的神经网络，需要用一种自适应的算法。    
+残差块与BN层：    
+如果你希望训练一个更深更复杂的网络，那么残差块绝对是一个重要的组件，它可以让你的网络训练的更深。    
+BN层具有加速训练速度，有效防止梯度消失与梯度爆炸，具有防止过拟合的效果，所以构建网络时最好要加上这个组件。    
+自动调参方法：    
+（1）Grid Search：网格搜索，在所有候选的参数选择中，通过循环遍历，尝试每一种可能性，表现最好的参数就是最终的结果。其原理就像是在数组里找最大值。缺点是太费时间了，特别像神经网络，一般尝试不了太多的参数组合。    
+（2）Random Search：经验上，Random Search比Gird Search更有效。实际操作的时候，一般也是先用Gird Search的方法，得到所有候选参数，然后每次从中随机选择进行训练。另外Random Search往往会和由粗到细的调参策略结合使用，即在效果比较好的参数附近进行更加精细的搜索。    
+（3）Bayesian Optimization：贝叶斯优化，考虑到了不同参数对应的 实验结果值，因此更节省时间，贝叶斯调参比Grid Search迭代次数少， 速度快；而且其针对非凸问题依然稳健。    
+参数随机初始化与数据预处理：    
+参数初始化很重要，它决定了模型的训练速度与是否可以躲开局部极小。relu激活函数初始化推荐使用He normal，tanh初始化推荐使用Glorot normal，其中Glorot normal也称作Xavier normal初始化；数据预处理方法一般也就采用数据归一化即可。    
+“Xavier”初始化方法是一种很有效的神经网络初始化方法，方法来源于2010年的一篇论文《Understanding the difficulty of training deep feedforward neural networks》。    
 
-主要的目标就是使得每一层输出的方差应该尽量相等。
+主要的目标就是使得每一层输出的方差应该尽量相等。    
 
 
-三. 模型优化：
-3.1 模型不收敛：
-a）learning rate设大了会带来跑飞（loss突然很大）的问题
+三. 模型优化：    
+3.1 模型不收敛：    
+a）learning rate设大了会带来跑飞（loss突然很大）的问题    
 这个是新手最常见的情况——为啥网络跑着跑着看着要收敛了结果突然飞了呢？可能性最大的原因是你用了relu作为激活函数的同时使用了softmax或者带有exp的函数做分类层的loss函数。当某一次训练传到最后一层的时候，某一节点激活过度（比如100），那么exp(100)=Inf，发生溢出，bp后所有的weight会变成NAN，然后从此之后weight就会一直保持NAN，于是loss就飞起来辣。我的depth estimation相关项目的loss曲线，如下：
-可以看出跑飞了，（幸lr设的并不是非常大所以又拉了回来）。如果lr设的过大会出现跑飞再也回不来的情况。这时候你停一下随便挑一个层的weights看一看，很有可能都是NAN了。对于这种情况建议用二分法尝试。0.1~0.0001.不同模型不同任务最优的lr都不一样。
+可以看出跑飞了，（幸lr设的并不是非常大所以又拉了回来）。如果lr设的过大会出现跑飞再也回不来的情况。这时候你停一下随便挑一个层的weights看一看，很有可能都是NAN了。对于这种情况建议用二分法尝试。0.1~0.0001.不同模型不同任务最优的lr都不一样。    
 
-b）数据库太小一般不会带来不收敛的问题
+b）数据库太小一般不会带来不收敛的问题    
+只要你一直在train总会收敛（rp问题跑飞了不算）。反而不收敛一般是由于样本的信息量太大导致网络不足以fit住整个样本空间。样本少只可能带来过拟合的问题，你看下你的training set上的loss收敛了吗？如果只是validate set上不收敛那就说明overfitting了，这时候就要考虑各种anti-overfit的trick了，比如dropout，SGD，增大minibatch的数量，减少fc层的节点数量，momentum，finetune等。    
 
-只要你一直在train总会收敛（rp问题跑飞了不算）。反而不收敛一般是由于样本的信息量太大导致网络不足以fit住整个样本空间。样本少只可能带来过拟合的问题，你看下你的training set上的loss收敛了吗？如果只是validate set上不收敛那就说明overfitting了，这时候就要考虑各种anti-overfit的trick了，比如dropout，SGD，增大minibatch的数量，减少fc层的节点数量，momentum，finetune等。
+c）尽量用小模型。    
+如果数据太少尽量缩小模型复杂度。考虑减少层数或者减少kernel number。    
 
-c）尽量用小模型。
+3.2 Loss不下降：    
+a）train loss与test loss结果分析    
+train loss 不断下降，test loss不断下降，说明网络仍在学习;    
+train loss 不断下降，test loss趋于不变，说明网络过拟合;    
+train loss 趋于不变，test loss不断下降，说明数据集100%有问题;    
+train loss 趋于不变，test loss趋于不变，说明学习遇到瓶颈，需要减小学习率或批量数目;    
+train loss 不断上升，test loss不断上升，说明网络结构设计不当，训练超参数设置不当，数据集经过清洗等问题。    
 
-如果数据太少尽量缩小模型复杂度。考虑减少层数或者减少kernel number。
+总结    
+loss一直不下降的原因有很多，可以从头到尾滤一遍： 1）数据的输入是否正常，data和label是否一致。 2）网络架构的选择，一般是越深越好，也分数据集。 并且用不用在大数据集上pre-train的参数也很重要的 3）loss 公式对不对。    
 
-3.2 Loss不下降：
-a）train loss与test loss结果分析
+四、性能    
+4.1 性能测试    
+CPU内存使用率变化情况    
+参考：使用Python记录CPU内存使用率变化_ljyfree的专栏-CSDN博客_记录设备cpu变化    ​blog.csdn.net/ljyfree/article/details/105860549        
 
-train loss 不断下降，test loss不断下降，说明网络仍在学习;
-train loss 不断下降，test loss趋于不变，说明网络过拟合;
-train loss 趋于不变，test loss不断下降，说明数据集100%有问题;
-train loss 趋于不变，test loss趋于不变，说明学习遇到瓶颈，需要减小学习率或批量数目;
-train loss 不断上升，test loss不断上升，说明网络结构设计不当，训练超参数设置不当，数据集经过清洗等问题。
-总结
+内存使用情况    
+参考：使用memory_profiler工具对python工程做内存分析_大数据AI笔记-CSDN博客_memoryprofiler installer    ​blog.csdn.net/qq_30262201/article/details/101905086?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-3.nonecase&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-3.nonecase        
 
-loss一直不下降的原因有很多，可以从头到尾滤一遍： 1）数据的输入是否正常，data和label是否一致。 2）网络架构的选择，一般是越深越好，也分数据集。 并且用不用在大数据集上pre-train的参数也很重要的 3）loss 公式对不对。
-
-四、性能
-4.1 性能测试
-
-CPU内存使用率变化情况
-参考：使用Python记录CPU内存使用率变化_ljyfree的专栏-CSDN博客_记录设备cpu变化    ​blog.csdn.net/ljyfree/article/details/105860549    
-
-内存使用情况
-参考：使用memory_profiler工具对python工程做内存分析_大数据AI笔记-CSDN博客_memoryprofiler installer    ​blog.csdn.net/qq_30262201/article/details/101905086?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-3.nonecase&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-3.nonecase    
-
-4.2 CPU多核运行
+4.2 CPU多核运行    
 机器是几核
 import multiprocessing
 print(multiprocessing.cpu_count())
