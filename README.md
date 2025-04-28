@@ -170,7 +170,7 @@ MLOps的概念、原则和实践    https://zhuanlan.zhihu.com/p/527768254
 步骤3： 使用 CUDA 提供的调试工具（如 cuda-memcheck）来检测和修复运行时错误。
 
 
-### CUDA 常见问题
+### PYTHON代码 常见问题
     
 1.1 Tensorflow:
 a)问题：报错 tensorflow 报错 Segmentation fault (core dumped nohup)
