@@ -1568,9 +1568,9 @@ spec:
             nvidia.com/gpu: 1 # 每个Pod请求的GPU数量
 ##############################################################
 ```
-
-
-
+  
+  
+  
 注意事项：  
 1.环境变量：在Kubernetes部署中，MASTER_ADDR 和 MASTER_PORT 需要正确设置以确保Pod之间可以通信。在真实的Kubernetes环境中，你可能需要使用服务（Service）来发现其他Pods。  
 2.World Size 和 Local Rank：在分布式训练中，WORLD_SIZE 表示总的进程数，而 LOCAL_RANK 表示当前进程的唯一标识符。在Kubernetes中，你可能需要使用更复杂的逻辑来设置这些值，例如通过StatefulSet或Downward API。  
