@@ -87,34 +87,34 @@ Key MLops Terminologies：
 
 ![](IMAGE-1/MLOps-20250408111027.png)
 
-1️⃣ MLOps：在整个生命周期内有效管理 ML 模型的操作实践。 
-2️⃣ 模型训练：使用数据来教授算法以改进预测的过程。 
-3️⃣ 模型部署：将训练好的 ML 模型转移到生产环境中以供实际使用。 
-4️⃣ 持续集成 (CI)：自动更新代码，以实现 ML 工作流中的无缝协作。 
-5️⃣ 持续部署 (CD)：确保定期更新生产中的 ML 模型。 
-6️⃣ 版本控制：管理代码、数据和模型的变化。 
-7️⃣ 模型监控：跟踪部署后的模型性能和行为。 
-8️⃣ 数据漂移：数据分布的变化影响模型准确性。 
-9️⃣ 模型再训练：使用新数据更新模型以保持相关性。 
-1️⃣0️⃣ 特征工程：创建输入变量以提高 ML 模型性能。
+1️⃣ MLOps：在整个生命周期内有效管理 ML 模型的操作实践。     
+2️⃣ 模型训练：使用数据来教授算法以改进预测的过程。     
+3️⃣ 模型部署：将训练好的 ML 模型转移到生产环境中以供实际使用。     
+4️⃣ 持续集成 (CI)：自动更新代码，以实现 ML 工作流中的无缝协作。     
+5️⃣ 持续部署 (CD)：确保定期更新生产中的 ML 模型。     
+6️⃣ 版本控制：管理代码、数据和模型的变化。     
+7️⃣ 模型监控：跟踪部署后的模型性能和行为。     
+8️⃣ 数据漂移：数据分布的变化影响模型准确性。     
+9️⃣ 模型再训练：使用新数据更新模型以保持相关性。     
+1️⃣0️⃣ 特征工程：创建输入变量以提高 ML 模型性能。    
 
 
 
 
 
 ### 1.2.MLOps相关的论文
-Revisiting Reliability in Large-Scale Machine Learning Research Clusters    https://arxiv.org/abs/2410.21680
-Hidden Technical Debt in Machine Learning Systems    https://proceedings.neurips.cc/paper/2015/file/86df7dcfd896fcaf2674f757a2463eba-Paper.pdf
-MLOps -- Definitions, Tools and Challenges    https://arxiv.org/abs/2201.00162
-The ML Test Score: A rubric for ML Production Readiness and technical debt deduction    https://research.google/pubs/the-ml-test-score-a-rubric-for-ml-production-readiness-and-technical-debt-reduction/
-MLOps: Continuous delivery and automation pipelines in machine learning    https://medium.com/@rajuhegde2006/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning-093cd6e09fb3
-Attention Is All You Need    https://arxiv.org/abs/1706.03762
-The Llama 3 Herd of Models    https://arxiv.org/abs/2407.21783 
-MegaScale: Scaling Large Language Model Training to More Than 10,000 GPUs    https://arxiv.org/abs/2402.15627
-Alibaba HPN: A Data Center Network for Large Language Model Training     https://ennanzhai.github.io/pub/sigcomm24-hpn.pdf
-FlashAttention-3: Fast and Accurate Attention with Asynchrony and Low-precision    https://arxiv.org/abs/2407.08608
-Free Process Rewards without Process Labels    https://arxiv.org/abs/2412.01981    https://github.com/PRIME-RL/PRIME
-DeepSeek-V3 Technical Report    https://arxiv.org/abs/2412.19437
+Revisiting Reliability in Large-Scale Machine Learning Research Clusters    https://arxiv.org/abs/2410.21680    
+Hidden Technical Debt in Machine Learning Systems    https://proceedings.neurips.cc/paper/2015/file/86df7dcfd896fcaf2674f757a2463eba-Paper.pdf    
+MLOps -- Definitions, Tools and Challenges    https://arxiv.org/abs/2201.00162    
+The ML Test Score: A rubric for ML Production Readiness and technical debt deduction    https://research.google/pubs/the-ml-test-score-a-rubric-for-ml-production-readiness-and-technical-debt-reduction/    
+MLOps: Continuous delivery and automation pipelines in machine learning    https://medium.com/@rajuhegde2006/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning-093cd6e09fb3    
+Attention Is All You Need    https://arxiv.org/abs/1706.03762    
+The Llama 3 Herd of Models    https://arxiv.org/abs/2407.21783     
+MegaScale: Scaling Large Language Model Training to More Than 10,000 GPUs    https://arxiv.org/abs/2402.15627    
+Alibaba HPN: A Data Center Network for Large Language Model Training     https://ennanzhai.github.io/pub/sigcomm24-hpn.pdf    
+FlashAttention-3: Fast and Accurate Attention with Asynchrony and Low-precision    https://arxiv.org/abs/2407.08608    
+Free Process Rewards without Process Labels    https://arxiv.org/abs/2412.01981    https://github.com/PRIME-RL/PRIME    
+DeepSeek-V3 Technical Report    https://arxiv.org/abs/2412.19437    
 
 ### 1.3.MLOps的框架和工具
 |        |                                   |                                                              |
@@ -133,14 +133,14 @@ DeepSeek-V3 Technical Report    https://arxiv.org/abs/2412.19437
 
 
 
-参考资料：
-机器学习运维(MLOps)：原理、组件、角色和架构    https://blog.csdn.net/soaring_casia/article/details/126367217
-Habib ShaikhHabib Shaikh     https://www.linkedin.com/in/habib-shaikh-aikadoctor/recent-activity/all/
-MLOps（六）-回顾2023年开源的MLOps产品、框架、工具与格局变化    https://zhuanlan.zhihu.com/p/667299175
-什么是 MLOps?    https://zhuanlan.zhihu.com/p/392216271
-机器学习运维(MLOps)：原理、组件、角色和架构    https://blog.csdn.net/soaring_casia/article/details/126367217
-零基础了解大模型网络基础设施    https://zhuanlan.zhihu.com/p/29384865118
-大规模 GPU 集群运维实践：  https://mp.weixin.qq.com/s/PVk1ve3C3Jjr64yu2t2-aw
-谷歌 MLOps 实践者指南：机器学习的持续交付和自动化框架    https://zhuanlan.zhihu.com/p/564428496
-MLOps的概念、原则和实践    https://zhuanlan.zhihu.com/p/527768254
+参考资料：    
+机器学习运维(MLOps)：原理、组件、角色和架构    https://blog.csdn.net/soaring_casia/article/details/126367217    
+Habib ShaikhHabib Shaikh     https://www.linkedin.com/in/habib-shaikh-aikadoctor/recent-activity/all/    
+MLOps（六）-回顾2023年开源的MLOps产品、框架、工具与格局变化    https://zhuanlan.zhihu.com/p/667299175    
+什么是 MLOps?    https://zhuanlan.zhihu.com/p/392216271    
+机器学习运维(MLOps)：原理、组件、角色和架构    https://blog.csdn.net/soaring_casia/article/details/126367217    
+零基础了解大模型网络基础设施    https://zhuanlan.zhihu.com/p/29384865118    
+大规模 GPU 集群运维实践：  https://mp.weixin.qq.com/s/PVk1ve3C3Jjr64yu2t2-aw    
+谷歌 MLOps 实践者指南：机器学习的持续交付和自动化框架    https://zhuanlan.zhihu.com/p/564428496    
+MLOps的概念、原则和实践    https://zhuanlan.zhihu.com/p/527768254    
 
