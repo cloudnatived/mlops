@@ -37,6 +37,21 @@ drwxr-xr-x 4 root root 4096  4月 28 17:55 cv_resnet18_ocr-detection-line-level_
 
 
 2. 环境依赖
+
+pip3 install modelscope
+pip3 install numpy
+pip3 install packaging
+pip3 install addict
+pip3 install datasets==2.21.0
+pip3 install torch
+pip3 install opencv-python
+pip3 install gradio
+pip3 install torchvision
+pip3 install simplejson
+pip3 install sortedcontainers
+pip3 install tensorflow
+pip3 install tensorflow==2.12.0
+
 requirement.txt，版本依赖不对可能会导致各种报错，
 tensorflow和keras的对应版本关系，可以参考本文，也可以在Stack Overflow上搜搜solution
 
@@ -54,6 +69,8 @@ keras==2.12.0
 typing_extensions==4.10.0
 datasets==2.21.0   #否则会出错
 #################################
+
+pip3 install -r requirements.txt
 
 然后，OCR文字识别这个应用场景下，没有GPU也是OK的，但如果你装了GPU版本的tensorflow代码会默认在GPU上运行。这些依赖都搞定以后，咱们就可以通过下面这部分的代码自验，并且开始下载对应的ConvNextViT模型了
 #################################
