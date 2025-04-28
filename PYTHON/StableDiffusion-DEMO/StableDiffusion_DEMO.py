@@ -117,15 +117,8 @@ def display_pipeline(prompt: str,
     return image
 
 # 在报错的位置前看情况做一下GPU缓存清理，比如：
-gc.collect()
-torch.cuda.empty_cache()
-
-# 因为 SDXL 1.0 在stable 1.5的基础上做了改进，参数数量从0.98B扩大到6.6B，所以对GPU显存要求比较高
-# 可以尝试参数少点的模型比如stable-diffusion-v1-5
-pipe = pipeline(task=Tasks.text_to_image_synthesis,
-                model='AI-ModelScope/stable-diffusion-v1-5',
-                use_safetensors=True,
-                model_revision='v1.0.0')
+#gc.collect()
+#torch.cuda.empty_cache()
 
 
 # 使用Gradio的Blocks API创建一个交互式界面
