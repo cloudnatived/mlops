@@ -172,28 +172,28 @@ MLOps的概念、原则和实践    https://zhuanlan.zhihu.com/p/527768254
 
 ### DRL常见问题（报错、训练、调参） 
     
-1.1 Tensorflow:
-a)问题：报错 tensorflow 报错 Segmentation fault (core dumped nohup)
-原程序在win10下正常运行，迁移到CentOS后，报错Segmentation fault (core dumped nohup)，然后程序异常退出。
-可能原因：
-内存溢出（查询后，未出现内存溢出）
-第三方库 Python里使用C扩展导致（访问了非法内存区域，可能和C自身内存管理机制有关），导致执行Python程序报错
-不同系统的gcc、g++版本问题
-解决：尝试了很多方法，报错gdb调试；ulimit -S-s unlimited + sys.setrecursionlimit(100000)什么的都没有用；然后删了整个conda虚拟环境，重新跑程序，根据提示一个个重新装依赖，结果就好了。
+1.1 Tensorflow:    
+a)问题：报错 tensorflow 报错 Segmentation fault (core dumped nohup)    
+原程序在win10下正常运行，迁移到CentOS后，报错Segmentation fault (core dumped nohup)，然后程序异常退出。    
+可能原因：    
+内存溢出（查询后，未出现内存溢出）    
+第三方库 Python里使用C扩展导致（访问了非法内存区域，可能和C自身内存管理机制有关），导致执行Python程序报错    
+不同系统的gcc、g++版本问题    
+解决：尝试了很多方法，报错gdb调试；ulimit -S-s unlimited + sys.setrecursionlimit(100000)什么的都没有用；然后删了整个conda虚拟环境，重新跑程序，根据提示一个个重新装依赖，结果就好了。    
 
-b) 问题：大数据量内存溢出问题OOM
-解决：TensorFlow和Keras解决大数据量内存溢出问题
+b) 问题：大数据量内存溢出问题OOM    
+解决：TensorFlow和Keras解决大数据量内存溢出问题    
 
-c)问题：循环里调用predict或者tf.function 告警追溯函数导致预测速度变慢
-WARNING:tensorflow:5 out of the last 5 calls to triggered tf.function retracing. Tracing is expensive and the excessive number of tracings is likely due to passing python objects instead of tensors. Also, tf.function has experimental_relax_shapes=True option that relaxes argument shapes that can avoid unnecessary retracing. Please refer tohttps://www.tensorflow.org/beta/tutorials/eager/tf_function#python_or_tensor_argsandhttps://www.tensorflow.org/api_docs/python/tf/functionfor more details.
-解决：这个我试了n种方法，参考tf.functionの再トレースによる訓練の低速化について確かめる讲的比较全了，结果最后有效的就只是，加一行 tf.compat.v1.disable_eager_execution()。。。
+c)问题：循环里调用predict或者tf.function 告警追溯函数导致预测速度变慢    
+WARNING:tensorflow:5 out of the last 5 calls to triggered tf.function retracing. Tracing is expensive and the excessive number of tracings is likely due to passing python objects instead of tensors. Also, tf.function has experimental_relax_shapes=True option that relaxes argument shapes that can avoid unnecessary retracing. Please refer tohttps://www.tensorflow.org/beta/tutorials/eager/tf_function#python_or_tensor_argsandhttps://www.tensorflow.org/api_docs/python/tf/functionfor more details.    
+解决：这个我试了n种方法，参考tf.functionの再トレースによる訓練の低速化について確かめる讲的比较全了，结果最后有效的就只是，加一行 tf.compat.v1.disable_eager_execution()。。。    
 
-d) 问题：h5模型转化tflite报错
-"invalid shape '{1}'.".format(_tensor_name(tensor), shape))
-ValueError: None is only supported in the 1st dimension. Tensor 'input_1' has invalid shape '[None, None]'
-解决：tflite是静态图，需要指定input-shape值。
-from keras.models import load_model
-from keras_bert import get_custom_objects
+d) 问题：h5模型转化tflite报错    
+"invalid shape '{1}'.".format(_tensor_name(tensor), shape))    
+ValueError: None is only supported in the 1st dimension. Tensor 'input_1' has invalid shape '[None, None]'    
+解决：tflite是静态图，需要指定input-shape值。    
+from keras.models import load_model    
+from keras_bert import get_custom_objects    
 
 新的模型文件的转化与存储
 train_model = load_model(h5_model_file_path, custom_objects=get_custom_objects())  # 加载模型
