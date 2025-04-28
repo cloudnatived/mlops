@@ -67,7 +67,7 @@ ML：MLOps系列讲解之《MLOps的定义与发展—你为什么可能想使�
 
 MLOPS: THE AI LIFECYCLE FOR IT PRODUCTION
 
-![](IMAGE-1\1-MLOps-NVIDIA-invert-final.jpg)
+![](IMAGES/1-MLOps-NVIDIA-invert-final.jpg)
 
 
 
@@ -75,7 +75,7 @@ MLOPS: THE AI LIFECYCLE FOR IT PRODUCTION
 
 Hidden Technical Debt in Machine Learning Systems：
 
-![](IMAGE-1/Hidden-Technical-Debt-in-Machine-Learning-Systems-1744026634700.jpg)
+![](IMAGES/Hidden-Technical-Debt-in-Machine-Learning-Systems-1744026634700.jpg)
 
 
 
@@ -85,7 +85,7 @@ Key MLops Terminologies：
 
 
 
-![](IMAGE-1/MLOps-20250408111027.png)
+![](IMAGES/MLOps-20250408111027.png)
 
 1️⃣ MLOps：在整个生命周期内有效管理 ML 模型的操作实践。     
 2️⃣ 模型训练：使用数据来教授算法以改进预测的过程。     
