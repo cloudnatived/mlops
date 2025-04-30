@@ -1,4 +1,63 @@
+# MCP server
 
+https://docs.cline.bot/
+
+cline_mcp_settings.json
+```
+{
+  "mcpServers": {
+    "weather": {
+      "disabled": true,
+      "timeout": 60,
+      "command": "uv",
+      "args": [
+        "--directory",
+        "C:/Users/Administrator/AppData/Roaming/Code/User/globalStorage/saoudrizwan.claude-dev/WEATHER",
+        "run",
+        "weather.py"
+      ],
+      "transportType": "stdio"
+    },
+    "weather1": {
+      "disabled": true,
+      "timeout": 60,
+      "command": "python",
+      "args": [
+        "C:/Users/Administrator/AppData/Roaming/Code/User/globalStorage/saoudrizwan.claude-dev/WEATHER/mcp_logger.py",
+        "uv",
+        "--directory",
+        "C:/Users/Administrator/AppData/Roaming/Code/User/globalStorage/saoudrizwan.claude-dev/WEATHER",
+        "run",
+        "weather.py"
+      ],
+      "transportType": "stdio"
+    },
+    "fetch": {
+      "disabled": true,
+      "timeout": 60,
+      "command": "uvx",
+      "args": [
+        "mcp-server-fetch"
+      ],
+      "transportType": "stdio"
+    },
+    "mcp-server-hotnews": {
+      "timeout": 60,
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@wopal/mcp-server-hotnews"
+      ],
+      "transportType": "stdio",
+      "disabled": true
+    }
+  }
+}
+```
+
+## 编写MCP weather server weather
 编写MCP weather server的代码示例：    
 https://github.com/cloudnatived/yx/blob/main/WEATHER/weather.py
 
@@ -15,9 +74,11 @@ uv add "mcp[cli]“ httpx
 ![MCP交互过程](IMAGES/MCP-0.png)
 
 
-weather.py：一个示例 MCP Server，可用于天气预告和天气预警，代码主要来自 MCP 官方示例。
-mcp_logger.py：用于记录 MCP Server 的输入输出，并把记录内容放到 mcp_io.log 上面，该代码主要由 Gemini 2.5 Pro 编写。
+weather.py：一个示例 MCP Server，可用于天气预告和天气预警，代码主要来自 MCP 官方示例。  
+mcp_logger.py：用于记录 MCP Server 的输入输出，并把记录内容放到 mcp_io.log 上面，该代码主要由 Gemini 2.5 Pro 编写。  
 
+weather.py：一个示例 MCP Server，可用于天气预告和天气预警，代码主要来自 MCP 官方示例。  
+mcp_logger.py：用于记录 MCP Server 的输入输出，并把记录内容放到 mcp_io.log 上面，该代码主要由 Gemini 2.5 Pro 编写。  
 
 
 ```
@@ -115,6 +176,5 @@ Forecast: {period['detailedForecast']}
 if __name__ == "__main__":
     # Initialize and run the server
     mcp.run(transport=‘stdio’)  # transport为stdio，标识MCP Server与Cline交互方式为stido
-
 
 ```
