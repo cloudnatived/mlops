@@ -22,7 +22,7 @@ Stable Diffusion XL
 Rocky Ding：深入浅出完整解析Stable Diffusion XL（SDXL）核心基础知识1634 赞同 · 246 评论文章
 2. 环境依赖
 
-首先是主要的python库依赖和版本，贴一下我的requirement.txt
+首先是主要的python库依赖和版本，贴一下我的requirements.txt
 ###############################################
 python>=3.8
 transformers>=4.37.0
