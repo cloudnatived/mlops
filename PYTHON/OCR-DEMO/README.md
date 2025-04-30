@@ -55,7 +55,7 @@ pip3 install tensorflow==2.12.0
 requirement.txt，版本依赖不对可能会导致各种报错，
 tensorflow和keras的对应版本关系，可以参考本文，也可以在Stack Overflow上搜搜solution
 
-cat requirement.txt 
+cat requirements.txt 
 #################################
 transformers>=4.37.0
 modelscope>=1.9.5  # ModelScope 核心库，支持模型推理和管道操作
