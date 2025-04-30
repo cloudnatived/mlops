@@ -195,7 +195,7 @@ deepspeed、MegatronLM和Megatron-deepspeed的关系    https://blog.csdn.net/m0
 【AI】推理系统和推理引擎的整体架构　　　　https://blog.csdn.net/weixin_45651194/article/details/132872588
 
 
-
+```
 
 pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple;
 mkdir -p /root/.config/pip;
@@ -203,6 +203,6 @@ cat > /root/.config/pip/pip.conf <<EOF
 [global]
 index-url = https://pypi.tuna.tsinghua.edu.cn/simple
 EOF
-
+```
 
 
