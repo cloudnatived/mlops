@@ -11,7 +11,7 @@ MAX_MAX_NEW_TOKENS = 2048
 DEFAULT_MAX_NEW_TOKENS = 1024
 MAX_INPUT_TOKEN_LENGTH = int(os.getenv("MAX_INPUT_TOKEN_LENGTH", "4096"))
 
-DESCRIPTION = "" 
+DESCRIPTION = ""
 if not torch.cuda.is_available():
     DESCRIPTION += "\n<p>Running on CPU This demo does not work on CPU.</p>"
 
