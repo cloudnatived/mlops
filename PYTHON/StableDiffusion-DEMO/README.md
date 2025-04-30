@@ -42,6 +42,11 @@ sortedcontainers
 torch.cuda.is_available()
 # out：True
 
+# 命令行运行
+python3 -c "import torch; print(torch.cuda.get_device_capability())"
+python3 -c "import torch; print(torch.cuda.is_available())"
+
+
 这些依赖都搞定以后，咱们就可以通过下面这部分的代码自验，并且开始下载对应的stable-diffusion-xl-base-1.0模型了（耗时较久）
 
 3.模型调用
