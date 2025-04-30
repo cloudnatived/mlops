@@ -15,16 +15,12 @@
 Stable Diffusion（简称SD）是一个由Stability AI公司研发与其他研究者和合作者合作开发的，基于潜在扩散模型 Latent Diffusion Models（LDMs）的多模态领域（text-to-image）开源生成模型，能够根据给定的文本提示来合成高分辨率的图像
 Stable Diffusion XL
 
-而Stable Diffusion XL是在SD的基础上的一个二阶段的级联扩散模型
-（Latent Diffusion Model），包括Base模型和Refiner模型
+而Stable Diffusion XL是在SD的基础上的一个二阶段的级联扩散模型（Latent Diffusion Model），包括Base模型和Refiner模型。其中Base模型的主要工作和Stable Diffusion 1.x-2.x一致，具备文生图（txt2img）、图生图（img2img）、图像inpainting等能力。在Base模型之后，级联了Refiner模型，对Base模型生成的图像Latent特征进行精细化提升，其本质上是在做图生图的工作。
+如果想要了解更多技术原理细节可以参考：Rocky Ding：深入浅出完整解析Stable Diffusion XL（SDXL）核心基础知识1634 赞同 · 246 评论文章
 
-。其中Base模型的主要工作和Stable Diffusion 1.x-2.x一致，具备文生图（txt2img）、图生图（img2img）、图像inpainting等能力。在Base模型之后，级联了Refiner模型，对Base模型生成的图像Latent特征进行精细化提升，其本质上是在做图生图的工作。如果想要了解更多技术原理细节可以参考：
-Rocky Ding：深入浅出完整解析Stable Diffusion XL（SDXL）核心基础知识1634 赞同 · 246 评论文章
 2. 环境依赖
-
-首先是主要的python库依赖和版本，贴一下我的requirements.txt
+python库依赖和版本，requirements.txt
 ###############################################
-python>=3.8
 transformers>=4.37.0
 accelerate>=0.27.0
 modelscope>=1.9.5
@@ -34,9 +30,13 @@ gradio>=4.8.0
 diffusers>=0.26.3
 opencv-python>=4.9.0.80
 safetensors>=0.4.2
+addict
+datasets==2.21.0
+simplejson
+sortedcontainers
 ###############################################
 
-然后是GPU依赖，咱们需要有安装好GPU版本的torch（which means得有一张显卡哦亲～）
+然后是GPU依赖，咱们需要有安装好GPU版本的torch。
 
 # 检查cuda是否可用
 torch.cuda.is_available()
