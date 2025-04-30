@@ -1,6 +1,7 @@
 from threading import Thread
 from typing import Iterator
 
+import os
 import gradio as gr
 import torch
 from modelscope import AutoModelForCausalLM, AutoTokenizer
@@ -10,7 +11,7 @@ MAX_MAX_NEW_TOKENS = 2048
 DEFAULT_MAX_NEW_TOKENS = 1024
 MAX_INPUT_TOKEN_LENGTH = int(os.getenv("MAX_INPUT_TOKEN_LENGTH", "4096"))
 
-
+DESCRIPTION = "" 
 if not torch.cuda.is_available():
     DESCRIPTION += "\n<p>Running on CPU This demo does not work on CPU.</p>"
 
