@@ -1,4 +1,10 @@
-## 用PyTorch实现MNIST手写数字识别
+
+
+# MNIST 汇总
+
+
+
+## 用PyTorch实现MNIST手写数字识别 /pytorch_mnist.py
 
 原文链接：https://nextjournal.com/gkoehler/pytorch-mnist    
 ​​​​​Keras版本：https://blog.csdn.net/sxf1061700625/article/details/117397030
@@ -70,7 +76,7 @@ python3 pytorch_mnist.py
 
 
 
-## mnist_network
+## mnist_network /MNIST-XHH
 三层神经网络训练手写数字识别
 
 
@@ -93,3 +99,15 @@ python3 xhh-test.py
 
 
 ```
+
+
+
+## MNIST-CHATGPT /MNIST-CHATGPT
+```
+用于 加载保存的模型并对单张图片进行预测。这张图片可以是 MNIST 格式的（28x28 灰度图），或者是从外部导入的一张手写数字图像。
+python predict_image.py example_digit.png
+
+
+```
+
+
