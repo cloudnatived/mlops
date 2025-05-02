@@ -2,10 +2,10 @@
 
 # MNIST 汇总
 
+用PyTorch实现MNIST手写数字识别(非常详细)
 
 
-## /pytorch_mnist.py  --  用PyTorch实现MNIST手写数字识别
-
+## /pytorch_mnist.py  --  用PyTorch实现MNIST手写数字识别(非常详细)  
 原文链接：https://nextjournal.com/gkoehler/pytorch-mnist    
 ​​​​​Keras版本：https://blog.csdn.net/sxf1061700625/article/details/117397030
 
@@ -74,7 +74,12 @@ python3 pytorch_mnist.py
 2. 我们似乎仍然没有遇到过拟合问题!看起来我们的dropout层做了一个很好的规范模型。
 使用PyTorch和TorchVision构建了一个新环境，并使用它从MNIST数据集中对手写数字进行分类，希望使用PyTorch开发出一个良好的直觉。对于进一步的信息，官方的PyTorch文档确实写得很好，论坛也很活跃!
 
+## /pytorch_mnist.py  --  用PyTorch实现MNIST手写数字识别（最新，非常详细）
 
+```
+
+
+```
 
 ## /MNIST-XHH   --  mnist_network
 三层神经网络训练手写数字识别
@@ -109,5 +114,3 @@ python predict_image.py example_digit.png
 
 
 ```
-
-
