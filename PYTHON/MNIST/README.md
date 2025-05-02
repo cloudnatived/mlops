@@ -2,7 +2,6 @@
 
 # MNIST 汇总
 
-用PyTorch实现MNIST手写数字识别(非常详细)
 
 
 ## /pytorch_mnist.py  --  用PyTorch实现MNIST手写数字识别(非常详细)  
