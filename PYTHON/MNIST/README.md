@@ -1,9 +1,9 @@
 
 
 # MNIST 汇总
-
-
-
+  
+  
+  
 ## /pytorch_mnist.py  --  用PyTorch实现MNIST手写数字识别(非常详细)  
 原文链接：https://nextjournal.com/gkoehler/pytorch-mnist    
 ​​​​​Keras版本：https://blog.csdn.net/sxf1061700625/article/details/117397030
