@@ -113,3 +113,27 @@ python predict_image.py example_digit.png
 
 
 ```
+
+## /MNIST-SMG  --  读书笔记，四种方式实现minist分类！全部详细代码实现！Cnn(卷积神经网络，两种方式)，感知机（Bp神经网络），逻辑回归
+
+```
+MNIST-SMG/CNN1.py
+CNN1.py使用 TensorFlow 1.x 风格实现的一个简单 CNN 卷积神经网络，用于识别 MNIST 手写数字图片。Cnn实现minist代码分类–tf.nn实现。
+
+完全兼容 TensorFlow 2.x；
+使用 tf.keras 构建高阶模型，清晰易懂；
+保留原始架构（Conv → Pool → Conv → Pool → Dense → Dropout → Output）；
+自动绘图，展示准确率与损失随 epoch 的变化。
+
+pip3 uninstall tensorflow -y
+pip3 install tensorflow-cpu
+
+
+
+
+
+```
+
+
+
+
