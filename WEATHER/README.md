@@ -83,6 +83,10 @@ python mcp_logger.py uv --dlrectory C:/Users/Administrator/AppData/Roaming/Code/
 
 
 ```
+uv --dlrectory C:/Users/Administrator/AppData/Roaming/Code/User/globalStorage/saoudrizwan.claude-dev/WEATHER run weather.py
+python mcp_logger.py uv --dlrectory C:/Users/Administrator/AppData/Roaming/Code/User/globalStorage/saoudrizwan.claude-dev/WEATHER run weather.py
+
+#############################
 from typing import Any
 import httpx
 from mcp.server.fastmcp import FastMCP  #调用FastMCP函数用于快速构建MCP服务器
@@ -177,5 +181,5 @@ Forecast: {period['detailedForecast']}
 if __name__ == "__main__":
     # Initialize and run the server
     mcp.run(transport=‘stdio’)  # transport为stdio，标识MCP Server与Cline交互方式为stido
-
+#############################
 ```
