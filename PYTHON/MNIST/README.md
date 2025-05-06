@@ -1,6 +1,6 @@
 
 
-# MNIST 汇总
+# MNIST 数据集
   
   
   
