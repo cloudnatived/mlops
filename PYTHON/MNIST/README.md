@@ -114,7 +114,7 @@ python predict_image.py example_digit.png
 
 ```
 
-## /MNIST-SMG  --  读书笔记，@尚码哥@
+## /MNIST-SMG  --  尚码哥
 
 ```
 MNIST-SMG/CNN1.py
