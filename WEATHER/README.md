@@ -119,7 +119,7 @@ Description: {props.get('description', 'No description available')}
 Instructions: {props.get('instruction', 'No specific instructions provided')}
 """
 @mcp.tool() #装饰器，将函数注册为tool，从函数的注释里提取函数的用途，以及每个参数的含义，以便模型决定调用这个函数的最佳时机。大模型在tool调用get_alerts函数时，将get_alerts函数包括的4个信息传给模型
-async def get_alerts(state: str) -> str:  #定义函数get_alerts，用于接收美国某个州的天气预警，参数是美国州代码。get_alerts函数包括，1.函数名get_alerts,2.字符串类新参数state,3.函数的功能，4.每个参数的功能。
+async def get_alerts(state: str) -> str:  #定义函数get_alerts，用于接收美国某个州的天气预警，参数是美国州代码。get_alerts函数包括，1.函数名get_alerts,2.字符串类型参数state,3.函数的功能，4.每个参数的功能。
     """Get weather alerts for a US state.
 
     Args:
