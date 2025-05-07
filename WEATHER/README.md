@@ -135,7 +135,7 @@ async def get_alerts(state: str) -> str:  #定义函数get_alerts，用于接收
         return "No active alerts for this state."
 
     alerts = [format_alert(feature) for feature in data["features"]]  #对调用返回的预警信息做格式化
-    return “\n---\n”.join(alerts)  #对方会信息做格式化，截取程序所需要的那一部分
+    return “\n---\n”.join(alerts)  #对返回信息做格式化，截取程序所需要的那一部分
 
 @mcp.tool() #装饰器，将函数注册为tool，从函数的注释里提取函数的用途，以及每个参数的含义，以便模型决定调用这个函数的最佳时机
 async def get_forecast(latitude: float, longitude: float) -> str:  #第2个tool get_forecast，参数是维度和经度，latitude和longitude
