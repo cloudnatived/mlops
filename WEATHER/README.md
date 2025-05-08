@@ -94,13 +94,13 @@ mcp = FastMCP("weather", log_level="ERROR")   #调用FastMCP函数用于快速�
 NWS_API_BASE = https://api.weather.gov  #常量1，美国气象局地址，请求这个地址，获取气象信息
 USER_AGENT = "weather-app/1.0"  #常量2，请求标识，如果是浏览器请求，就标识如chrome的信息，在weather这个MCP Server里调用美国气象局这个接口，命名为weather-app，版本号1.0
 
-async def make_nws_request(url: str) -> dict[str, Any] | None:  #自定义后续会用到的，请求天气数据的函数，1.make_nws_request，用于请求天气数据，接受参数url: str，
+async def make_nws_request(url: str) -> dict[str, Any] | None:  #自定义后续会用到的，请求天气数据的工具类函数1.make_nws_request，用于请求天气数据，接受参数url: str，
     """Make a request to the NWS API with proper error handling."""
     headers = {
         "User-Agent": USER_AGENT,
         "Accept": "application/geo+json"
     }
-    async with httpx.AsyncClient() as client:  #make_nws_request，用于请求天气数据，接受参数url: str，使用http库调用指定的url，并返回拿到的结果
+    async with httpx.AsyncClient() as client:  #工具类函数1.make_nws_request，，使用http库调用指定的url，并返回拿到的结果
         try:
             response = await client.get(url, headers=headers, timeout=30.0)
             response.raise_for_status()
@@ -108,7 +108,7 @@ async def make_nws_request(url: str) -> dict[str, Any] | None:  #自定义后续
         except Exception:
             return None
 
-def format_alert(feature: dict) -> str:  #2.工具类函数format_alert，用于对告警数据做格式化
+def format_alert(feature: dict) -> str:  #工具类函数2.format_alert，用于对告警数据做格式化
     """Format an alert feature into a readable string."""
     props = feature["properties"]
     return f"""
