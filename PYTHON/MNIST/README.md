@@ -29,6 +29,10 @@ apt update -y;
 apt list --upgradable;
 apt upgrade -y;
 
+apt install -y python3-pip python3 python3-netaddr wget git;
+apt install -y python3-dev;
+pip install --upgrade pip;
+
 # 安装python3和pip3
 apt install python3-pip;
 pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple;
