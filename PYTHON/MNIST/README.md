@@ -314,12 +314,11 @@ pip3 uninstall tensorflow -y
 pip3 install tensorflow-cpu
 
 
+```
+
 参考资料：
 tensorflow 自己制作Mnist数据集，用训练好的模型来测试准确度。手把手教你实现！教你怎么调用自己已经训练好的模型！清晰易懂！加深你对卷积CNN的理解    https://blog.csdn.net/weixin_41146894/article/details/110010179
 深度学习入门！四种方式实现minist分类！全部详细代码实现！Cnn(卷积神经网络，两种方式)，感知机（Bp神经网络），逻辑回归！代码详细注释！！minist数据集该怎么使用？    https://blog.csdn.net/weixin_41146894/article/details/109779806
-
-```
-
 
 
 
