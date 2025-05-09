@@ -20,9 +20,9 @@ class Network(nn.Module):
     # 在前向传播，forward函数中，输入为图像x
     def forward(self, x):
         x = x.view(-1, 28 * 28) # 使用view函数，将向量x展平，尺寸变为nx784
-        x = self.layer1(x)  # 将x输入至layer1
-        x = torch.relu(x)  # 使用relu激活
-        x = self.layer2(x) # 输入至layer2计算结果
+        x = self.layer1(x)      # 将x输入至layer1
+        x = torch.relu(x)       # 使用relu激活
+        x = self.layer2(x)      # 输入至layer2计算结果
         return x # 返回结果
 
 #手动的遍历模型中的各个结构，并计算可以训练的参数
