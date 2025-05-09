@@ -1,21 +1,25 @@
 import torch
 from torch import nn
-
-# 定义神经网络Network
+# 神经网络的实现代码
+# 实现任何的深度学习模型，最重要的两步骤
+# 定义神经网络Network，继承为nn.Module类
 class Network(nn.Module):
-    def __init__(self):
-        super().__init__()
-        # 线性层1，输入层和隐藏层之间的线性层
+# 神经网络中的神经元的数量是固定的，所以init不用传入参数
+    def __init__(self): 
+        super().__init__() # 调用了父类的初始化函数
+        # layer1是输入层与隐藏层之间的线性层
         self.layer1 = nn.Linear(784, 256)
-        # 线性层2，隐藏层和输出层之间的线性层
+        # layer2是隐藏层与输出层之间的线性层
         self.layer2 = nn.Linear(256, 10)
-
+    # 在forward函数中，定义该神经网络的推理计算过程
+    # 函数输入张量x，x的尺寸是nx28x28，其中n表示了n张图片
     # 在前向传播，forward函数中，输入为图像x
     def forward(self, x):
-        x = x.view(-1, 28 * 28) # 使用view函数，将x展平
+        x = x.view(-1, 28 * 28) # 使用view函数，将向量x展平，尺寸变为nx784
         x = self.layer1(x)  # 将x输入至layer1
         x = torch.relu(x)  # 使用relu激活
-        return self.layer2(x) # 输入至layer2计算结果
+        x = self.layer2(x) # 输入至layer2计算结果
+        return x # 返回结果
 
 #手动的遍历模型中的各个结构，并计算可以训练的参数
 def print_parameters(model):
