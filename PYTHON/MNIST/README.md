@@ -85,13 +85,39 @@ python3 pytorch_mnist.py
 
 ```
 # ubuntu 22.04.5 下的环境准备
+cp /etc/apt/sources.list /etc/apt/sources.list.original;
+cat > /etc/apt/sources.list <<EOF
+# 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy main restricted universe multiverse
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-security main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-security main restricted universe multiverse
 
+# 预发布软件源，不建议启用
+# deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-proposed main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-proposed main restricted universe multiverse
+EOF
+
+apt update -y;
+apt list --upgradable;
+apt upgrade -y;
 
 # 安装python3和pip3
+apt install python3-pip;
+pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple;
+mkdir -p /root/.config/pip;
+cat > /root/.config/pip/pip.conf <<EOF
+[global]
+index-url = https://pypi.tuna.tsinghua.edu.cn/simple
+EOF
 
+python3 -m pip install --upgrade pip;
 
-
-# 程序所在目录
+# 程序所在目录，下载这5个文件
 https://github.com/cloudnatived/mlops/tree/main/PYTHON/MNIST/MNIST-XHH
 # 下载这5个文件
 requirements.txt
@@ -100,10 +126,17 @@ download_data.py
 train.py
 test.py
 
+# 安装项目所需的python库
+pip3 install -r requirements.txt;
 
-#下载数据集
-pip3 install torchvision
+# 下载数据集
 python3 download_data.py
+
+# 训练模型，讲模型保存成mnist.pth
+python3 train.py
+
+# 用测试数据集测试训练好的模型
+python3 test.py
 
 ```
 
