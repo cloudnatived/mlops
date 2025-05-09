@@ -1,4 +1,4 @@
-from xhh_model import Network
+from model import Network
 from torchvision import transforms
 from torchvision import datasets
 import torch
