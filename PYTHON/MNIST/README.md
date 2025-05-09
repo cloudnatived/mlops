@@ -81,19 +81,37 @@ python3 pytorch_mnist.py
 ```
 
 ## /MNIST-XHH   -- 小黑黑 mnist_network
-三层神经网络训练手写数字识别
-
+### 三层神经网络训练手写数字识别
 
 ```
+# ubuntu 22.04.5 下的环境准备
 
-xhh_download_data.py
-xhh_model.py
-xhh_test.py
-xhh_train.py
+
+# 安装python3和pip3
+
+
+
+# 程序所在目录
+https://github.com/cloudnatived/mlops/tree/main/PYTHON/MNIST/MNIST-XHH
+# 下载这5个文件
+requirements.txt
+model.py
+download_data.py
+train.py
+test.py
+
 
 #下载数据集
 pip3 install torchvision
 python3 download_data.py
+
+```
+
+
+
+
+```
+
 
 
 ###########################################################
@@ -134,7 +152,7 @@ save_images(test_data, 'test')
 ###########################################################
 
 # 定义模型
-xhh_model.py
+model.py
 ###########################################################
 import torch
 from torch import nn
@@ -192,13 +210,13 @@ if __name__ == '__main__':
 
 
 #模型训练
-python3 xhh-train.py
+python3 train.py
 ###########################################################
 import torch
 from torch import nn
 from torch import optim
 
-from xhh_model import Network
+from model import Network
 
 from torchvision import transforms
 from torchvision import datasets
@@ -250,9 +268,9 @@ if __name__ == '__main__':
 
 
 #模型测试
-python3 xhh-test.py
+python3 test.py
 ###########################################################
-from xhh_model import Network
+from model import Network
 from torchvision import transforms
 from torchvision import datasets
 import torch
