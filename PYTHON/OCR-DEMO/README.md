@@ -1,5 +1,5 @@
 
-# OCR-DEMO
+# OCR-DEMO - CPU
 https://zhuanlan.zhihu.com/p/685353998
 
 ```
