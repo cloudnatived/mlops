@@ -35,12 +35,12 @@ if __name__ == '__main__':
         for batch_idx, (data, label) in enumerate(train_loader):
             # 内层每循环一次，就会进行一次梯度下降算法
             # 包括了5个步骤:
-            output = model(data) # 1.计算神经网络的前向传播结果
-            loss = criterion(output, label) # 2.计算output和标签label之间的损失loss
-            loss.backward()  # 3.使用backward计算梯度
-            optimizer.step()  # 4.使用optimizer.step更新参数
-            optimizer.zero_grad()  # 5.将梯度清零
-            # 这5个步骤，是使用pytorch框架训练模型的定式，初学的时候，先记住就可以了
+            output = model(data)                # 1.计算神经网络的前向传播结果
+            loss = criterion(output, label)     # 2.计算output和标签label之间的损失loss
+            loss.backward()                     # 3.使用backward计算梯度
+            optimizer.step()                    # 4.使用optimizer.step更新参数
+            optimizer.zero_grad()               # 5.将梯度清零
+                                                # 这5个步骤，是使用pytorch框架训练模型的定式，初学的时候，先记住就可以了
 
             # 每迭代100个小批量，就打印一次模型的损失，观察训练的过程
             if batch_idx % 100 == 0:
