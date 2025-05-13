@@ -10,7 +10,7 @@ class Network(nn.Module):
     def __init__(self): 
         super().__init__() # 调用了父类的初始化函数
         # layer1是输入层与隐藏层之间的线性层
-        self.layer1 = nn.Linear(784, 256)
+        self.layer1 = nn.Linear( 28 * 28, 256)
         # layer2是隐藏层与输出层之间的线性层
         self.layer2 = nn.Linear(256, 10)
         
