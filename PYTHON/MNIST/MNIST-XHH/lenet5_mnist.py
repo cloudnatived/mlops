@@ -45,9 +45,9 @@ class LeNet5(nn.Module):
 
 # 定义数据变换和加载MNIST数据集
 transform = transforms.Compose([
-    transforms.Resize((32, 32)),  # 将图像调整为32x32，符合LeNet-5输入要求
-    transforms.ToTensor(),
-    transforms.Normalize((0.1307,), (0.3081,))  # MNIST数据集的均值和标准差
+    transforms.Resize((32, 32)),                 # 将图像调整为32x32，符合LeNet-5输入要求
+    transforms.ToTensor(),                       # 转换为张量
+    transforms.Normalize((0.1307,), (0.3081,))   # MNIST数据集的均值和标准差
 ])
 
 
@@ -106,12 +106,11 @@ def train(net, train_loader, criterion, optimizer, device, epoch):
     for i, data in enumerate(train_loader, 0):
         inputs, labels = data[0].to(device), data[1].to(device)
         
-        optimizer.zero_grad()  # 清零梯度
-
-        outputs = net(inputs)  # 前向传播
-        loss = criterion(outputs, labels)  # 计算损失
-        loss.backward()  # 反向传播，计算梯度
-        optimizer.step()  # 更新权重
+        optimizer.zero_grad()                       # 清零梯度
+        outputs = net(inputs)                       # 前向传播
+        loss = criterion(outputs, labels)           # 计算损失
+        loss.backward()                             # 反向传播，计算梯度
+        optimizer.step()                            # 更新权重
 
         running_loss += loss.item()
         _, predicted = outputs.max(1)

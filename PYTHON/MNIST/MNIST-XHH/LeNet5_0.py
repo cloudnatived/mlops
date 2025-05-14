@@ -57,16 +57,15 @@ for epoch in range(5):  # 可以根据需要调整训练的轮数
     running_loss = 0.0
     for i, data in enumerate(train_loader, 0):
         inputs, labels = data
-        optimizer.zero_grad()  # 清零梯度
-
-        outputs = net(inputs)  # 前向传播
-        loss = criterion(outputs, labels)  # 计算损失
-        loss.backward()  # 反向传播，计算梯度
-        optimizer.step()  # 更新权重
+        optimizer.zero_grad()                   # 清零梯度
+        outputs = net(inputs)                   # 前向传播                   
+        loss = criterion(outputs, labels)       # 计算损失
+        loss.backward()                         # 反向传播，计算梯度
+        optimizer.step()                        # 更新权重
 
         running_loss += loss.item()
     print(f"Epoch {epoch + 1}, Loss: {running_loss / len(train_loader)}")
-    torch.save(net.state_dict(), 'LeNet5_0.pth') 
+    torch.save(net.state_dict(), 'LeNet5_0.pth')   # 保存模型
 
 print("Finished Training")
 
