@@ -1,4 +1,3 @@
-
 # From AI 
 import torch
 import torch.nn as nn
@@ -50,12 +49,12 @@ def train(model, device, train_loader, optimizer, epoch):
     model.train()
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = data.to(device), target.to(device)
-        optimizer.zero_grad()
-        output = model(data)
-        loss = F.cross_entropy(output, target)
-        loss.backward()
-        optimizer.step()
-        if batch_idx % 100 == 0:
+        optimizer.zero_grad()                            # 5.将梯度清零
+        output = model(data)                             # 1.计算神经网络的前向传播结果
+        loss = F.cross_entropy(output, target)           # 2.计算output和标签label之间的损失loss  
+        loss.backward()                                  # 3.使用backward计算梯度
+        optimizer.step()                                 # 4.使用optimizer.step更新参数
+        if batch_idx % 100 == 0:                         # 每迭代100个小批量，就打印一次模型的损失，观察训练的过程
             print(f'Train Epoch: {epoch} [{batch_idx * len(data)}/{len(train_loader.dataset)} '
                   f'({100. * batch_idx / len(train_loader):.0f}%)]\tLoss: {loss.item():.6f}')
 
