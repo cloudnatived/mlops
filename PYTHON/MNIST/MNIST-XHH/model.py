@@ -19,42 +19,42 @@ class Network(nn.Module):
     # 函数输入张量x，x的尺寸是nx28x28，其中n表示了n张图片
     # 在前向传播，forward函数中，输入为图像x
     def forward(self, x):
-        x = x.view(-1, 28 * 28) # 使用view函数，将向量x展平，尺寸变为nx784
-        x = self.layer1(x)      # 将x输入至layer1
-        x = torch.relu(x)       # 使用relu激活
-        x = self.layer2(x)      # 输入至layer2计算结果
+        x = x.view(-1, 28 * 28)     # 使用view函数，将向量x展平，尺寸变为nx784
+        x = self.layer1(x)          # 将x输入至layer1
+        x = torch.relu(x)           # 使用relu激活
+        x = self.layer2(x)          # 输入至layer2计算结果
         return x # 返回结果
 
 #手动的遍历模型中的各个结构，并计算可以训练的参数
 def print_parameters(model):
     cnt = 0
-    for name, layer in model.named_children(): #遍历每一层
+    for name, layer in model.named_children():     #遍历每一层
         # 打印层的名称和该层中包含的可训练参数
         print(f"layer({name}) parameters:")
         for p in layer.parameters():
             print(f'\t {p.shape} has {p.numel()} parameters')
-            cnt += p.numel() #将参数数量累加至cnt
+            cnt += p.numel()                      #将参数数量累加至cnt
     #最后打印模型总参数数量
     print('The model has %d trainable parameters\n' % (cnt))
 
 #打印输入张量x经过每一层时的维度变化情况
 def print_forward(model, x):
-    print(f"x: {x.shape}") # x从一个5*28*28的输入张量
-    x = x.view(-1, 28 * 28) # 经过view函数，变成了一个5*784的张量
+    print(f"x: {x.shape}")              # x从一个5*28*28的输入张量
+    x = x.view(-1, 28 * 28)             # 经过view函数，变成了一个5*784的张量
     print(f"after view: {x.shape}")
-    x = model.layer1(x) # 经过第1个线性层，得到5*256的张量
+    x = model.layer1(x)                 # 经过第1个线性层，得到5*256的张量
     print(f"after layer1: {x.shape}")
-    x = torch.relu(x) # 经过relu函数，没有变化
+    x = torch.relu(x)                   # 经过relu函数，没有变化
     print(f"after relu: {x.shape}")
-    x = model.layer2(x) # 经过第2个线性层，得到一个5*10的结果
+    x = model.layer2(x)                 # 经过第2个线性层，得到一个5*10的结果
     print(f"after layer2: {x.shape}")
 
 if __name__ == '__main__':
-    model = Network() # 定义一个Network模型
-    print(model) # 将其打印，观察打印结果可以了解模型的结构
+    model = Network()                   # 定义一个Network模型
+    print(model)                        # 将其打印，观察打印结果可以了解模型的结构
     print("")
 
-    print_parameters(model) #将模型的参数打印出来
+    print_parameters(model)             #将模型的参数打印出来
     # 定义一个5x28x28的张量x，表示了5个28x28的图像
     # 打印输入张量x经过每一层维度的变化情况
     x = torch.zeros([5, 28, 28])
