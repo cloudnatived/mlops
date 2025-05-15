@@ -32,9 +32,9 @@ if __name__ == '__main__':
     # 60000个训练数据，如果每个小批量，读入64个样本，那么60000个数据会被分成938组
     # 计算938*64=60032，这说明最后一组，会不够64个数据
 
-    model = Network()  # 模型本身，它就是我们设计的神经网络
-    optimizer = optim.Adam(model.parameters())  # 优化模型中的参数
-    criterion = nn.CrossEntropyLoss()  # 分类问题，使用交叉熵损失误差
+    model = Network()                              # 模型本身，它就是我们设计的神经网络
+    optimizer = optim.Adam(model.parameters())     # 优化模型中的参数
+    criterion = nn.CrossEntropyLoss()              # 分类问题，使用交叉熵损失误差
 
     # 进入模型的迭代循环
     for epoch in range(10):  # 外层循环，代表了整个训练数据集的遍历次数
@@ -44,17 +44,16 @@ if __name__ == '__main__':
         for batch_idx, (data, label) in enumerate(train_loader):
             # 内层每循环一次，就会进行一次梯度下降算法
             # 包括了5个步骤:
-            output = model(data)                # 1.计算神经网络的前向传播结果
-            loss = criterion(output, label)     # 2.计算output和标签label之间的损失loss
-            loss.backward()                     # 3.使用backward计算梯度
-            optimizer.step()                    # 4.使用optimizer.step更新参数
-            optimizer.zero_grad()               # 5.将梯度清零
-                                                # 这5个步骤，是使用pytorch框架训练模型的定式，初学的时候，先记住就可以了
+            output = model(data)                   # 1.计算神经网络的前向传播结果
+            loss = criterion(output, label)        # 2.计算output和标签label之间的损失loss
+            loss.backward()                        # 3.使用backward计算梯度
+            optimizer.step()                       # 4.使用optimizer.step更新参数
+            optimizer.zero_grad()                  # 5.将梯度清零
+                                                   # 这5个步骤，是使用pytorch框架训练模型的定式，初学的时候，先记住就可以了
 
-            # 每迭代100个小批量，就打印一次模型的损失，观察训练的过程
-            if batch_idx % 100 == 0:
+            if batch_idx % 100 == 0:               # 每迭代100个小批量，就打印一次模型的损失，观察训练的过程
                 print(f"Epoch {epoch + 1}/10 "
                       f"| Batch {batch_idx}/{len(train_loader)} "
                       f"| Loss: {loss.item():.4f}")
 
-    torch.save(model.state_dict(), 'mnist.pth') # 保存模型
+    torch.save(model.state_dict(), 'mnist.pth')    # 保存模型
