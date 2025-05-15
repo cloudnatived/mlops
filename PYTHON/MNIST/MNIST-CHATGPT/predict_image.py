@@ -7,15 +7,15 @@ import sys
 def predict(image_path):
     # 图像预处理：转为灰度图 → 缩放至 28x28 → 转 Tensor → 标准化
     transform = transforms.Compose([
-        transforms.Grayscale(),  # 保证为单通道
+        transforms.Grayscale(),                                     # 保证为单通道
         transforms.Resize((28, 28)),
         transforms.ToTensor(),
-        transforms.Normalize((0.1307,), (0.3081,)),  # MNIST 的均值与方差
+        transforms.Normalize((0.1307,), (0.3081,)),                 # MNIST 的均值与方差
     ])
 
     # 加载图片并预处理
     image = Image.open(image_path)
-    image = transform(image).unsqueeze(0)  # 添加 batch 维度 [1, 1, 28, 28]
+    image = transform(image).unsqueeze(0)                            # 添加 batch 维度 [1, 1, 28, 28]
 
     # 加载模型
     model = SimpleCNN()
