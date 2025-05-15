@@ -24,9 +24,13 @@ if __name__ == '__main__':
     train_dataset = datasets.ImageFolder(root='./mnist_images/train', transform=transform)
     print("train_dataset length: ", len(train_dataset))
 
+    # 使用trainloader,实现小批量的数据读取
+    # 这里设置小批量的大小，batch size=64。也就是每个批次，包括64个数据
     # 小批量的数据读入
     train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
     print("train_loader length: ", len(train_loader))
+    # 60000个训练数据，如果每个小批量，读入64个样本，那么60000个数据会被分成938组
+    # 计算938*64=60032，这说明最后一组，会不够64个数据
 
     model = Network()  # 模型本身，它就是我们设计的神经网络
     optimizer = optim.Adam(model.parameters())  # 优化模型中的参数
