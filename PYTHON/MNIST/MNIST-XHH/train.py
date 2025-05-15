@@ -11,10 +11,15 @@ from torch.utils.data import DataLoader
 if __name__ == '__main__':
     # 图像的预处理
     transform = transforms.Compose([
-        transforms.Grayscale(num_output_channels=1),  # 转换为单通道灰度图
-        transforms.ToTensor()  # 转换为张量
+        transforms.Grayscale(num_output_channels=1),      # transform功能1.转换为单通道灰度图
+        transforms.ToTensor()                             # transform功能2.转换为张量
     ])
 
+    # 使用ImageFolder所数，读取数据文件夹，构建数据集dataset
+    # 这个函数会将保存数据的文件夹的名字，作为数据的标签，组织数据
+    # 例如，对于名字为"3"的文件夹
+    # 会将"3"就会作为文件夹中图像数据的标签，和图像配对，用于后续的训练，使用起来非常的方便
+    
     # 读入并构造数据集
     train_dataset = datasets.ImageFolder(root='./mnist_images/train', transform=transform)
     print("train_dataset length: ", len(train_dataset))
