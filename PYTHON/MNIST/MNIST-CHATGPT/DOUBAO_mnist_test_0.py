@@ -10,7 +10,7 @@ def test():
     test_loader = DataLoader(test_dataset, batch_size=64, shuffle=False)
 
     model = SimpleCNN()
-    model.load_state_dict(torch.load("DOUBAO_mnist.pth", map_location="cpu"))
+    model.load_state_dict(torch.load("DOUBAO_mnist_0.pth", map_location="cpu"))
     model.eval()
 
     correct = 0
