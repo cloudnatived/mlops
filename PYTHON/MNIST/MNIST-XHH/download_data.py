@@ -20,7 +20,6 @@ test_data = [(ToPILImage()(img), label) for img, label in test_data]
 
 import os
 import secrets
-#def save_images(dataset, folder_name):
 def save_images_with_progress(dataset, folder_name):
     root_dir = os.path.join('./mnist_images', folder_name)                           # 按folder_name（train或test）创建根目录。
     os.makedirs(root_dir, exist_ok=True)                                             # 创建根目录（如 ./mnist_images/train）
@@ -32,7 +31,5 @@ def save_images_with_progress(dataset, folder_name):
         random_filename = secrets.token_hex(8) + '.png'                              # 使用secrets.token_hex(8)生成随机文件名，避免同名文件覆盖。8字节16进制字符串，如 "a1b2c3d4e5f6.png"
         img.save(os.path.join(label_dir, random_filename))                           # 保存图像
 
-#save_images(train_data, 'train')
 save_images_with_progress(train_data, 'train')
-#save_images(test_data, 'test')
 save_images_with_progress(test_data, 'test')
