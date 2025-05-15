@@ -6,13 +6,12 @@ import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 
-# 设备配置
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")      # 检查CUDA配置
 
 # 数据预处理：MNIST为28x28灰度图，无需Resize
 transform = transforms.Compose([
     transforms.ToTensor(),
-    transforms.Normalize((0.1307,), (0.3081,))  # MNIST预定义均值/标准差
+    transforms.Normalize((0.1307,), (0.3081,))                             # MNIST预定义均值/标准差
 ])
 
 # 加载数据集
@@ -30,11 +29,11 @@ class SimpleCNN(nn.Module):
             nn.Conv2d(1, 32, kernel_size=3, padding=1),
             nn.BatchNorm2d(32),
             nn.ReLU(),
-            nn.MaxPool2d(2),  # 14x14
+            nn.MaxPool2d(2),                                                  # 14x14
             nn.Conv2d(32, 64, kernel_size=3, padding=1),
             nn.BatchNorm2d(64),
             nn.ReLU(),
-            nn.MaxPool2d(2)   # 7x7
+            nn.MaxPool2d(2)                                                    # 7x7
         )
         self.fc = nn.Sequential(
             nn.Linear(64 * 7 * 7, 128),
@@ -45,14 +44,14 @@ class SimpleCNN(nn.Module):
 
     def forward(self, x):
         x = self.conv(x)
-        x = x.view(x.size(0), -1)  # 动态展平，兼容不同批量大小
+        x = x.view(x.size(0), -1)                                              # 动态展平，兼容不同批量大小
         return self.fc(x)
 
 # 初始化模型、损失函数和优化器
 model = SimpleCNN().to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=1e-3)
-scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.5)  # 学习率衰减
+scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.5)       # 学习率衰减
 
 # 训练函数
 def train_model(model, train_loader, criterion, optimizer, epoch, device):
@@ -103,7 +102,7 @@ for epoch in range(num_epochs):
     train_loss, train_acc = train_model(model, train_loader, criterion, optimizer, epoch, device)
     test_loss, test_acc = evaluate_model(model, test_loader, criterion, device)
     
-    scheduler.step()  # 调整学习率
+    scheduler.step()                                                               # 调整学习率
     
     train_losses.append(train_loss)
     train_accs.append(train_acc)
