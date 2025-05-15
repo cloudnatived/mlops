@@ -16,12 +16,9 @@ transform = transforms.Compose([
 ])
 
 # 加载数据集
-train_dataset = torchvision.datasets.MNIST(
-    root="./data", train=True, transform=transform, download=True
-)
-test_dataset = torchvision.datasets.MNIST(
-    root="./data", train=False, transform=transform, download=True
-)
+train_dataset = torchvision.datasets.MNIST(root="./data", train=True, transform=transform, download=True)
+test_dataset = torchvision.datasets.MNIST(root="./data", train=False, transform=transform, download=True)
+
 train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True, num_workers=2)
 test_loader = DataLoader(test_dataset, batch_size=128, shuffle=False, num_workers=2)
 
