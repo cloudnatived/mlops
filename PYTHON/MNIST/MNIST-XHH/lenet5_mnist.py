@@ -16,21 +16,14 @@ np.random.seed(42)
 class LeNet5(nn.Module):
     def __init__(self):
         super(LeNet5, self).__init__()
-        # 第一卷积层：输入1通道（灰度图像），输出6通道，卷积核大小为5x5
-        self.conv1 = nn.Conv2d(1, 6, kernel_size=5)
-        # 第一池化层：最大池化，池化窗口大小为2x2，步幅为2
-        self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
-        # 第二卷积层：输入6通道，输出16通道，卷积核大小为5x5
-        self.conv2 = nn.Conv2d(6, 16, kernel_size=5)
-        # 第二池化层：最大池化，池化窗口大小为2x2，步幅为2
-        self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
-        # 第一个全连接层：输入维度是16*4*4，输出维度是120
-        #self.fc1 = nn.Linear(16 * 4 * 4, 120)
-        self.fc1 = nn.Linear(16 * 5 * 5, 120)
-        # 第二个全连接层：输入维度是120，输出维度是84
-        self.fc2 = nn.Linear(120, 84)
-        # 第三个全连接层：输入维度是84，输出维度是10，对应10个类别
-        self.fc3 = nn.Linear(84, 10)
+        self.conv1 = nn.Conv2d(1, 6, kernel_size=5)            # 第一卷积层：输入1通道（灰度图像），输出6通道，卷积核大小为5x5
+        self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)     # 第一池化层：最大池化，池化窗口大小为2x2，步幅为2
+        self.conv2 = nn.Conv2d(6, 16, kernel_size=5)           # 第二卷积层：输入6通道，输出16通道，卷积核大小为5x5
+        self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)     # 第二池化层：最大池化，池化窗口大小为2x2，步幅为2
+        #self.fc1 = nn.Linear(16 * 4 * 4, 120)                 # 第一个全连接层：输入维度是16*4*4，输出维度是120
+        self.fc1 = nn.Linear(16 * 5 * 5, 120)                  # 第一个全连接层：输入维度是16*4*4，输出维度是120
+        self.fc2 = nn.Linear(120, 84)                          # 第二个全连接层：输入维度是120，输出维度是84
+        self.fc3 = nn.Linear(84, 10)                           # 第三个全连接层：输入维度是84，输出维度是10，对应10个类别
 
     def forward(self, x):
         # 前向传播函数定义网络的数据流向
@@ -45,9 +38,9 @@ class LeNet5(nn.Module):
 
 # 定义数据变换和加载MNIST数据集
 transform = transforms.Compose([
-    transforms.Resize((32, 32)),                 # 将图像调整为32x32，符合LeNet-5输入要求
-    transforms.ToTensor(),                       # 转换为张量
-    transforms.Normalize((0.1307,), (0.3081,))   # MNIST数据集的均值和标准差
+    transforms.Resize((32, 32)),                              # 将图像调整为32x32，符合LeNet-5输入要求
+    transforms.ToTensor(),                                    # 转换为张量
+    transforms.Normalize((0.1307,), (0.3081,))                # MNIST数据集的均值和标准差
 ])
 
 
@@ -86,8 +79,8 @@ print(f"Using device: {device}")
 
 # 初始化LeNet-5模型以及定义损失函数和优化器
 net = LeNet5().to(device)
-criterion = nn.CrossEntropyLoss()  # 交叉熵损失函数，用于分类问题
-optimizer = optim.Adam(net.parameters(), lr=0.001)  # Adam优化器，学习率为0.001
+criterion = nn.CrossEntropyLoss()                                       # 交叉熵损失函数，用于分类问题
+optimizer = optim.Adam(net.parameters(), lr=0.001)                      # Adam优化器，学习率为0.001
 scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=2, factor=0.5)
 
 # 训练和验证历史记录
@@ -117,7 +110,7 @@ def train(net, train_loader, criterion, optimizer, device, epoch):
         total += labels.size(0)
         correct += predicted.eq(labels).sum().item()
         
-        if i % 100 == 99:  # 每100个批次打印一次
+        if i % 100 == 99:                            # 每100个批次打印一次
             print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 100:.3f}')
             running_loss = 0.0
     
@@ -155,7 +148,7 @@ def validate(net, val_loader, criterion, device):
 
 # 训练主循环
 best_val_acc = 0.0
-num_epochs = 10  # 增加训练轮数
+num_epochs = 10                                               # 增加训练轮数
 
 for epoch in range(num_epochs):
     train_loss, train_acc = train(net, train_loader, criterion, optimizer, device, epoch)
@@ -190,8 +183,8 @@ class_total = list(0. for i in range(10))
 with torch.no_grad():
     for data in test_loader:
         inputs, labels = data[0].to(device), data[1].to(device)
-        outputs = net(inputs)  # 前向传播
-        _, predicted = torch.max(outputs, 1)  # 找到最大概率的类别
+        outputs = net(inputs)                                        # 前向传播
+        _, predicted = torch.max(outputs, 1)                         # 找到最大概率的类别
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
         
