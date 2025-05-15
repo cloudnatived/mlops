@@ -21,14 +21,14 @@ class Network(nn.Module):    # 步骤1:弄懂这个模型中“有什么"? 模�
         x = self.layer2(x)          # 输入至layer2计算结果
         return x                    # 返回结果
 
-def print_parameters(model):                #手动的遍历模型中的各个结构，并计算可以训练的参数
+def print_parameters(model):                                     #手动的遍历模型中的各个结构，并计算可以训练的参数
     cnt = 0
-    for name, layer in model.named_children():     #遍历每一层
-        print(f"layer({name}) parameters:") # 打印层的名称和该层中包含的可训练参数
+    for name, layer in model.named_children():                   #遍历每一层
+        print(f"layer({name}) parameters:")                      # 打印层的名称和该层中包含的可训练参数
         for p in layer.parameters():
             print(f'\t {p.shape} has {p.numel()} parameters')
-            cnt += p.numel()                      #将参数数量累加至cnt
-    print('The model has %d trainable parameters\n' % (cnt)) #最后打印模型总参数数量
+            cnt += p.numel()                                     #将参数数量累加至cnt
+    print('The model has %d trainable parameters\n' % (cnt))     #最后打印模型总参数数量
 
 def print_forward(model, x):            #打印输入张量x经过每一层时的维度变化情况
     print(f"x: {x.shape}")              # x从一个5*28*28的输入张量
