@@ -21,10 +21,11 @@ test_data = [(ToPILImage()(img), label) for img, label in test_data]
 import os
 import secrets
 #def save_images(dataset, folder_name):
-def save_images_with_progress(dataset, folder_name):                                 # 添加进度条显示保存进度
+def save_images_with_progress(dataset, folder_name):
     root_dir = os.path.join('./mnist_images', folder_name)                           # 按folder_name（train或test）创建根目录。
     os.makedirs(root_dir, exist_ok=True)                                             # 创建根目录（如 ./mnist_images/train）
-    for i in range(len(dataset)):
+    #for i in range(len(dataset)):
+    for i in tqdm(range(len(dataset)), desc=f"Saving {folder_name} images"):         # 增加进度条显示
         img, label = dataset[i]
         label_dir = os.path.join(root_dir, str(label))                               # 创建标签子目录（如 ./mnist_images/train/0）
         os.makedirs(label_dir, exist_ok=True)
@@ -35,10 +36,3 @@ def save_images_with_progress(dataset, folder_name):                            
 save_images_with_progress(train_data, 'train')
 #save_images(test_data, 'test')
 save_images_with_progress(test_data, 'test')
-
-
-
-
-
-
-
