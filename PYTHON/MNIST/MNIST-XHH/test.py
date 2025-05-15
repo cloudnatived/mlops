@@ -8,23 +8,22 @@ if __name__ == '__main__':
         transforms.Grayscale(num_output_channels=1),
         transforms.ToTensor()
     ])
-    # 读取测试数据集
-    test_dataset = datasets.ImageFolder(root='./mnist_images/test', transform=transform)
+
+    test_dataset = datasets.ImageFolder(root='./mnist_images/test', transform=transform)    # 读取测试数据集
     print("test_dataset length: ", len(test_dataset))
 
-    model = Network()  # 定义神经网络模型
-    model.load_state_dict(torch.load('mnist.pth')) # 加载刚刚训练好的模型文件
+    model = Network()                                  # 定义神经网络模型
+    model.load_state_dict(torch.load('mnist.pth'))     # 加载刚刚训练好的模型文件
 
-    right = 0 # 保存正确识别的数量
+    right = 0                                          # 保存正确识别的数量
     for i, (x, y) in enumerate(test_dataset):
-        output = model(x)  # 将其中的数据x输入到模型
-        predict = output.argmax(1).item() # 选择概率最大标签的作为预测结果
-        # 对比预测值predict和真实标签y
-        if predict == y:
+        output = model(x)                              # 将其中的数据x输入到模型
+        predict = output.argmax(1).item()              # 选择概率最大标签的作为预测结果
+
+        if predict == y:                               # 对比预测值predict和真实标签y
             right += 1
-        else:
-            # 将识别错误的样例打印了出来
-            img_path = test_dataset.samples[i][0]
+        else:             
+            img_path = test_dataset.samples[i][0]      # 将识别错误的样例打印了出来
             print(f"wrong case: predict = {predict} y = {y} img_path = {img_path}")
 
     # 计算出测试效果
