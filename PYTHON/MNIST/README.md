@@ -8,6 +8,7 @@
 
 ```
 # ubuntu 22.04.5 下的环境准备
+#############################################################################################################
 cp /etc/apt/sources.list /etc/apt/sources.list.original;
 cat > /etc/apt/sources.list <<EOF
 # 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释
@@ -43,6 +44,8 @@ index-url = https://pypi.tuna.tsinghua.edu.cn/simple
 EOF
 
 python3 -m pip install --upgrade pip;
+#############################################################################################################
+
 
 # 程序所在目录，下载这5个文件
 https://github.com/cloudnatived/mlops/tree/main/PYTHON/MNIST/MNIST-XHH
@@ -56,7 +59,7 @@ test.py
 # 安装项目所需的python库
 pip3 install -r requirements.txt;
 
-# 下载数据集
+# 下载数据集，并保存成图片，其它的手写数字识别程序没有这一步
 python3 download_data.py
 
 # 训练模型，讲模型保存成mnist.pth
@@ -68,6 +71,11 @@ python3 test.py
 准确率：
 test accuracy = 9801 / 10000 = 0.980
 
+LeNet5_0.py
+
+LeNet5_1.py
+
+lenet5_mnist.py
 
 ```
 
