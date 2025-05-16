@@ -74,7 +74,7 @@ test accuracy = 9801 / 10000 = 0.980
 
 
 
-## MNIST-CHATGPT -- 
+## /MNIST-CHATGPT -- 
 
 ```
 # CHATGPT写的一个手写数字识别
