@@ -56,7 +56,7 @@ def train():
             total_loss += loss.item()
         print(f"Epoch {epoch+1}, Loss: {total_loss:.4f}")
 
-    torch.save(model.state_dict(), "mnist_cnn.pth")
+    torch.save(model.state_dict(), "CHATGPT_mnist_cnn.pth")
     print("模型已保存为 mnist_cnn.pth")
 
 if __name__ == "__main__":

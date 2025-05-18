@@ -1,7 +1,7 @@
 import torch
 from torchvision import transforms
 from PIL import Image
-from train_mnist import SimpleCNN  # 确保 train_mnist.py 中定义的 SimpleCNN 类可导入
+from CHATGPT_train_mnist import SimpleCNN  # 确保 train_mnist.py 中定义的 SimpleCNN 类可导入
 import sys
 
 def predict(image_path):

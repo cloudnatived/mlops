@@ -1,7 +1,7 @@
 import torch
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
-from train_mnist import SimpleCNN
+from CHATGPT_train_mnist import SimpleCNN
 
 def test():
     transform = transforms.ToTensor()
