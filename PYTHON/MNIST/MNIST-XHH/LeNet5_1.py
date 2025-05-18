@@ -15,7 +15,7 @@ class LeNet(nn.Module):
         self.fc2 = nn.Linear(120, 84)                    # 全连接层：输入120，输出84
         self.fc3 = nn.Linear(84, 10)                     # 全连接层：输入84，输出10（对应10个类别）
 
-    def forward(self, x):
+    def forward(self, x):                                # 前向传播函数，定义数据流向
         x = F.relu(self.conv1(x))                        # 第一层卷积 + 激活 + 池化
         x = F.max_pool2d(x, 2, 2)                        
         x = F.relu(self.conv2(x))
