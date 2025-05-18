@@ -8,16 +8,16 @@ from torchvision import datasets, transforms
 # 定义 LeNet-5 网络结构
 class LeNet(nn.Module):
     def __init__(self):
-        super(LeNet, self).__init__()
-        self.conv1 = nn.Conv2d(1, 6, 5)
-        self.conv2 = nn.Conv2d(6, 16, 5)
-        self.fc1 = nn.Linear(16 * 5 * 5, 120)
-        self.fc2 = nn.Linear(120, 84)
-        self.fc3 = nn.Linear(84, 10)
+        super(LeNet, self).__init__()                                                          
+        self.conv1 = nn.Conv2d(1, 6, 5)                  # 第一层卷积层：输入1通道，输出6通道，卷积核5x5，padding=same
+        self.conv2 = nn.Conv2d(6, 16, 5)                 # 第二层卷积层：输入6通道，输出16通道，卷积核5x5
+        self.fc1 = nn.Linear(16 * 5 * 5, 120)            # 第三层卷积层：输入16通道，输出120通道，卷积核5x5
+        self.fc2 = nn.Linear(120, 84)                    # 全连接层：输入120，输出84
+        self.fc3 = nn.Linear(84, 10)                     # 全连接层：输入84，输出10（对应10个类别）
 
     def forward(self, x):
-        x = F.relu(self.conv1(x))
-        x = F.max_pool2d(x, 2, 2)
+        x = F.relu(self.conv1(x))                        # 第一层卷积 + 激活 + 池化
+        x = F.max_pool2d(x, 2, 2)                        
         x = F.relu(self.conv2(x))
         x = F.max_pool2d(x, 2, 2)
         x = x.view(-1, 16 * 5 * 5)
@@ -28,9 +28,9 @@ class LeNet(nn.Module):
 
 # 数据预处理和加载
 transform = transforms.Compose([
-    transforms.Resize((32, 32)),  # LeNet 输入是 32x32
-    transforms.ToTensor(),
-    transforms.Normalize((0.1307,), (0.3081,))
+    transforms.Resize((32, 32)),                          # 将图像调整为32x32，LeNet 输入是 32x32，符合LeNet-5输入要求
+    transforms.ToTensor(),                                # 转换为Tensor
+    transforms.Normalize((0.1307,), (0.3081,))            # MNIST数据集的均值和标准差
 ])
 
 train_dataset = datasets.MNIST(root='./data', train=True, download=True, transform=transform)
