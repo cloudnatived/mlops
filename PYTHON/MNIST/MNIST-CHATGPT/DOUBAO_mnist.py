@@ -16,11 +16,11 @@ transform = transforms.Compose([
 ])
 
 # 加载数据集
-train_dataset = torchvision.datasets.MNIST(root="./data", train=True, transform=transform, download=True)
-test_dataset = torchvision.datasets.MNIST(root="./data", train=False, transform=transform, download=True)
+train_dataset = torchvision.datasets.MNIST(root="./data", train=True, transform=transform, download=True)   # download = True，下载
+test_dataset = torchvision.datasets.MNIST(root="./data", train=False, transform=transform, download=True)   # download = True，下载
 
-train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True, num_workers=2)
-test_loader = DataLoader(test_dataset, batch_size=128, shuffle=False, num_workers=2)
+train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True, num_workers=2)         # shuffle=True，打乱
+test_loader = DataLoader(test_dataset, batch_size=128, shuffle=False, num_workers=2)         # shuffle=False，不打乱
 
 # 定义模型
 class SimpleCNN(nn.Module):
@@ -62,8 +62,8 @@ def train_model(model, train_loader, criterion, optimizer, epoch, device):
     total = 0
     for batch_idx, (data, targets) in enumerate(train_loader):
         data, targets = data.to(device), targets.to(device)                   # 把数据转换成Variable，把变量变成Variable形式，因为这样子才有梯度
-        optimizer.zero_grad()                                                 # 5.将梯度清零（避免累加）
-        outputs = model(data)                                                 # 1.计算神经网络的前向传播结果
+        optimizer.zero_grad()                                                 # 5.将梯度清零（避免累加），以便在下一次反向传播中不累积之前的梯度
+        outputs = model(data)                                                 # 1.计算神经网络的前向传播结果，得到模型的预测结果 outputs
         loss = criterion(outputs, targets)                                    # 2.计算output和标签label之间的损失loss，交叉熵损失函数
         loss.backward()                                                       # 3.使用backward计算梯度，反向传播梯度
         optimizer.step()                                                      # 4.使用optimizer.step更新参数，结束一次前向传播+反向传播之后，更新参数
@@ -72,7 +72,8 @@ def train_model(model, train_loader, criterion, optimizer, epoch, device):
         _, predicted = torch.max(outputs.data, 1)                             # 找到最大概率的类别
         total += targets.size(0)
         correct += (predicted == targets).sum().item()
-        
+
+        # 在每经过一定数量的批次后，输出当前训练轮次、总周轮数、当前批次、总批次数和损失值
         if batch_idx % 100 == 0:                                              # 每迭代100个小批量，就打印一次模型的损失，观察训练的过程
             print(f"Epoch [{epoch+1}/10], Step [{batch_idx}/{len(train_loader)}], Loss: {loss.item():.4f}, Acc: {100.*correct/total:.2f}%")
     return running_loss / len(train_loader), 100.*correct/total
@@ -91,8 +92,8 @@ def evaluate_model(model, test_loader, criterion, device):
             
             running_loss += loss.item()                                       # 前向传播
             _, predicted = torch.max(outputs.data, 1)                         # 找到最大概率的类别
-            total += targets.size(0)
-            correct += (predicted == targets).sum().item()
+            total += targets.size(0)                                          # 累积总样本数
+            correct += (predicted == targets).sum().item()                    # 累积正确分类的样本数
     return running_loss / len(test_loader), 100.*correct/total
 
 # 训练主循环
