@@ -1,9 +1,7 @@
 import torch
 from torch import nn
 from torch import optim
-
 from model import Network
-
 from torchvision import transforms
 from torchvision import datasets
 from torch.utils.data import DataLoader
