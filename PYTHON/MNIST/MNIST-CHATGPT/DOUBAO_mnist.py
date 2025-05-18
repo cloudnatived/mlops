@@ -12,7 +12,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")      # 检
 transform = transforms.Compose([
     transforms.RandomRotation(10),                                         # 随机旋转±10度
     transforms.ToTensor(),
-    transforms.Normalize((0.1307,), (0.3081,))                             # MNIST预定义均值/标准差
+    transforms.Normalize((0.1307,), (0.3081,))                             # MNIST预定义均值/标准差，数据集给出的均值和标准差系数，每个数据集都不同的，都数据集提供方给出的
 ])
 
 # 加载数据集
@@ -61,7 +61,7 @@ def train_model(model, train_loader, criterion, optimizer, epoch, device):
     correct = 0
     total = 0
     for batch_idx, (data, targets) in enumerate(train_loader):
-        data, targets = data.to(device), targets.to(device)
+        data, targets = data.to(device), targets.to(device)                   # 把数据转换成Variable，把变量变成Variable形式，因为这样子才有梯度
         optimizer.zero_grad()                                                 # 5.将梯度清零（避免累加）
         outputs = model(data)                                                 # 1.计算神经网络的前向传播结果
         loss = criterion(outputs, targets)                                    # 2.计算output和标签label之间的损失loss
