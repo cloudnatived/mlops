@@ -1,10 +1,9 @@
-import torch
-from torch import nn
-from torch import optim
-from model import Network
-from torchvision import transforms
-from torchvision import datasets
-from torch.utils.data import DataLoader
+import torch                                         # 导入PyTorch库
+from torch import nn                                 # 导入PyTorch的神经网络模块
+from torch import optim                              # 导入优化器工具
+from model import Network                            # 从model.py中，导入自定义类 Network
+from torchvision import datasets, transforms         # 从torchvision导入数据集和数据转换工具
+from torch.utils.data import DataLoader              # 导入DataLoader，用于加载数据
 
 if __name__ == '__main__':
     # 图像的预处理
@@ -22,23 +21,19 @@ if __name__ == '__main__':
     train_dataset = datasets.ImageFolder(root='./mnist_images/train', transform=transform)
     print("train_dataset length: ", len(train_dataset))
 
-    # 使用trainloader,实现小批量的数据读取
-    # 这里设置小批量的大小，batch size=64。也就是每个批次，包括64个数据
-    # 小批量的数据读入
-    train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
+    train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)    # 使用trainloader,实现小批量的数据读取，设置小批量的大小，batch size=64。每个批次，包括64个数据
     print("train_loader length: ", len(train_loader))
     # 60000个训练数据，如果每个小批量，读入64个样本，那么60000个数据会被分成938组
     # 计算938*64=60032，这说明最后一组，会不够64个数据
 
-    model = Network()                              # 模型本身，它就是我们设计的神经网络
-    optimizer = optim.Adam(model.parameters())     # 优化模型中的参数
+    model = Network()                              # 自定义的神经网络模型本身
+    optimizer = optim.Adam(model.parameters())     # Adam优化模型中的参数
     criterion = nn.CrossEntropyLoss()              # 分类问题，使用交叉熵损失误差
 
     # 进入模型的迭代循环
-    for epoch in range(10):  # 外层循环，代表了整个训练数据集的遍历次数，整个训练集要循环多少轮，设置成10次、20次或者100次都是可以的
+    for epoch in range(10):                        # 外层循环，代表了整个训练数据集的遍历次数，整个训练集要循环多少轮，设置成10次、20次或者100次都是可以的
 
-        # 内存循环使用train_loader，进行小批量的数据读取，每一次循环，都会取出64个图像数据，作为一个小批量batch
-        for batch_idx, (data, label) in enumerate(train_loader):
+        for batch_idx, (data, label) in enumerate(train_loader):    # 内存循环使用train_loader，进行小批量的数据读取，每一次循环，都会取出64个图像数据，作为一个小批量batch
             # 内层每循环一次，就会进行一次梯度下降算法
             # 包括了5个步骤:
             output = model(data)                   # 1.计算神经网络的前向传播结果
