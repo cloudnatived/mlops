@@ -64,9 +64,9 @@ def train_model(model, train_loader, criterion, optimizer, epoch, device):
         data, targets = data.to(device), targets.to(device)                   # 把数据转换成Variable，把变量变成Variable形式，因为这样子才有梯度
         optimizer.zero_grad()                                                 # 5.将梯度清零（避免累加）
         outputs = model(data)                                                 # 1.计算神经网络的前向传播结果
-        loss = criterion(outputs, targets)                                    # 2.计算output和标签label之间的损失loss
-        loss.backward()                                                       # 3.使用backward计算梯度
-        optimizer.step()                                                      # 4.使用optimizer.step更新参数
+        loss = criterion(outputs, targets)                                    # 2.计算output和标签label之间的损失loss，交叉熵损失函数
+        loss.backward()                                                       # 3.使用backward计算梯度，反向传播梯度
+        optimizer.step()                                                      # 4.使用optimizer.step更新参数，结束一次前向传播+反向传播之后，更新参数
         
         running_loss += loss.item()                                           # 统计损失和准确率
         _, predicted = torch.max(outputs.data, 1)
