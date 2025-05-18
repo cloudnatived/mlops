@@ -62,18 +62,18 @@ def train_model(model, train_loader, criterion, optimizer, epoch, device):
     total = 0
     for batch_idx, (data, targets) in enumerate(train_loader):
         data, targets = data.to(device), targets.to(device)
-        optimizer.zero_grad()                                                 # 清空梯度（避免累加）
-        outputs = model(data)                                                 # 前向传播
-        loss = criterion(outputs, targets)                                    # 计算损失
-        loss.backward()                                                       # 反向传播，计算梯度
-        optimizer.step()                                                      # 更新模型参数
+        optimizer.zero_grad()                                                 # 5.将梯度清零（避免累加）
+        outputs = model(data)                                                 # 1.计算神经网络的前向传播结果
+        loss = criterion(outputs, targets)                                    # 2.计算output和标签label之间的损失loss
+        loss.backward()                                                       # 3.使用backward计算梯度
+        optimizer.step()                                                      # 4.使用optimizer.step更新参数
         
         running_loss += loss.item()                                           # 统计损失和准确率
         _, predicted = torch.max(outputs.data, 1)
         total += targets.size(0)
         correct += (predicted == targets).sum().item()
         
-        if batch_idx % 100 == 0:
+        if batch_idx % 100 == 0:                                              # 每迭代100个小批量，就打印一次模型的损失，观察训练的过程
             print(f"Epoch [{epoch+1}/10], Step [{batch_idx}/{len(train_loader)}], Loss: {loss.item():.4f}, Acc: {100.*correct/total:.2f}%")
     return running_loss / len(train_loader), 100.*correct/total
 
@@ -89,21 +89,21 @@ def evaluate_model(model, test_loader, criterion, device):
             outputs = model(data)
             loss = criterion(outputs, targets)
             
-            running_loss += loss.item()
-            _, predicted = torch.max(outputs.data, 1)
+            running_loss += loss.item()                                       # 前向传播
+            _, predicted = torch.max(outputs.data, 1)                         # 找到最大概率的类别
             total += targets.size(0)
             correct += (predicted == targets).sum().item()
     return running_loss / len(test_loader), 100.*correct/total
 
 # 训练主循环
-num_epochs = 10
+num_epochs = 10                                                               # 增加训练轮数
 train_losses, train_accs, test_losses, test_accs = [], [], [], []
 
 for epoch in range(num_epochs):
     train_loss, train_acc = train_model(model, train_loader, criterion, optimizer, epoch, device)
     test_loss, test_acc = evaluate_model(model, test_loader, criterion, device)
     
-    scheduler.step()                                                               # 调整学习率，按epoch衰减学习率
+    scheduler.step()                                                          # 调整学习率，按epoch衰减学习率
     
     train_losses.append(train_loss)
     train_accs.append(train_acc)
