@@ -10,9 +10,9 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")      # 检
 
 # 数据预处理：MNIST为28x28灰度图，无需Resize
 transform = transforms.Compose([
-    transforms.RandomRotation(10),                                         # 随机旋转±10度
-    transforms.ToTensor(),
-    transforms.Normalize((0.1307,), (0.3081,))                             # MNIST预定义均值/标准差，数据集给出的均值和标准差系数，每个数据集都不同的，都数据集提供方给出的
+    transforms.RandomRotation(10),                                         # 随机旋转图片±10度
+    transforms.ToTensor(),                                                 # 将图片转化为Tensor格式
+    transforms.Normalize((0.1307,), (0.3081,))                             # MNIST预定义均值/标准差，数据集给出的均值和标准差系数，每个数据集都不同的，都数据集提供方给出的。正则化(当模型出现过拟合的情况时，用来降低模型的复杂度)
 ])
 
 # 加载数据集
@@ -69,7 +69,7 @@ def train_model(model, train_loader, criterion, optimizer, epoch, device):
         optimizer.step()                                                      # 4.使用optimizer.step更新参数，结束一次前向传播+反向传播之后，更新参数
         
         running_loss += loss.item()                                           # 统计损失和准确率
-        _, predicted = torch.max(outputs.data, 1)
+        _, predicted = torch.max(outputs.data, 1)                             # 找到最大概率的类别
         total += targets.size(0)
         correct += (predicted == targets).sum().item()
         
