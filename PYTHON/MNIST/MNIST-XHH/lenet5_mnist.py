@@ -21,7 +21,7 @@ class LeNet5(nn.Module):
         self.conv2 = nn.Conv2d(6, 16, kernel_size=5)           # 第二卷积层：输入6通道，输出16通道，卷积核大小为5x5
         self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)     # 第二池化层：最大池化，池化窗口大小为2x2，步幅为2
         #self.fc1 = nn.Linear(16 * 4 * 4, 120)                 # 第一个全连接层：输入维度是16*4*4，输出维度是120
-        self.fc1 = nn.Linear(16 * 5 * 5, 120)                  # 第一个全连接层：输入维度是16*4*4，输出维度是120
+        self.fc1 = nn.Linear(16 * 5 * 5, 120)                  # 第一个全连接层：输入维度是16*5*5，输出维度是120
         self.fc2 = nn.Linear(120, 84)                          # 第二个全连接层：输入维度是120，输出维度是84
         self.fc3 = nn.Linear(84, 10)                           # 第三个全连接层：输入维度是84，输出维度是10，对应10个类别
 
@@ -38,8 +38,8 @@ class LeNet5(nn.Module):
 
 # 定义数据变换和加载MNIST数据集
 transform = transforms.Compose([
-    transforms.Resize((32, 32)),                              # 将图像调整为32x32，符合LeNet-5输入要求
-    transforms.ToTensor(),                                    # 转换为张量
+    transforms.Resize((32, 32)),                              # 将图像调整为32x32，LeNet 输入是 32x32，符合LeNet-5输入要求
+    transforms.ToTensor(),                                    # 转换为Tensor
     transforms.Normalize((0.1307,), (0.3081,))                # MNIST数据集的均值和标准差
 ])
 
@@ -99,18 +99,18 @@ def train(net, train_loader, criterion, optimizer, device, epoch):
     for i, data in enumerate(train_loader, 0):
         inputs, labels = data[0].to(device), data[1].to(device)
         
-        optimizer.zero_grad()                       # 清零梯度
-        outputs = net(inputs)                       # 前向传播
-        loss = criterion(outputs, labels)           # 计算损失
-        loss.backward()                             # 反向传播，计算梯度
-        optimizer.step()                            # 更新权重
+        optimizer.zero_grad()                       # 5.将梯度清零（避免累加）
+        outputs = net(inputs)                       # 1.计算神经网络的前向传播结果
+        loss = criterion(outputs, labels)           # 2.计算output和标签label之间的损失loss
+        loss.backward()                             # 3.使用backward计算梯度
+        optimizer.step()                            # 4.使用optimizer.step更新参数
 
-        running_loss += loss.item()
+        running_loss += loss.item()                 # 统计损失和准确
         _, predicted = outputs.max(1)
         total += labels.size(0)
         correct += predicted.eq(labels).sum().item()
         
-        if i % 100 == 99:                            # 每100个批次打印一次
+        if i % 100 == 99:                            # 每迭代100个小批量，就打印一次模型的损失，观察训练的过程
             print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 100:.3f}')
             running_loss = 0.0
     
@@ -154,8 +154,7 @@ for epoch in range(num_epochs):
     train_loss, train_acc = train(net, train_loader, criterion, optimizer, device, epoch)
     val_loss, val_acc = validate(net, test_loader, criterion, device)
     
-    # 学习率调整
-    scheduler.step(val_loss)
+    scheduler.step(val_loss)                                  # 调整学习率，按epoch衰减学习率
     
     print(f'Epoch {epoch + 1}/{num_epochs}')
     print(f'Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.2f}%')
