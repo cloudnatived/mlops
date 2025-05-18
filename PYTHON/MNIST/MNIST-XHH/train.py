@@ -11,8 +11,8 @@ from torch.utils.data import DataLoader
 if __name__ == '__main__':
     # 图像的预处理
     transform = transforms.Compose([
-        transforms.Grayscale(num_output_channels=1),      # transform功能1.转换为单通道灰度图
-        transforms.ToTensor()                             # transform功能2.转换为张量
+        transforms.Grayscale(num_output_channels=1),      # transform 功能1.转换为单通道灰度图
+        transforms.ToTensor()                             # transform 功能2.转换为张量
     ])
 
     # 使用ImageFolder所数，读取数据文件夹，构建数据集dataset
@@ -37,8 +37,7 @@ if __name__ == '__main__':
     criterion = nn.CrossEntropyLoss()              # 分类问题，使用交叉熵损失误差
 
     # 进入模型的迭代循环
-    for epoch in range(10):  # 外层循环，代表了整个训练数据集的遍历次数
-        # 整个训练集要循环多少轮，设置成10次、20次或者100次都是可以的
+    for epoch in range(10):  # 外层循环，代表了整个训练数据集的遍历次数，整个训练集要循环多少轮，设置成10次、20次或者100次都是可以的
 
         # 内存循环使用train_loader，进行小批量的数据读取，每一次循环，都会取出64个图像数据，作为一个小批量batch
         for batch_idx, (data, label) in enumerate(train_loader):
@@ -49,7 +48,7 @@ if __name__ == '__main__':
             loss.backward()                        # 3.使用backward计算梯度
             optimizer.step()                       # 4.使用optimizer.step更新参数
             optimizer.zero_grad()                  # 5.将梯度清零
-                                                   # 这5个步骤，是使用pytorch框架训练模型的定式，初学的时候，先记住就可以了
+                                                   # 这5个步骤，是使用pytorch框架训练模型的定式，简单记忆就可以了
 
             if batch_idx % 100 == 0:               # 每迭代100个小批量，就打印一次模型的损失，观察训练的过程
                 print(f"Epoch {epoch + 1}/10 "
