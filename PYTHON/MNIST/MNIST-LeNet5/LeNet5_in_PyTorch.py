@@ -1,3 +1,4 @@
+# From https://github.com/TiezhuXing01/LeNet5_in_PyTorch/blob/main/LeNet5.py
 import torch
 import torch.nn as nn
 import torchvision
@@ -12,8 +13,8 @@ class LeNet5(nn.Module):
         super(LeNet5, self).__init__()
         # 卷积层 1
         self.layer1 = nn.Sequential(
-            nn.Conv2d(1, 6, kernel_size=5, stride=1, padding=0),	# 卷积
-            nn.BatchNorm2d(6),		# 批归一化
+            nn.Conv2d(1, 6, kernel_size=5, stride=1, padding=0),	        # 卷积
+            nn.BatchNorm2d(6),		                                        # 批归一化
             nn.ReLU(),)
         # 下采样
         self.subsampel1 = nn.MaxPool2d(kernel_size = 2, stride = 2)		# 最大池化
@@ -54,7 +55,7 @@ train_dataset = torchvision.datasets.MNIST(root = './data',	# 数据集保存路
                                                   transforms.Resize((32,32)),
                                                   transforms.ToTensor(),
                                                   transforms.Normalize(mean = (0.1307,), 
-												                     std = (0.3081,))]),
+					           std = (0.3081,))]),
                                            download = True)	#是否下载
  
 # 加载测试集
