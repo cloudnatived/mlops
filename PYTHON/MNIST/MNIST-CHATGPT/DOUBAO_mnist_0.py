@@ -10,7 +10,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")      # 检
 # 数据预处理：MNIST为28x28灰度图，无需Resize
 transform = transforms.Compose([
     transforms.RandomRotation(10),                                         # 随机旋转±10度
-    transforms.ToTensor(),
+    transforms.ToTensor(),                                                 # transform 功能，转换为张量
     transforms.Normalize((0.1307,), (0.3081,))                             # MNIST预定义均值/标准差
 ])
 
