@@ -11,3 +11,4 @@ addict
 datasets==2.21.0
 simplejson
 sortedcontainers
+diffusers
