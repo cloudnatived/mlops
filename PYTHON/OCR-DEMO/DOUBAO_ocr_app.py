@@ -1,4 +1,3 @@
-# From https://zhuanlan.zhihu.com/p/685353998
 from modelscope.pipelines import pipeline
 from modelscope.utils.constant import Tasks
 import numpy as np
@@ -9,6 +8,7 @@ from PIL import ImageDraw
 from torchvision import transforms
 from PIL import Image
 import pandas as pd
+import time
 
 title = "读光OCR-多场景文字识别"
 ocr_detection = pipeline(Tasks.ocr_detection,
@@ -120,42 +120,77 @@ def text_detection(image_full, ocr_detection):
     return np.array(det_result_list)
 
 # 文本识别函数：该函数用于对检测到的文本区域执行OCR识别
-def text_recognition(det_result, image_full, ocr_recognition):
+def text_recognition(det_result, image_full, ocr_recognition, progress=gr.Progress()):
     output = []
+    total = det_result.shape[0]
     # 对每个检测结果执行以下操作：
-    for i in range(det_result.shape[0]):
+    for i in progress.tqdm(range(total), desc="正在识别文本"):
         pts = order_point(det_result[i]) # 排序角点
         image_crop = crop_image(image_full, pts) # 裁剪出文本区域
         result = ocr_recognition(image_crop)  # 对裁剪后的图像执行文本识别
         # 将识别结果以及相关信息添加到输出列表中
         output.append([str(i+1), result['text'], ','.join([str(e) for e in list(pts.reshape(-1))])])
+        time.sleep(0.1)  # 仅用于演示进度条，实际使用时可删除
     # 返回一个datafranme
     result = pd.DataFrame(output, columns=['检测框序号', '行识别结果', '检测框坐标'])
     return result
 
 # text_ocr函数：上层封装函数，用于区分不同场景下的文本OCR流程（比如车牌场景要区分一下参数）
-def text_ocr(image_full, types='通用场景'):
-    if types == '车牌场景':
-        det_result = text_detection(image_full, license_plate_detection)
-        ocr_result = text_recognition(det_result, image_full, ocr_recognition_licenseplate)
-        image_draw = draw_boxes(image_full, det_result)
-    else:
-        det_result = text_detection(image_full, ocr_detection)
-        ocr_result = text_recognition(det_result, image_full, types_dict[types])
-        image_draw = draw_boxes(image_full, det_result)
-    return image_draw, ocr_result
+def text_ocr(image_full, types='通用场景', progress=gr.Progress()):
+    try:
+        if image_full is None:
+            return None, "请上传图像"
+            
+        progress(0, desc="开始处理图像")
+        
+        if types == '车牌场景':
+            progress(0.2, desc="正在检测车牌")
+            det_result = text_detection(image_full, license_plate_detection)
+            progress(0.5, desc="正在识别车牌文字")
+            ocr_result = text_recognition(det_result, image_full, ocr_recognition_licenseplate, progress=progress)
+            progress(0.9, desc="正在生成可视化结果")
+            image_draw = draw_boxes(image_full, det_result)
+        else:
+            progress(0.2, desc="正在检测文本")
+            det_result = text_detection(image_full, ocr_detection)
+            progress(0.5, desc="正在识别文本内容")
+            ocr_result = text_recognition(det_result, image_full, types_dict[types], progress=progress)
+            progress(0.9, desc="正在生成可视化结果")
+            image_draw = draw_boxes(image_full, det_result)
+            
+        progress(1.0, desc="处理完成")
+        return image_draw, ocr_result
+    except Exception as e:
+        return None, f"处理出错: {str(e)}"
+
+# 添加示例图片
+examples = [
+    ["examples/plate.jpg", "车牌场景"],
+    ["examples/document.jpg", "文档场景"],
+    ["examples/handwritten.jpg", "手写场景"],
+    ["examples/scene.jpg", "自然场景"]
+]
 
 with gr.Blocks() as demo:
-    # gr.Markdown(description)
+    gr.Markdown(f"# {title}")
+    gr.Markdown("上传一张图片，选择对应的场景类型，然后点击'一键识别'按钮进行OCR识别。")
+    
     with gr.Row():
         select_types = gr.Radio(label="图像类型选择", choices=["通用场景", "自然场景", "手写场景", "文档场景", "车牌场景"], value="通用场景")
+    
     with gr.Row():
         img_input = gr.Image(label='输入图像', elem_id="fixed_size_img")
         img_output = gr.Image(label='图像可视化效果', elem_id="fixed_size_img")
+    
     with gr.Row():
-        btn_submit = gr.Button(value="一键识别")
+        btn_submit = gr.Button(value="一键识别", variant="primary")
+    
     with gr.Row():
         text_output = gr.components.Dataframe(label='识别结果', headers=['检测框序号', '行识别结果', '检测框坐标'], wrap=True)
+    
+    with gr.Row():
+        gr.Examples(examples=examples, inputs=[img_input, select_types])
+    
     btn_submit.click(fn=text_ocr, inputs=[img_input, select_types], outputs=[img_output, text_output])
 
 demo.launch()
