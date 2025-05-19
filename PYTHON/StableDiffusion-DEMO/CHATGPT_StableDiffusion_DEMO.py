@@ -5,6 +5,8 @@ import numpy as np
 from modelscope.utils.constant import Tasks
 from modelscope.pipelines import pipeline
 
+device = 'cuda' if torch.cuda.is_available() else 'cpu'                # 支持 CPU 运行（如适配低配机器）
+
 # 内嵌风格中的正面提示词定义
 prompt_dict = {
     "None": "{prompt}",
@@ -70,13 +72,14 @@ def concatenate_images(images):
         x_offset += img.shape[1]  # 更新偏移量为下一张图片的起始位置
     return concatenated_image  # 返回拼接后的图片
 
+
 # 下载模型，并初始化模型管道
 pipe = pipeline(task=Tasks.text_to_image_synthesis,
-                #model='AI-ModelScope/stable-diffusion-xl-base-1.0',
-                model='AI-ModelScope/tiny-stable-diffusion-v1.0'         # 建议替代模型（如需更轻量）
+                model='AI-ModelScope/stable-diffusion-xl-base-1.0',
+                #model='AI-ModelScope/tiny-stable-diffusion-v1.0',         # 建议替代模型（如需更轻量）
                 use_safetensors=True,
-                model_revision='v1.0.0')
-                device=device  # 加载模型到 CPU
+                model_revision='v1.0.0',
+                device=device)  # 加载模型到 CPU
 
 # 定义一个展示管道的函数，该函数使用文本提示生成图片
 def display_pipeline(prompt: str,
