@@ -1,0 +1,51 @@
+{
+  "mcpServers": {
+    "weather": {
+      "disabled": true,
+      "timeout": 60,
+      "command": "uv",
+      "args": [
+        "--directory",
+        "C:/Users/Administrator/AppData/Roaming/Code/User/globalStorage/saoudrizwan.claude-dev/WEATHER",
+        "run",
+        "weather.py"
+      ],
+      "transportType": "stdio"
+    },
+    "weather1": {
+      "disabled": true,
+      "timeout": 60,
+      "command": "python",
+      "args": [
+        "C:/Users/Administrator/AppData/Roaming/Code/User/globalStorage/saoudrizwan.claude-dev/WEATHER/mcp_logger.py",
+        "uv",
+        "--directory",
+        "C:/Users/Administrator/AppData/Roaming/Code/User/globalStorage/saoudrizwan.claude-dev/WEATHER",
+        "run",
+        "weather.py"
+      ],
+      "transportType": "stdio"
+    },
+    "fetch": {
+      "disabled": true,
+      "timeout": 60,
+      "command": "uvx",
+      "args": [
+        "mcp-server-fetch"
+      ],
+      "transportType": "stdio"
+    },
+    "mcp-server-hotnews": {
+      "timeout": 60,
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@wopal/mcp-server-hotnews"
+      ],
+      "transportType": "stdio",
+      "disabled": true
+    }
+  }
+}
