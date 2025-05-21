@@ -1,5 +1,8 @@
 
 
+
+
+
 ```
 modelscope download --model 'Qwen/Qwen2-7b' --local_dir /Data/modelscope/hub/models/Qwen/Qwen2-7b
 modelscope download --model 'Qwen/QwQ-32b' --local_dir /Data/modelscope/hub/models/Qwen/QwQ-32b
@@ -8,6 +11,7 @@ modelscope download --model 'iic/nlp_structbert_word-segmentation_chinese-base' 
 
 python3 -m sglang.check_env
 
+docker run -ti --net=host --pid=host --ipc=host --privileged -v ~/.cache/huggingface:/root/.cache/huggingface --name Qwen3_0.6B  vllm/vllm-openai:v0.8.5.post1 --model Qwen/Qwen3-0.6B --tensor-parallel-size 8 --trust-remote-code --entrypoint /bin/bash
 
 ```
 
