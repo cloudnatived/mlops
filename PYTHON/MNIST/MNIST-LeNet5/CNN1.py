@@ -12,7 +12,7 @@ NUM_CLASSES = 10
 BATCH_SIZE = 128                    # 训练集每一批次的照片
 MAX_EPOCHS = 50                     # 迭代的次数
 DROPOUT_RATE = 0.15                 # Dropout比率
-MODEL_DIR = "saved_model"
+#MODEL_DIR = "saved_model"
 MODEL_H5_PATH = "mnist_cnn.h5"
 
 # 数据预处理函数
