@@ -66,8 +66,8 @@ def build_model():                                                              
     """构建CNN模型架构"""
     model = tf.keras.Sequential([                                                             # Keras Sequential API：直接堆叠层，无需显式定义forward。
         # 第一个卷积块：32个5×5卷积核，ReLU激活，He初始化，有效填充
-        tf.keras.layers.Conv2D(32, kernel_size=5, activation='relu', padding='valid',
-                               kernel_initializer='he_normal', input_shape=INPUT_SHAPE),
+        tf.keras.layers.Conv2D(32, kernel_size=5, activation='relu', padding='valid',         # Keras 层自动初始化：建层（如Conv2D、Dense）时，权重和偏置会自动初始化。
+                               kernel_initializer='he_normal', input_shape=INPUT_SHAPE),      # 可通过kernel_initializer参数指定初始化方法（如 He 初始化、Xavier 初始化）。
         tf.keras.layers.MaxPooling2D(pool_size=2),                                            # 最大池化，尺寸减半
         tf.keras.layers.Dropout(DROPOUT_RATE),                                                # 随机丢弃部分神经元，防止过拟合
         
