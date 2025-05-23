@@ -1,5 +1,22 @@
 # 构建了一个基本的卷积神经网络（CNN）来训练 MNIST 手写数字识别任务，并带有训练曲线可视化。
 #下面是你原始 CNN 模型的 TensorFlow 2.x / Keras 风格重写版本，保持了原有结构（两层卷积 + Dropout + 全连接），支持可视化准确率和损失曲线，并使用 He 初始化和标准化输入
+
+# 1. 数据预处理：
+#    采用标准化（z-score）而非简单归一化，更适合 CNN 训练
+#    添加通道维度（expand_dims）以匹配模型输入要求
+#    使用tf.data的cache()和prefetch()提升数据加载效率
+# 2. 模型架构：
+#    采用两次卷积 + 池化结构，逐步提取特征
+#    使用 He 初始化（适合 ReLU 激活函数）加速收敛
+#    多层 Dropout 抑制过拟合
+# 3. 训练策略：
+#    早停机制（EarlyStopping）防止过度训练
+#    同时监控训练集和测试集指标，便于发现过拟合
+# 4. 保存格式：
+#    .keras：Keras 原生格式，推荐用于 TensorFlow 2.x
+#    .h5：HDF5 格式，兼容旧版 Keras
+#    model.export()：错误写法，应为model.save()
+
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
