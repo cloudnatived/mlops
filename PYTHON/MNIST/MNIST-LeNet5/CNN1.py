@@ -62,9 +62,9 @@ def load_datasets():
     return ds_train, ds_test
 
 # 模型构建
-def build_model():
+def build_model():                                                                            # PyTorch：基于类的继承，需手动定义__init__（初始化层）和forward（定义数据流向）。
     """构建CNN模型架构"""
-    model = tf.keras.Sequential([
+    model = tf.keras.Sequential([                                                             # Keras Sequential API：直接堆叠层，无需显式定义forward。
         # 第一个卷积块：32个5×5卷积核，ReLU激活，He初始化，有效填充
         tf.keras.layers.Conv2D(32, kernel_size=5, activation='relu', padding='valid',
                                kernel_initializer='he_normal', input_shape=INPUT_SHAPE),
