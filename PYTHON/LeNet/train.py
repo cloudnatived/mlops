@@ -13,11 +13,13 @@ def main():
 
     # 50000张训练图片
     # 第一次使用时要将download设置为True才会自动去下载数据集
-    train_set = torchvision.datasets.CIFAR10(root='./data', train=True,
-                                             download=True, transform=transform)
-                                             #download=False, transform=transform)
-    train_loader = torch.utils.data.DataLoader(train_set, batch_size=36,
-                                               shuffle=True, num_workers=0)
+    train_set = torchvision.datasets.CIFAR10(root='./data', train=True,                     # 数据集存放目录，表示是数据集中的训练集
+                                             download=True, transform=transform)            # 第一次运行时为True，下载数据集，下载完成后改为False，预处理过程
+                                             #download=False, transform=transform)       
+
+    # 加载训练集，实际过程需要分批次（batch）训练   
+    train_loader = torch.utils.data.DataLoader(train_set, batch_size=36,                    # 导入的训练集，每批训练的样本数
+                                               shuffle=True, num_workers=0)                 # 是否打乱训练集，使用线程数，在windows下设置为0
 
     # 10000张验证图片
     # 第一次使用时要将download设置为True才会自动去下载数据集
@@ -42,10 +44,8 @@ def main():
             # get the inputs; data is a list of [inputs, labels]
             inputs, labels = data
 
-            # zero the parameter gradients
-            optimizer.zero_grad()
-            # forward + backward + optimize
-            outputs = net(inputs)
+            optimizer.zero_grad()                                            # zero the parameter gradients
+            outputs = net(inputs)                                            # forward + backward + optimize
             loss = loss_function(outputs, labels)
             loss.backward()
             optimizer.step()
