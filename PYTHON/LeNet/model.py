@@ -2,9 +2,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-class LeNet(nn.Module):
-    def __init__(self):
-        super(LeNet, self).__init__()
+class LeNet(nn.Module):                       # 继承来自nn.Module的父类
+    def __init__(self):                       # 初始化网络
+        super(LeNet, self).__init__()         # super()继承父类的构造函数，多继承需用到super函数
         self.conv1 = nn.Conv2d(3, 16, 5)
         self.pool1 = nn.MaxPool2d(2, 2)
         self.conv2 = nn.Conv2d(16, 32, 5)
