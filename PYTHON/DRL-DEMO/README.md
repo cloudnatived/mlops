@@ -228,16 +228,16 @@ tensorflow 自己制作Mnist数据集，用训练好的模型来测试准确度�
 
 
 ## /LeNet-Pytorch   -- 
-参考资料：Pytorch官方demo（LeNet）  https://zhuanlan.zhihu.com/p/1887640705884746376
-pytorch图像分类篇：2.pytorch官方demo实现一个分类器(LeNet)    https://blog.csdn.net/m0_37867091/article/details/107136477
+参考资料：Pytorch官方demo（LeNet）  https://zhuanlan.zhihu.com/p/1887640705884746376  
+pytorch图像分类篇：2.pytorch官方demo实现一个分类器(LeNet)    https://blog.csdn.net/m0_37867091/article/details/107136477  
 
 
   
 ## /AlexNet-flower-Pytorch -- 使用pytorch搭建AlexNet并训练花分类数据集
-参考资料：pytorch图像分类篇：3.搭建AlexNet并训练花分类数据集    https://blog.csdn.net/m0_37867091/article/details/107150142
+参考资料：pytorch图像分类篇：3.搭建AlexNet并训练花分类数据集    https://blog.csdn.net/m0_37867091/article/details/107150142  
 
-数据集下载地址，数据集包含 5 中类型的花，每种类型有600~900张图像不等。
-http://download.tensorflow.org/example_images/flower_photos.tgz
+数据集下载地址，数据集包含 5 中类型的花，每种类型有600~900张图像不等。  
+http://download.tensorflow.org/example_images/flower_photos.tgz  
 
 
 
