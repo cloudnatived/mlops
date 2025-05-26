@@ -217,3 +217,10 @@ tensorflow 自己制作Mnist数据集，用训练好的模型来测试准确度�
 
 
 
+## /AlexNet-flower -- 使用AlexNet网络训练花卉识别
+
+数据集下载地址，数据集包含 5 中类型的花，每种类型有600~900张图像不等。
+http://download.tensorflow.org/example_images/flower_photos.tgz
+
+
+
