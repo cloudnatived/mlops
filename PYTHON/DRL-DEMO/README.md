@@ -225,7 +225,7 @@ pytorch图像分类篇：2.pytorch官方demo实现一个分类器(LeNet)    http
 
 
   
-## /AlexNet-flower-Pytorch -- 使用AlexNet网络训练花卉识别
+## /AlexNet-flower-Pytorch -- 使用pytorch搭建AlexNet并训练花分类数据集
 参考资料：pytorch图像分类篇：3.搭建AlexNet并训练花分类数据集    https://blog.csdn.net/m0_37867091/article/details/107150142
 
 数据集下载地址，数据集包含 5 中类型的花，每种类型有600~900张图像不等。
