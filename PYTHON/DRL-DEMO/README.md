@@ -231,7 +231,7 @@ https://blog.csdn.net/qq_37541097/category_9488472_2.html
 这个up主发了好多能动手实验的教程。太阳花的小绿豆。
 
 
-## /LeNet-Pytorch   -- 
+## /LeNet-Pytorch   -- CIFAR10 图像
 参考资料：Pytorch官方demo（LeNet）  https://zhuanlan.zhihu.com/p/1887640705884746376  
 pytorch图像分类篇：2.pytorch官方demo实现一个分类器(LeNet)    https://blog.csdn.net/m0_37867091/article/details/107136477  
 
