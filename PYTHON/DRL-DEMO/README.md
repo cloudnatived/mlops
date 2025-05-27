@@ -226,7 +226,7 @@ tensorflow 自己制作Mnist数据集，用训练好的模型来测试准确度�
 
 
 https://blog.csdn.net/qq_37541097/category_9488472_2.html  
-这个up发了好多能动手实验的教程。太阳花的小绿豆。
+这个up主发了好多能动手实验的教程。太阳花的小绿豆。
 
 
 ## /LeNet-Pytorch   -- 
@@ -239,7 +239,12 @@ pytorch图像分类篇：2.pytorch官方demo实现一个分类器(LeNet)    http
 参考资料：pytorch图像分类篇：3.搭建AlexNet并训练花分类数据集    https://blog.csdn.net/m0_37867091/article/details/107150142  
 
 数据集下载地址，数据集包含 5 中类型的花，每种类型有600~900张图像不等。  
-http://download.tensorflow.org/example_images/flower_photos.tgz  
+wget http://download.tensorflow.org/example_images/flower_photos.tgz  
 
 
+## /AlexNet-flower-tensorflow -- 使用tensorflow搭建AlexNet并训练花分类数据集
+参考资料：
+
+数据集下载地址，数据集包含 5 中类型的花，每种类型有600~900张图像不等。  
+wget http://download.tensorflow.org/example_images/flower_photos.tgz  
 
