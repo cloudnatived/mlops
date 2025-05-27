@@ -116,7 +116,7 @@ python3 DOUBAO_mnist_test_0.py
   
   
 ## /pytorch_mnist.py  --  用PyTorch实现MNIST手写数字识别(非常详细)  
-参考资料：用PyTorch实现MNIST手写数字识别(非常详细)   https://zhuanlan.zhihu.com/p/137571225
+参考资料：用PyTorch实现MNIST手写数字识别(非常详细)   https://zhuanlan.zhihu.com/p/137571225  
 原文链接：https://nextjournal.com/gkoehler/pytorch-mnist    
 ​​​​​Keras版本：https://blog.csdn.net/sxf1061700625/article/details/117397030
 
