@@ -186,7 +186,7 @@ python3 pytorch_mnist.py
 使用PyTorch和TorchVision构建了一个新环境，并使用它从MNIST数据集中对手写数字进行分类，希望使用PyTorch开发出一个良好的直觉。对于进一步的信息，官方的PyTorch文档确实写得很好，论坛也很活跃!
 
 ## /pytorch_mnist.py  --  用PyTorch实现MNIST手写数字识别（最新，非常详细）
-
+参考资料：https://blog.csdn.net/qq_45588019/article/details/120935828    https://blog.csdn.net/qq_45588019/article/details/120935828  
 ```
 # 详解
 
