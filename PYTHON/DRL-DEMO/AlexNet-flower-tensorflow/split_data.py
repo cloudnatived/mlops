@@ -1,3 +1,7 @@
+# 首先下载数据集。
+# wget http://download.tensorflow.org/example_images/flower_photos.tgz;
+# tar zxf flower_photos.tgz
+
 import os
 from shutil import copy, rmtree
 import random
