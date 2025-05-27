@@ -270,6 +270,24 @@ self.conv3 = nn.Conv2d(32, 64, 5)  # 新增卷积层
 并在forward方法中添加对应操作。
 ```
 
+```
+/LeNet-Pytorch/test_model.py
+python3 test_model.py 
+模型在测试集上的整体准确率: 66.67%
+plane 类别准确率: 73.50%
+car 类别准确率: 72.20%
+bird 类别准确率: 61.10%
+cat 类别准确率: 46.60%
+deer 类别准确率: 57.00%
+dog 类别准确率: 56.50%
+frog 类别准确率: 82.70%
+horse 类别准确率: 61.50%
+ship 类别准确率: 75.40%
+truck 类别准确率: 80.20%
+
+
+```
+
   
 ## /AlexNet-flower-Pytorch -- 使用pytorch搭建AlexNet并训练花分类数据集
 参考资料：pytorch图像分类篇：3.搭建AlexNet并训练花分类数据集    https://blog.csdn.net/m0_37867091/article/details/107150142  
