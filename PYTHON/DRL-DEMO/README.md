@@ -226,7 +226,7 @@ tensorflow 自己制作Mnist数据集，用训练好的模型来测试准确度�
 
 
 https://blog.csdn.net/qq_37541097/category_9488472_2.html  
-这个up发了好多能动手实验的教程。
+这个up发了好多能动手实验的教程。太阳花的小绿豆。
 
 
 ## /LeNet-Pytorch   -- 
