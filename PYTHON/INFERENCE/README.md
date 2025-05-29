@@ -1,5 +1,24 @@
 
 
+## vLLM + DeepSeek-R1 671B 多机部署
+
+```
+NGC的PyTorch镜像。
+docker pull nvcr.io/nvidia/pytorch:24.05-py3 # NGC
+
+docker pull vllm/vllm-openai:v0.7.3 # vLLM官方镜像(推荐)
+
+
+nerdctl pull nvcr.io/nvidia/tritonserver:22.01-py3
+nerdctl pull vllm/vllm-openai:v0.8.5.post1
+nerdctl pull nvcr.io/nvidia/tritonserver:25.02-trtllm-python-py3
+nerdctl pull nvcr.io/nvidia/k8s/dcgm-exporter:4.2.0-4.1.0-ubuntu22.04
+
+docker pull nvcr.io/nvidia/pytorch:24.05-py3
+
+
+```
+
 
 
 
