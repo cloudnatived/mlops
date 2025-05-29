@@ -1,5 +1,38 @@
 
 
+```
+检查 CUDA 是否安装和可用：
+python3 -c "import torch; print(torch.cuda.is_available())"
+
+检查 NCCL 是否可用（Linux/GPU 环境）：
+python3 -c "import torch.distributed as dist; dist.init_process_group(backend='nccl')"
+
+多 GPU 情况运行此脚本（使用 torchrun）：
+torchrun --nproc_per_node=2 test_communication.py
+
+##################################################
+
+PyTorch_GLOO_CPU_only.py
+运行多个进程模拟多个节点，比如 2 个：
+# 终端1：
+python PyTorch_GLOO_CPU_only.py --backend gloo --world_size 2 --rank 0 --init_method tcp://127.0.0.1:29500
+# 终端2：
+python PyTorch_GLOO_CPU_only.py --backend gloo --world_size 2 --rank 1 --init_method tcp://127.0.0.1:29500
+
+##################################################
+
+test_communication.py
+分布式通信测试脚本，包含了：
+    动态选择 NCCL / GLOO / MPI 后端；
+    NCCL（GPU）与 GLOO（CPU）通信测试；
+    vLLM 的 NCCL 测试（含 CUDA Graph）。
+这段代码主要用于测试 NCCL、GLOO 和 vLLM 通信后端，但它目前默认依赖 CUDA（torch.cuda 和 NCCL），这在 CPU-only 环境中无法运行。
+
+
+
+```
+
+
 ## vLLM + DeepSeek-R1 671B 多机部署
 
 ```
