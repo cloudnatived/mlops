@@ -447,3 +447,115 @@ ModuleNotFoundError: No module named 'common_variables'
 Keras入门笔记(番一)：从源码分析K.batch_dot及与dot的区别_身披白袍's博客-CSDN博客
 ​blog.csdn.net/Shenpibaipao/article/details/103063911
 
+
+
+ubuntu-22.04.3-live-server-amd64.iso  
+ubuntu-22.04.4-live-server-amd64.iso  
+ubuntu-22.04.5-live-server-amd64.iso  
+ubuntu-24.10-live-server-amd64.iso  #未测试，但是不习惯python的管理工具  
+
+1.设置基础环境。
+```
+sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config;
+sed -i 's/GSSAPIAuthentication yes/GSSAPIAuthentication no/g' /etc/ssh/sshd_config;
+echo "GSSAPIAuthentication no" >> /etc/ssh/sshd_config;
+sed -i 's/UseDNS yes/UseDNS no/g' /etc/ssh/sshd_config;
+cat >> /etc/ssh/sshd_config <<EOF
+UseDNS no
+PermitRootLogin yes
+EOF
+
+systemctl restart sshd;
+
+cp /etc/apt/sources.list /etc/apt/sources.list.original;
+cat > /etc/apt/sources.list <<EOF
+# 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy main restricted universe multiverse
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-security main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-security main restricted universe multiverse
+
+# 预发布软件源，不建议启用
+# deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-proposed main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-proposed main restricted universe multiverse
+EOF
+
+
+apt update -y;
+apt list --upgradable;
+apt upgrade -y;
+
+
+#为了解决这个WARNING：
++++++++++++++++++++++++++++++++
+root@x:~# netplan apply
+WARNING:root:Cannot call Open vSwitch: ovsdb-server.service is not running.
++++++++++++++++++++++++++++++++
+chmod 600 /etc/netplan/*
+touch /etc/cloud/cloud-init.disabled;
+apt -y install openvswitch-switch;
+systemctl disable openvswitch-switch.service;
+
+#运行在init 3
+systemctl isolate multi-user.target;
+systemctl isolate runlevel3.target;
+ln -sf /lib/systemd/system/multi-user.target /etc/systemd/system/default.target;
+systemctl set-default multi-user.target;
+
+#关闭不需要的服务：
+systemctl list-unit-files |awk '{ print $1,$2 }'|grep enable|egrep -v "ssh|multi|systemd-resolved|wpa_" |awk '{ print $1}'|xargs -i systemctl disable {};
+
+#确认服务已关闭：
+systemctl list-unit-files |awk '{print $1,$2}'|grep enabled;
+
+apt install -y python3-pip python3 python3-netaddr wget git;
+apt install -y python3-dev;
+pip install --upgrade pip;
+
+pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple;
+mkdir -p /root/.config/pip;
+cat > /root/.config/pip/pip.conf <<EOF
+[global]
+index-url = https://pypi.tuna.tsinghua.edu.cn/simple
+EOF
+
+#以下配置host及环境：
+cat > /etc/hostname <<EOF
+k101
+EOF
+
+cat >> /etc/hosts <<EOF
+192.168.32.101 k101
+EOF
+
+hostname k101;
+
+cat >> /etc/profile <<EOF
+ulimit -S -c 0 > /dev/null 2>&1
+ulimit -n 10240
+ulimit -u 77823
+EOF
+
+cat >> /etc/sysctl.conf <<EOF
+net.ipv4.ip_forward=1
+net.ipv4.conf.all.rp_filter=0
+net.ipv4.conf.default.rp_filter=0
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv6.conf.lo.disable_ipv6 = 1
+
+net.bridge.bridge-nf-call-iptables = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+
+fs.inotify.max_user_instances=2280
+fs.inotify.max_user_watches=655360
+EOF
+
+ssh-keygen -t rsa -N "";
+cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys;
+
+```
