@@ -22,6 +22,16 @@ python PyTorch_GLOO_CPU_only.py --backend gloo --world_size 2 --rank 1 --init_me
 ##################################################
 
 test_communication.py
+
+## 测试NCCL后端
+#torchrun --nproc_per_node=2 test_communication.py --backend nccl
+## 测试GLOO后端
+#torchrun --nproc_per_node=2 test_communication.py --backend gloo
+## 单GPU环境测试（跳过vLLM）
+#python test_communication.py --backend nccl --skip-vllm
+# 3机互连通信检查，每个node节点运行一样的命令
+# NCCL_DEBUG=TRACE torchrun --nnodes 3 --nproc-per-node=8 --rdzv_backend=c10d --rdzv_endpoint=head_node_ip:8887 check_nccl.py
+
 分布式通信测试脚本，包含了：
     动态选择 NCCL / GLOO / MPI 后端；
     NCCL（GPU）与 GLOO（CPU）通信测试；
