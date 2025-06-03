@@ -1,5 +1,5 @@
 
-# CUDA
+# Nvidia卡驱动和CUDA toolkit
 CUDA(Compute Unified Device Architecture)：是一种由 NVIDIA 推出的通用并行计算架构，该架构使 GPU 能够解决复杂的计算问题;，它包括编译器(nvcc)、开发工具、运行时库和驱动等模块，是当今最流行的GPU编程环境
 cuDNN：是基于 CUDA 的深度学习 GPU 加速库，支持常见的深度学习计算类型(卷积、下采样、非线性、Softmax 等)
 
