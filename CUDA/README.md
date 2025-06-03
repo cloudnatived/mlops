@@ -199,7 +199,10 @@ dcgmi dmon -e 1001 -d 1
     
 ### NVIDIA Nsight Compute
 ```
-Nsight系列工具中的一个组件，专门用于CUDA核函数的性能分析，它是更接近内核的分析。它允许开发人员对 CUDA 核函数进行详细的性能分析，包括核函数的时间分布、内存访问模式、并行性、指令分发等。Nsight Compute提供了许多有用的数据和图形化的界面，帮助开发人员深入理解和优化核函数的性能。
+Nsight系列工具中的一个组件，专门用于CUDA核函数的性能分析，它是更接近内核的分析。
+它允许开发人员对 CUDA 核函数进行详细的性能分析，包括核函数的时间分布、内存访问模式、并行性、指令分发等。
+Nsight Compute提供了许多有用的数据和图形化的界面，帮助开发人员深入理解和优化核函数的性能。
+
 ncu命令主要分析kernel内部的带宽、活跃线程数、warp利用率等。
 地址：https://developer.nvidia.com/nsight-compute
 DOC：https://developer.nvidia.com/tools-overview/nsight-compute/get-started
@@ -254,7 +257,8 @@ NsightComputeProfiling入门    https://blog.csdn.net/m0_61864577/article/detail
 
 ### NVIDIA Nsight Systems
 ```
-系统级的性能分析工具，用于分析和优化整个CUDA应用程序或系统的性能。它可以提供对应用程序整体性能的全面见解，以及考察GPU活动、内存使用、线程间通信等方面的详细信息，它提供了可视化界面和统计数据，开发人员可以使用它来发现性能瓶颈、调整应用程序的配置，以及提高整体性能。
+系统级的性能分析工具，用于分析和优化整个CUDA应用程序或系统的性能。
+它可以提供对应用程序整体性能的全面见解，以及考察GPU活动、内存使用、线程间通信等方面的详细信息，它提供了可视化界面和统计数据，开发人员可以使用它来发现性能瓶颈、调整应用程序的配置，以及提高整体性能。
 nsys命令主要分析api级别的性能时间等。
 地址：https://developer.nvidia.com/nsight-systems
 DOC：https://developer.nvidia.com/nsight-systems/get-started
@@ -268,7 +272,8 @@ nsys 提供了强大的命令行界面（CLI），方便用户进行各种性能
 
 nsys profile [options] [application] [application args]: 这是最核心的命令，用于启动应用程序并捕获其性能数据。
 
---trace=<trace>: 通过这个选项，你可以指定要跟踪的 API 或事件类型，例如 cuda（跟踪 CUDA API 和内核）、cudart（跟踪 CUDA 运行时 API）、osrt（跟踪操作系统运行时 API）、opengl、vulkan 等。你可以使用逗号分隔多个跟踪类型，例如 --trace=cuda,osrt,vulkan。
+--trace=<trace>: 通过这个选项，你可以指定要跟踪的 API 或事件类型，例如 cuda（跟踪 CUDA API 和内核）、cudart（跟踪 CUDA 运行时 API）、osrt（跟踪操作系统运行时 API）、opengl、vulkan 等。
+你可以使用逗号分隔多个跟踪类型，例如 --trace=cuda,osrt,vulkan。
 -o <filename>: 使用此选项指定输出报告文件的名称，通常以 .qdrep 格式保存。例如，-o my_report.qdrep。
 --duration=<seconds>: 设置性能分析的持续时间，单位为秒。例如，--duration=10 将会分析应用程序运行的 10 秒。
 --delay=<seconds>: 设置开始性能分析前的延迟时间，单位为秒。这在需要等待应用程序启动完成后再开始分析时非常有用。
@@ -301,7 +306,8 @@ nsys nvprof [nvprof options] [application] [application args]: 对于熟悉 NVID
 ②分析DRAM以及PCIe带宽的使用率，没有使用shared memory，那么DRAM brandwidth就没有变化，可以分析哪些带宽没有被充分利用；
 ③分析warp的占有率，从而可以知道一个SM中计算资源是否被充分利用；
 
-NVIDIA Nsight Systems (nsys) 是一款功能强大的系统级性能分析工具，它通过提供全方位的性能数据和直观的可视化界面，帮助开发者深入了解应用程序在整个系统中的行为。掌握 nsys 的使用，能够让你更有效地识别性能瓶颈，优化资源利用率，最终提升应用程序的整体效率。
+NVIDIA Nsight Systems (nsys) 是一款功能强大的系统级性能分析工具，它通过提供全方位的性能数据和直观的可视化界面，帮助开发者深入了解应用程序在整个系统中的行为。
+掌握 nsys 的使用，能够让你更有效地识别性能瓶颈，优化资源利用率，最终提升应用程序的整体效率。
 
 参考资料：
 cuda学习日记(6) nsight system / nsight compute    https://zhuanlan.zhihu.com/p/640344249
@@ -346,7 +352,9 @@ NVIDIA CUDA Library Samples 项目是由 NVIDIA 公司开发并开源的，旨�
 主要的编程语言是 C++ 和 CUDA C/C++，因为这些语言能够充分利用 GPU 的并行计算能力。    
 
 ```
-The CUDA Library Samples repository contains various examples that demonstrate the use of GPU-accelerated libraries in CUDA. These libraries enable high-performance computing in a wide range of applications, including math operations, image processing, signal processing, linear algebra, and compression. The samples included cover:
+The CUDA Library Samples repository contains various examples that demonstrate the use of GPU-accelerated libraries in CUDA.
+These libraries enable high-performance computing in a wide range of applications, including math operations, image processing, signal processing, linear algebra, and compression.
+The samples included cover:
 
     Math and Image Processing Libraries
     cuBLAS (Basic Linear Algebra Subprograms)
