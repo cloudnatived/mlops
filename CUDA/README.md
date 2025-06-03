@@ -1,5 +1,7 @@
 
-# Nvidia卡驱动和CUDA toolkit
+# 英伟达GPU驱动、CUDA Toolkit、容器化工具nvidia-container-toolkit、Nvidia的GPU和CUDA分析工具NVIDIA NVIDIA-smi、NVIDIA Nsight Compute、NVIDIA Nsight Systems
+
+
 CUDA(Compute Unified Device Architecture)：是一种由 NVIDIA 推出的通用并行计算架构，该架构使 GPU 能够解决复杂的计算问题;，它包括编译器(nvcc)、开发工具、运行时库和驱动等模块，是当今最流行的GPU编程环境
 cuDNN：是基于 CUDA 的深度学习 GPU 加速库，支持常见的深度学习计算类型(卷积、下采样、非线性、Softmax 等)
 
@@ -10,7 +12,7 @@ cuDNN：是基于 CUDA 的深度学习 GPU 加速库，支持常见的深度学�
 将数据从 GPU 拷贝 到 CPU 中
 删除 GPU 中的数据
 
-## 一. Nvidia卡驱动和CUDA toolkit
+## 一. 英伟达GPU驱动和CUDA toolkit
 ### apt方式，Ubuntu22.04安装Nvidia 550驱动和CUDA toolkit 12.4.1（包括CUDA、NCCL）
 
 ```
