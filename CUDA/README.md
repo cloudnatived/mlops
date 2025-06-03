@@ -345,6 +345,7 @@ Samples/0_Introduction/matrixMul/matrixMul
 NVIDIA CUDA Library Samples 项目是由 NVIDIA 公司开发并开源的，旨在展示如何使用 GPU 加速库进行高性能计算。这些库包括数学运算、图像处理、信号处理、线性代数和压缩等多个领域。项目中的示例代码展示了如何利用这些库来加速各种计算任务。    
 主要的编程语言是 C++ 和 CUDA C/C++，因为这些语言能够充分利用 GPU 的并行计算能力。    
 
+```
 The CUDA Library Samples repository contains various examples that demonstrate the use of GPU-accelerated libraries in CUDA. These libraries enable high-performance computing in a wide range of applications, including math operations, image processing, signal processing, linear algebra, and compression. The samples included cover:
 
     Math and Image Processing Libraries
@@ -395,7 +396,7 @@ For more information and documentation on CUDA libraries, please visit:
     NVIDIA Developer Zone
     CUDA Samples
 
-
+```
     
 
 参考资料：
