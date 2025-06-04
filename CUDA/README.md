@@ -42,10 +42,195 @@ Nvidia的Driver、CUDA、CUDNN和TensorRT的关系：
 
 
 
+### 2.1.Nvidia驱动和CUDA toolkit
+
+apt方式，Ubuntu22.04安装Nvidia 550驱动和CUDA toolkit 12.4.1（包括CUDA、NCCL）
+
+```
+1. 安装显卡驱动550版本：
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb
+dpkg -i cuda-keyring_1.1-1_all.deb
+apt-get update
+apt-get -y install cuda-drivers
+
+命令来源于：
+https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=22.04&target_type=deb_network
+安装完成后重启，重启之后可以输入nvidia-smi命令验证：nvidia-smi 
+
+2. 安装CUDA toolkit 12.4.1（包括CUDA、NCCL）：
+apt-get -y install cuda-toolkit-12-4
+
+3. 为CUDA12.4在.bashrc中添加环境变量
+export PATH=/usr/local/cuda/bin:$PATH
+export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
+
+4. 验证CUDA toolkit 12.4.1安装成功
+xiaxinkai@msi:~$ nvcc -V
+nvcc: NVIDIA (R) Cuda compiler driver
+Copyright (c) 2005-2024 NVIDIA Corporation
+Built on Thu_Mar_28_02:18:24_PDT_2024
+Cuda compilation tools, release 12.4, V12.4.131
+Build cuda_12.4.r12.4/compiler.34097967_0
+
+5、卸载驱动库
+apt-get --purge remove nvidia*
+apt autoremove
+
+卸载cuda
+dpkg -l | grep nvidia
+
+remove CUDA Toolkit:
+apt-get --purge remove "*cublas*" "cuda*"
+
+卸载依赖文件
+apt-get --purge remove "*nvidia*"  （也可用：NVIDIA-Linux-x86_64-465.31.run --uninstall卸载，大同小异。）
+
+检查是否卸载彻底
+dpkg -l | grep nvidia（如果卸载干净了，这条指令后将无提示。）
+
+```
 
 
 
-# 一. 英伟达GPU驱动、CUDA Toolkit、Nccl
+### 2.2.Nvidia驱动和CUDA toolkit的run文件安装
+
+在nvidia.com选择合适版本的Nvidia的driver的run文件安装（（包括驱动、CUDA、NCCL））。
+
+```
+https://www.nvidia.cn/drivers/lookup/
+wget https://cn.download.nvidia.com/tesla/550.144.03/nvidia-driver-local-repo-ubuntu2204-550.144.03_1.0-1_amd64.deb
+wget https://developer.download.nvidia.com/compute/cuda/12.4.1/local_installers/cuda_12.4.1_550.54.15_linux.run
+
+cuda_12.4.1_550.54.15_linux.run
+┌─┐
+│ CUDA Installer se Agreement                                                  │
+│ - [X] Driver                                                                 │
+│      [X] 550.54.15                                                           │
+│ + [X] CUDA Toolkit 12.4                                                      │
+│   [X] CUDA Demo Suite 12.4                                                   │
+│   [X] CUDA Documentation 12.4                                                │
+│ - [ ] Kernel Objects                                                         │
+│      [ ] nvidia-fs                                                           │
+│   Options                                                                    │
+│   Install                                                                    │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│   reface                                                                     │
+│                                                                              │
+│                                                                              │
+│                                                                              
+│                                                                              │
+│ Up/Down: Move | Left/Right: Expand | 'Enter': Select | 'A': Advanced options │
+└─┘
+
+
+root@y249:/Data# ./cuda_12.4.1_550.54.15_linux.run 
+===========
+= Summary =
+===========
+
+Driver:   Installed
+Toolkit:  Installed in /usr/local/cuda-12.4/
+
+Please make sure that
+ -   PATH includes /usr/local/cuda-12.4/bin
+ -   LD_LIBRARY_PATH includes /usr/local/cuda-12.4/lib64, or, add /usr/local/cuda-12.4/lib64 to /etc/ld.so.conf and run ldconfig as root
+
+To uninstall the CUDA Toolkit, run cuda-uninstaller in /usr/local/cuda-12.4/bin
+To uninstall the NVIDIA Driver, run nvidia-uninstall
+Logfile is /var/log/cuda-installer.log
+
+cat >> /etc/profile << EOF
+export PATH=/usr/local/cuda/bin${PATH:+:${PATH}}
+export LD_LIBRARY_PATH=/usr/local/cuda/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+EOF
+
+# 工作中碰到的实际问题。
+4090卡最低驱动CUDA-12.8，H200最低驱动CUDA-12.6。但是在CUDA-12.6中，有一些NCCL的通讯支持有各种问题。
+```
+
+
+
+CUDA (Compute Unified Device Architecture)
+
+```
+CUDA(Compute Unified Device Architecture)：是一种由 NVIDIA 推出的通用并行计算架构，该架构使 GPU 能够解决复杂的计算问题;，它包括编译器(nvcc)、开发工具、运行时库和驱动等模块，是当今最流行的GPU编程环境
+cuDNN：是基于 CUDA 的深度学习 GPU 加速库，支持常见的深度学习计算类型(卷积、下采样、非线性、Softmax 等)
+
+一个基本的 CUDA 程序架构包含 5 个主要方面：
+分配 GPU 内存
+复制 CPU内存数据到 GPU 内存
+激活 CUDA 内核去执行特定程序的计算
+将数据从 GPU 拷贝 到 CPU 中
+删除 GPU 中的数据
+```
+
+
+
+```
+# 1、查看当前 cuda 版本
+nvcc -V 
+nvcc: NVIDIA (R) Cuda compiler driver
+Copyright (c) 2005-2017 NVIDIA Corporation
+Built on Fri_Sep__1_21:08:03_CDT_2017
+Cuda compilation tools, release 9.0, V9.0.176
+
+# 2、删除之前创建的软链接
+sudo rm -rf /usr/local/cuda
+
+# 3、建立新的软链接，cuda9.0 切换到 cuda11.0
+sudo ln -s /usr/local/cuda-11.0/ /usr/local/cuda/
+
+# 4、查看当前 cuda 版本
+nvcc -V 
+nvcc: NVIDIA (R) Cuda compiler driver
+Copyright (c) 2005-2020 NVIDIA Corporation
+Built on Wed_Jul_22_19:09:09_PDT_2020
+Cuda compilation tools, release 11.0, V11.0.221
+Build cuda_11.0_bu.TC445_37.28845127_0
+
+# 5、将 ~/.bashrc 或 caffe Makefile.config 等下与 cuda 相关的路径都改为 /usr/local/cuda/（指定版本的软链接）
+vim ~/.bashrc  # 不使用 /usr/local/cuda-9.0/ 或 /usr/local/cuda-11.0/ 等，这样每次切换版本，就不用改配置了
+
+export PATH=$PATH:/usr/local/cuda/bin
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64:/usr/lib/x86_64-linux-gnu
+export LIBRARY_PATH=$LIBRARY_PATH:/usr/local/cuda/lib64
+
+source ~/.bashrc  # 立即生效
+
+# cuda-12.4的路径。
+/usr/local/cuda-12.4/
+
+# 下载cuda-samples的对应版本v12.4.1
+https://github.com/NVIDIA/cuda-samples/releases/tag/v12.4.1
+https://github.com/NVIDIA/cuda-samples/archive/refs/tags/v12.4.1.tar.gz
+
+# cuda-samples的v12.4.1编译。
+make
+
+# 运行示例
+Samples/0_Introduction/asyncAPI/asyncAPI 
+Samples/0_Introduction/cudaOpenMP/cudaOpenMP
+Samples/0_Introduction/matrixMul/matrixMul
+
+1. 实用工具：实用工具示例，演示如何查询设备功能并测量 GPU/CPU 带宽。
+2. 概念与技术：演示 CUDA 相关概念和常用问题解决技术的示例。
+3. CUDA 功能：演示 CUDA 功能的示例（协同组、CUDA 动态并行、CUDA 图形等）。
+4. CUDA 库：演示如何使用 CUDA 平台库（NPP、NVJPEG、NVGRAPH cuBLAS、cuFFT、cuSPARSE、cuSOLVER 和 cuRAND）的示例。
+5. 领域特定：特定于领域的示例（图形、金融、图像处理）。
+6. 性能：演示性能优化的示例。
+7. libNVVM：演示如何使用 libNVVVM 和 NVVM IR 的示例。
+8. 平台特定/Tegra
+```
+
+
+
+NCCL
 
 ```
 https://developer.nvidia.com/nccl/nccl-download
@@ -85,10 +270,17 @@ $ sudo apt-get update
 
 
 
+
+
 make CUDA_HOME=/usr/local/cuda NCCL_HOME=/usr/local/lib/python3.10/dist-packages/nvidia/nccl -lnccl
+
 ```
 
-# 二. 容器化工具nvidia-container-toolkit
+
+
+### 2.3.nvidia-container-toolkit
+
+Ubuntu 22.04安装nvidia-container-toolkit
 
 ```
 NVIDIA Container Toolkit 使用户能够构建和运行 GPU 加速容器。该工具包包括一个容器运行时库和实用程序，用于自动配置容器以利用 NVIDIA GPU。
@@ -153,7 +345,9 @@ nvidia-smi：查看 NVIDIA GPU 的状态信息，包括 GPU 使用率、内存�
 $ sudo docker run --rm --runtime=nvidia --gpus all ubuntu nvidia-smi
 ```
 
-# 三. k8s-device-plugin 和 node-feature-discovery
+
+
+### 2.4.k8s-device-plugin 和 node-feature-discovery
 
 kubernetes集群管理GPU节点和作业的2个主要组件，k8s-device-plugin和node-feature-discovery
 
@@ -339,17 +533,19 @@ Node Feature Discovery（NFD）组件的主要应用场景是在Kubernetes集群
 Node Feature Discovery（NFD）可以帮助提高Kubernetes集群的智能程度，使其能够更好地适应各种类型的工作负载和节点特性，从而提高集群的性能、可靠性和效率。
 如果 Kubernetes 集群需要根据节点的硬件特性进行智能调度或者对节点的硬件资源进行感知和利用，那么安装 Node Feature Discovery（NFD）是有必要的。然而，如果集群中的节点都具有相似的硬件配置，且不需要考虑硬件资源的差异，那么不需要安装 NFD。
 ```
+
+
+
 ![](IMAGE-1\MLOps-624219-20240314162752542-1472069471.png)
+
+
 
 参考资料：
 Kubernetes集群部署Node Feature Discovery组件用于检测集群节点特性    https://www.cnblogs.com/zhangmingcheng/p/18072751
 
 
 
-
-# 四. Nvidia的GPU和CUDA分析工具NVIDIA NVIDIA-smi、NVIDIA Nsight Compute、NVIDIA Nsight Systems
-
-### 5.NVIDIA NVIDIA-smi
+### 2.5.NVIDIA NVIDIA-smi
 
 **NVIDIA-smi**：这是NVIDIA提供的命令行工具，用于监控GPU的实时状态。它能够显示GPU利用率、显存使用情况、温度、功耗等关键指标。
 **DCGM（Data Center GPU Manager）**：对于数据中心环境，DCGM提供了更高级的监控和管理功能，支持大规模GPU集群的监控和自动化管理。
@@ -509,6 +705,54 @@ NVIDIA Nsight Systems (nsys) 是一款功能强大的系统级性能分析工具
 cuda学习日记(6) nsight system / nsight compute    https://zhuanlan.zhihu.com/p/640344249
 NVIDIA Nsight Systems (nsys) 工具使用    https://www.cnblogs.com/menkeyi/p/18791669
 ```
+
+
+
+KAI Scheduler：优化GPU资源分配的Kubernetes调度器
+
+```
+https://github.com/NVIDIA/KAI-Scheduler
+
+项目核心功能/场景
+KAI Scheduler 是一款强大的Kubernetes调度器，专注于优化AI和机器学习工作负载的GPU资源分配。
+
+项目介绍
+KAI Scheduler 设计用于管理大规模GPU集群，包括成千上万的节点和高吞吐量的工作负载。它特别适合于广泛和苛刻的环境。管理员可以利用KAI Scheduler动态地为Kubernetes集群中的工作负载分配GPU资源。
+
+KAI Scheduler 支持整个AI生命周期，从需要最少资源的小型交互式任务到同一集群内的大型训练和推理任务。它确保了资源的最优分配，并在不同的消费者之间保持资源公平性。它还可以与其他已安装在集群上的调度器共同运行。
+
+项目技术分析
+KAI Scheduler 基于Kubernetes调度器，提供了一系列高级特性，用于优化GPU资源的调度和管理。以下是其技术特点：
+
+批调度：确保一个组内的所有Pod要么同时被调度，要么一个都不调度。
+装箱调度与扩散调度：通过最小化碎片化（装箱调度）或增加弹性和负载均衡（扩散调度）来优化节点使用。
+工作负载优先级：在队列中有效地优先调度工作负载。
+分层队列：使用两级队列层次结构管理工作负载，实现灵活的组织控制。
+资源分配：为每个队列自定义配额、超配额权重、限制和优先级。
+公平性策略：使用支配资源公平性（DRF）和跨队列的资源回收策略确保公平的资源分配。
+工作负载合并：智能地重新分配运行中的工作负载，以减少碎片化和提高集群利用率。
+弹性工作负载：在定义的最小和最大Pod数量范围内动态调整工作负载。
+动态资源分配：通过Kubernetes ResourceClaims支持特定供应商的硬件资源（例如，NVIDIA或AMD的GPU）。
+GPU共享：允许多个工作负载高效地共享一个或多个GPU，最大化资源利用率。
+云和本地支持：完全兼容动态云基础设施（包括自动扩展器如Karpenter）以及静态本地部署。
+
+项目技术应用场景
+KAI Scheduler 适用于以下几种技术应用场景：
+大型AI训练：对于需要大量GPU资源的大型AI训练任务，KAI Scheduler可以有效地管理和分配资源，确保训练任务的高效执行。
+机器学习模型推理：在模型推理阶段，KAI Scheduler能够动态调整资源，以满足不同负载的需求，提高资源利用率。
+多云和混合云环境：无论是在云环境还是本地部署中，KAI Scheduler都能提供一致的调度策略，确保资源的高效使用。
+
+项目特点
+高度可扩展性：KAI Scheduler 能够处理大规模的GPU集群，确保在高负载情况下依然能够高效调度资源。
+灵活性：通过分层队列和工作负载优先级，管理员可以根据需要灵活管理资源分配。
+资源优化：通过工作负载合并和弹性工作负载特性，KAI Scheduler 能够最大化资源利用率。
+兼容性：支持多种部署环境，包括动态云基础设施和静态本地部署。
+总结来说，KAI Scheduler 是一个针对GPU资源优化调度的高效Kubernetes调度器，适用于多种规模和复杂度的AI和机器学习工作负载。通过其先进的技术特性和灵活的调度策略，它为管理员提供了一个强大的工具来管理和优化GPU资源。无论是大型训练任务还是多云环境中的模型推理，KAI Scheduler 都能够提供出色的性能和效率。
+```
+
+
+
+
 
 
 
