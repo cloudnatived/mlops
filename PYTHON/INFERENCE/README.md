@@ -81,8 +81,8 @@ docker run -ti --net=host --pid=host --ipc=host --privileged -v ~/.cache/hugging
 
 # SGLang
   
-  
-SGLang部署deepseek-ai/DeepSeek-R1-Distill-Qwen-32B实测比VLLM快30%，LMDeploy比VLLM快50%
+参考资料：
+SGLang部署deepseek-ai/DeepSeek-R1-Distill-Qwen-32B实测比VLLM快30%，LMDeploy比VLLM快50% https://blog.csdn.net/weixin_46398647/article/details/145588854
 
 ```
 SGLang启动
@@ -99,11 +99,10 @@ CUDA_VISIBLE_DEVICES=5,6,7,8 lmdeploy serve api_server  ~/.cache/modelscope/hub/
 
 
 
-## Sglang
-https://docs.sglang.ai/backend/server_arguments.html   
-
+sglang的官网   https://docs.sglang.ai/backend/server_arguments.html   
+  
 Sglang部署大模型常用参数详解   
-
+  
 ```
 常用启动命令
 要启用多GPU张量并行性，请添加 --tp 2。如果报告错误“这些设备之间不支持对等访问”，请在服务器启动命令中添加 --enable-p2p-check。
