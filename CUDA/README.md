@@ -38,7 +38,7 @@ Aerial: 使用GPU 构建高性能、软件定义、云原生的 5G 应用，并�
 
 Nvidia的Driver、CUDA、CUDNN和TensorRT的关系：
 
-
+![](../IMAGES/MLOps-Drvice+CUDA+CUDNN+TensorRT.jpg)
 
 
 
