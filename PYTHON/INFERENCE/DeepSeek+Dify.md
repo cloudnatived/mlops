@@ -50,6 +50,7 @@ CPU： Intel(R) Xeon(R) CPU E5-2696 v4 @ 2.20GHz
 • Nvidia驱动535+（GPU加速需CUDA 12）
 💻 多平台安装要点：
 
+```
 # Linux专项配置（Ubuntu示例）
 sudo apt-get install -y nvidia-container-toolkit
 sudo systemctl restart docker
@@ -242,4 +243,4 @@ services:
           cpus: '2'
           memory: 8G
  
-
+```
