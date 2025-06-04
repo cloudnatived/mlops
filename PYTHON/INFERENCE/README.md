@@ -42,7 +42,9 @@ test_communication.py
 
 ```
 
-
+# VLLM
+  
+  
 ## vLLM + DeepSeek-R1 671B 多机部署
 
 ```
@@ -77,7 +79,9 @@ docker run -ti --net=host --pid=host --ipc=host --privileged -v ~/.cache/hugging
 
 ```
 
-
+# SGLang
+  
+  
 SGLang部署deepseek-ai/DeepSeek-R1-Distill-Qwen-32B实测比VLLM快30%，LMDeploy比VLLM快50%
 
 ```
