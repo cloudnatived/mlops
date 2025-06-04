@@ -1,3 +1,50 @@
+# 二. Nvidia的驱动、集成库、工具、组件
+
+多种业务场景下，Nvidia提供的驱动、集成库、工具、组件及主要用途：
+
+```
+CUDA Driver: 运行CUDA应用程序需要系统至少有一个具有CUDA功能的GPU和与CUDA工具包兼容的驱动程序。每个版本的CUDA工具包都对应一个最低版本的CUDA Driver，如果你安装的CUDA Driver版本比官方推荐的还低，那么很可能会无法正常运行。CUDA Driver是向后兼容的，根据CUDA的特定版本编译的应用程序将继续在后续发布的Driver上也能继续工作。
+CUDA: GPU 计算核心框架。
+nvidia-smi：全称是NVIDIA System Management Interface ，它是一个基于NVIDIA Management Library(NVML)构建的命令行实用工具，旨在帮助管理和监控NVIDIA GPU设备。
+NCCL: 分布式 GPU 训练 
+cudatoolkit：是高性能GPU加速应用的开发环境，提供了GPU加速库，debugging 和optimization工具，C/C++ 编译器以及一个部署应用的runtime的库。
+NVCC: CUDA的编译器,可以从CUDA Toolkit的/bin目录中获取,类似于gcc就是c语言的编译器。由于程序是要经过编译器编程成可执行的二进制文件，而cuda程序有两种代码，一种是运行在cpu上的host代码，一种是运行在gpu上的device代码，所以nvcc编译器要保证两部分代码能够编译成二进制文件在不同的机器上执行。
+
+Nsight: 性能优化
+NVIDIA Nsight Compute：是Nsight系列工具中的一个组件，专门用于CUDA核函数的性能分析，它是更接近内核的分析。它允许开发人员对 CUDA 核函数进行详细的性能分析，包括核函数的时间分布、内存访问模式、并行性、指令分发等。Nsight Compute提供了许多有用的数据和图形化的界面，帮助开发人员深入理解和优化核函数的性能。
+NVIDIA Nsight Systems：是一个系统级的性能分析工具，用于分析和优化整个CUDA应用程序或系统的性能。它可以提供对应用程序整体性能的全面见解，以及考察GPU活动、内存使用、线程间通信等方面的详细信息，它提供了可视化界面和统计数据，开发人员可以使用它来发现性能瓶颈、调整应用程序的配置，以及提高整体性能。
+
+cuDNN: 深度学习加速库，深度神经网络库。
+TensorRT: 推理优化，高性能深度学习推理的 SDK。 
+RAPIDS: GPU 数据科学 
+OptiX: 光线追踪 
+vGPU: GPU 虚拟化 
+CuNumeric: numpy加速库。
+CV-CUDA: 端到端计算机视觉和图像处理管道的开源库。
+CuQuantum: 加速量子计算工作流程的优化库和工具。
+Prabricks: 一个基因组分析软件套件。
+Sionna: 快速原型化复杂的通信系统架构。
+JetPack: 构建 AI 应用的全面解决方案。
+PAPIDS: 数据科学和机器学习推出的一套开源GPU加速库。
+Spark: 业内最广泛使用的大数据分析处理引擎。
+CuGraph: 数据科学家集合加速图分析。
+Triton: 开源推理框架，主要为用户提供在云和边缘推理上部署的解决方案。
+DeepStream: 将深度学习引入流处理管道中，以实现对视频和其他传感器数据的近实时分析。
+Flare：联邦学习应用环境。
+DOCA: DPU软件开发套件。
+MagIO: 适用于并行异步智能数据中心 IO 的架构，能更大限度提升存储和网络 IO 性能。
+Aerial: 使用GPU 构建高性能、软件定义、云原生的 5G 应用，并行处理基带信号和数据流。
+```
+
+Nvidia的Driver、CUDA、CUDNN和TensorRT的关系：
+
+
+
+
+
+
+
+
 # 一. 英伟达GPU驱动、CUDA Toolkit、Nccl
 
 ```
