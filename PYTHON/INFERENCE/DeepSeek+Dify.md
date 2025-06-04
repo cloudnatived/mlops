@@ -24,6 +24,7 @@
 
 
 2.1 硬件配置说明
+```
 1. 硬件配置清单
 ✅ 最低配置：
 CPU：2核以上（推荐Intel Xeon系列）
@@ -41,6 +42,7 @@ CPU： Intel(R) Xeon(R) CPU E5-2696 v4 @ 2.20GHz
 显存：16GB（Tesla V100-PCIE-16GB） * 3
 内存：256GB DDR4
 网络：千兆内网
+```
 
 2. 软件环境全攻略
 📦 必装组件：
@@ -48,18 +50,13 @@ CPU： Intel(R) Xeon(R) CPU E5-2696 v4 @ 2.20GHz
 • Docker Compose 2.20+
 • Ollama 0.5.5+
 • Nvidia驱动535+（GPU加速需CUDA 12）
-💻 多平台安装要点：
 
 ```
 # Linux专项配置（Ubuntu示例）
 sudo apt-get install -y nvidia-container-toolkit
 sudo systemctl restart docker
 
-# Windows特别提示
-需启用WSL2并设置内存限制：
-[wsl2]
-memory=16GB
-swap=0
+
 三、部署核心组件（含路径/端口定制）
 3.1 Ollama 配置
 1. Ollama深度配置
@@ -76,16 +73,12 @@ ollama run deepseek-r1:7b
 # 国内镜像源配置（速度提升10倍+）
 export OLLAMA_MIRROR=https://mirror.ghproxy.com/
 ollama run deepseek-r1:7b
-2. 避坑版Ollama安装
-# Windows特别版（解决路径含中文问题）
-setx OLLAMA_MODELS "D:\ollama_models"
-curl -L https://ollama.com/download/OllamaSetup_zh.exe -o ollama.exe
-./ollama.exe
-# 出现安全提示时选择"允许所有连接"
 
+2. 避坑版Ollama安装
 # Mac/Linux一键脚本（已处理权限问题）
 curl -fsSL https://ollama.com/install.sh | sudo env PATH=$PATH sh
 sudo systemctl enable ollama
+
 3. 组件连通性测试
 # 验证Ollama服务
 curl http://localhost:11434/api/tags
@@ -93,6 +86,7 @@ curl http://localhost:11434/api/tags
 # 检查Dify容器
 docker exec -it dify-api bash
 ping host.docker.internal
+
 3.2 Dify 部署方案
 1. Dify高级部署方案
 # 指定部署路径（原docker目录可自定义）
@@ -100,8 +94,7 @@ git clone https://github.com/langgenius/dify.git /opt/ai-platform/dify
 cd /opt/ai-platform/dify/docker
 
 
-# 小编自定义路径为 /data1/home/datascience/item/ai-platform/dify
-
+# 本次自定义路径为 /data1/home/datascience/item/ai-platform/dify
 
 # 关键配置文件修改（.env示例）
 vim .env
@@ -115,28 +108,15 @@ DATA_DIR=/data1/home/datascience/item/ai-platform/dify_data
 
 # 启动命令（后台运行）
 docker compose up -d --build
-image.png
-image.png
-dify路径位置
 
-image.png
-image.png
 启动dify容器
 
-image.png
-image.png
 在这个输出中，你应该可以看到包括 3 个业务服务 api / worker / web，以及 6 个基础组件 weaviate / db / redis / nginx / ssrf_proxy / sandbox 。
 
-image.png
-image.png
 首先访问地址,进行初始化配置，记得替换为你的ip和端口，这里配置的第一个默认账号为超级管理员，切记注意保存。
 
-image.png
-image.png
 输入账号密码，登录dify，进入配置
 
-image.png
-image.png
 3.3 Dify平台深度集成指南
 1. 模型接入关键步骤
 📍 路径：设置 > 模型供应商 > Ollama
@@ -147,28 +127,16 @@ Base URL：
 - Docker网络：http://host.docker.internal:11434
 Temperature：0.7（对话类建议0-1）
 Max Tokens：4096（7B模型实测上限）
-image.png
-image.png
+
 点击 ollama 选择安装
-
-image.png
-image.png
 点击添加模型
-
-image.png
-image.png
 开始添加LLM模型，输入模型名称，类型，URL 为需要接入的模型server，例如本地部署的deepseek，当然你也可以接入其他api。例如deepseek官网，豆包，通义千问等。
-image.png
-image.png
+
 3.4 应用创建
 创建空白应用，聊天助手，命名好你的应用名称
 
-image.png
-image.png
 测试AI助手的使用，正常对话查看模型调用
 
-image.png
-image.png
 3.5 企业级安全加固方案
 🔒 传输加密：
 
@@ -185,6 +153,7 @@ server {
         proxy_set_header Host $host;
     }
 }
+
 3.6 实战案例：10分钟构建智能客服系统
 1. 基础版Chatbot搭建
 [创建应用] → [对话型] → 命名"DeepSeek客服助手"
@@ -199,12 +168,7 @@ server {
 2. 高级工作流设计
 
 咨询类
-
 技术问题
-
-
-
-
 
 用户提问
 意图识别
@@ -213,6 +177,7 @@ server {
 生成回复
 敏感词过滤
 返回结果
+
 3.7 避坑大全：高频问题解决方案
 1. 端口冲突终极处理
 # 查看端口占用
