@@ -83,7 +83,8 @@ docker run -ti --net=host --pid=host --ipc=host --privileged -v ~/.cache/hugging
 ```
 
 # SGLang
-  
+sglang的官网   https://docs.sglang.ai/backend/server_arguments.html
+
 参考资料：
 SGLang部署deepseek-ai/DeepSeek-R1-Distill-Qwen-32B实测比VLLM快30%，LMDeploy比VLLM快50% https://blog.csdn.net/weixin_46398647/article/details/145588854
 ```
@@ -102,13 +103,184 @@ CUDA_VISIBLE_DEVICES=5,6,7,8 lmdeploy serve api_server  ~/.cache/modelscope/hub/
 
 ```
 
+参考资料：
+Docker 安装 sglang 完整部署 DeepSeek 满血版    https://zhuanlan.zhihu.com/p/29442431271
+```
+由于 DeepSeek-R1 参数量有 671B，在FP8 精度下，仅存储模型参数就需要 625GB 显存，加上KV cache 缓存及其他运行时的开销，单GPU 无法支持完全加载或高校运行，因此推荐容器分布式推理方案，更好的支持大模型的推理。
+
+满血版定义：671B参数的deepseek不管是V3/R1，只要满足671B参数就叫满血版。
+满血版划分：通常可细分为：原生满血版（FP8计算精度）、转译满血版（BF16或者FP16计算精度）、量化满血版（INT8、INT4、Q4、Q2计算精度）等版本，但是大家宣传都不会宣传XX满血版，只会宣传满血版，大家选择一定要擦亮眼睛。
+原生满血版：deepseek官方支持的 FP8 混合精度，不要怀疑，官方的我们认为就是最好的
+转译满血版：因为官方的 deepseek采用的是FP8混合精度，但是大部分的国产卡是不支持FP8精度的。所以要适配 deepseek，采用 BF16 或者 FP16来计算，这个方式理论上对精度影响很小，但是对计算和显存的硬件需求几乎增加一倍。
+
+关于显存计算，如果要部署671B的官方版大模型，用FP8混合精度，最小集群显存是750GB左右；如果采用FP16或者BF16，大概需要1.4T以上。
+
+量化满血版：很多厂家的AI卡只支持 INT8、FP16、FP32等格式，如果用FP16，单机需要1.4T显存以上，绝大多数国产AI单机没有那么大显存，为了单台机器能跑 671B deepseek，只能选择量化，量化就是通过减少计算精度，达到减少显存占用和提高吞吐效率的目的，量化后的版本会不会精准度，或者智商就变差了呢？？哈哈哈 ，大概路会吧
+
+本文将介绍如何基于 A100 ，通过分布式推理技术(sglang)完整部署并运行 DeepSeek-R1 满血版模型。
+A100 80G * 8卡的，需要4台
+有文档介绍：两个 H20 节点，每个节点有 8 个 GPU，就可以部署哈
+1. 环境准备
+OS 选型 - Ubuntu-22.04.5
+NVIDIA-Driver 安装
+https://us.download.nvidia.com/tesla/535.230.02/NVIDIA-Linux-x86_64-535.230.02.run
+模型下载
+下载工具安装：https://www.modelscope.cn/docs/intro/quickstart
+
+下载模型
+apt install git-lfs
+git lfs install
+git lfs clone https://www.modelscope.cn/deepseek-ai/DeepSeek-R1.git
+
+下载时间较长哈，建议大家从 modelscope下载模型。
+modelscope download --model 'deepseek-ai/DeepSeek-R1' --local_dir '/data'
+
+Docker 启动
+#添加Docker软件包源
+apt-get -y install apt-transport-https ca-certificates curl software-properties-common
+
+curl -fsSL http://mirrors.cloud.aliyuncs.com/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
+add-apt-repository -y "deb [arch=$(dpkg --print-architecture)] http://mirrors.cloud.aliyuncs.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
+
+#安装Docker社区版本，容器运行时containerd.io，以及Docker构建和Compose插件
+apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+#修改Docker存储路径
+vim /etc/docker/daemon.json
+{
+  "data-root/graph": "/mnt/docker"  #挂载路径
+}
+
+#安装安装nvidia-container-toolkit
+curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
+  && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
+    sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+    sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+apt-get install -y nvidia-container-toolkit
+
+#启动Docker
+systemctl start docker
+
+#设置Docker守护进程在系统启动时自动启动
+sudo systemctl enable docker
+
+分布式推理
+本次使用的是分布式推理框架是 sglang：https://github.com/sgl-project/sglang
+Docs：https://github.com/sgl-project/sglang/tree/main/benchmark/deepseek_v3
+DeepSeek 模型格式转换（FP8->BF16）
+模型格式转换，因为 A100 机型不支持 FP8 类型的数据格式，所以第一步必须将 DeepSeek-R1 的模型权重转换为 BF16 格式。
+格式转换脚本：https://github.com/deepseek-ai/DeepSeek-V3/blob/main/inference/fp8_cast_bf16.py
+
+主要通过weight_dequant函数将FP8权重转换为BF16格式，参考文档：
+快来学习一下：高性能 ：DeepSeek-V3 inference 推理时反量化实现 fp8_cast_bf16
+
+copy 转换后的模型权重至另外的 3 台 A100 机器。
+
+RDMA 网络配置
+分布式推理需要用到 RDMA 网络进行网络通信，否则推理效率非常低下。
+实测：在未使用 RDMA 网络时，DeepSeek-R1 在8h之内没有加载完成。
+
+检查 mellanox 网卡硬件设备是否存在：lspci | grep -i mellanox
+RDMA 驱动安装：https://network.nvidia.com/products/infiniband-drivers/linux/mlnx_ofed/
+参考文档：https://sulao.cn/post/977.html
+
+启动 RDMA 相关服务。
+检测 RDMA 设备：ofed_info
+启动 sglang 分布式推理
+
+补充说明
+启动命令时，先启动主节点，后启动副节点
+所有节点的 --dist-init-addr 均需设置为主节点IP
+在服务启动后，发起请求时需指定为主节点IP
+
+# node01
+docker run -d \
+     --privileged \
+     --gpus all \
+     -e NCCL_SOCKET_IFNAME=eth0 \
+     -e NCCL_NVLS_ENABLE=0 \
+     -e NCCL_DEBUG=INFO \
+     -e NCCL_IB_HCA=mlx5_1,mlx5_2,mlx5_3,mlx5_4 \
+     -e NCCL_IB_QPS_PER_CONNECTION=8 \
+     -e NCCL_SOCKET_FAMILY=AF_INET \
+     -e NCCL_IB_TIMEOUT=22 \
+     -e NCCL_IB_DISABLE=0 \
+     -e NCCL_IB_RETRY_CNT=12 \
+     -e NCCL_IB_GID_INDEX=3 \
+     --network host \
+     --shm-size 32g \
+     -p 30000:30000 \
+     -v /data/deepseek-R1-fp16:/data/deepseek-R1-fp16 \
+     --ipc=host \
+     <registry.io>/lmsysorg/sglang:latest \
+     python3 -m sglang.launch_server --model-path /data/deepseek-R1-fp16/ --tp 32 --dist-init-addr 192.168.5.4:5000 --nnodes 4 --node-rank 0 --trust-remote-code --host 0.0.0.0 --port 30000
+     
+# node02
+docker run -d \
+     --privileged \
+     --gpus all \
+     -e NCCL_SOCKET_IFNAME=eth0 \
+     -e NCCL_NVLS_ENABLE=0 \
+     -e NCCL_DEBUG=INFO \
+     -e NCCL_IB_HCA=mlx5_1,mlx5_2,mlx5_3,mlx5_4 \
+     -e NCCL_IB_QPS_PER_CONNECTION=8 \
+     -e NCCL_SOCKET_FAMILY=AF_INET \
+     -e NCCL_IB_TIMEOUT=22 \
+     -e NCCL_IB_DISABLE=0 \
+     -e NCCL_IB_RETRY_CNT=12 \
+     -e NCCL_IB_GID_INDEX=3 \
+     --network host \
+     --shm-size 32g \
+     -p 30000:30000 \
+     -v /data/deepseek-R1-fp16:/data/deepseek-R1-fp16 \
+     --ipc=host \
+     <registry.io>/lmsysorg/sglang:latest \
+     python3 -m sglang.launch_server --model-path /data/deepseek-R1-fp16/ --tp 32 --dist-init-addr 192.168.5.4:5000 --nnodes 4 --node-rank 1 --trust-remote-code     <registry.io>/sre/lmsysorg/sglang:latest \
 
 
+节点 02 ，节点 03 以此忘后推
+web 页面
+open webui进行支持
+https://github.com/open-webui/open-webui?tab=readme-ov-file#installation-with-default-configuration
+#拉取Open WebUI镜像。
+sudo docker pull alibaba-cloud-linux-3-registry.cn-hangzhou.cr.aliyuncs.com/alinux3/python:3.11.1
 
-sglang的官网   https://docs.sglang.ai/backend/server_arguments.html   
+#启动Open WebUI服务。
+
+#设置模型服务地址
+OPENAI_API_BASE_URL=http://127.0.0.1:30000/v1
+
+# 创建数据目录,确保数据目录存在并位于/mnt下
+sudo mkdir -p /mnt/open-webui-data
+
+#启动open-webui服务 
+#需注意系统盘空间，建议100GB以上
+sudo docker run -d -t --network=host --name open-webui \
+-e ENABLE_OLLAMA_API=False \
+-e OPENAI_API_BASE_URL=${OPENAI_API_BASE_URL} \
+-e DATA_DIR=/mnt/open-webui-data \
+-e HF_HUB_OFFLINE=1 \
+-v /mnt/open-webui-data:/mnt/open-webui-data \
+alibaba-cloud-linux-3-registry.cn-hangzhou.cr.aliyuncs.com/alinux3/python:3.11.1 \
+/bin/bash -c "pip config set global.index-url http://mirrors.cloud.aliyuncs.com/pypi/simple/ && \
+pip config set install.trusted-host mirrors.cloud.aliyuncs.com && \
+pip install --upgrade pip && \
+pip install open-webui && \
+mkdir -p /usr/local/lib/python3.11/site-packages/google/colab && \
+open-webui serve"
+
+#行以下命令，实时监控下载进度，等待下载结束。
+docker logs -f open-webui
+
+#在日志输出中寻找类似以下的消息：
+INFO:     Uvicorn running on http://0.0.0.0:8080 (Press CTRL+C to quit)
+#表示服务已经成功启动并在端口8080上监听。
+
+#本地物理机上使用浏览器访问http://<公网IP地址>:8080，首次登录时，请根据提示创建管理员账号。
+```
+
   
-Sglang部署大模型常用参数详解   
-  
+Sglang部署大模型常用参数详解    
 ```
 常用启动命令
 要启用多GPU张量并行性，请添加 --tp 2。如果报告错误“这些设备之间不支持对等访问”，请在服务器启动命令中添加 --enable-p2p-check。
