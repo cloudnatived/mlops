@@ -86,8 +86,11 @@ docker run -ti --net=host --pid=host --ipc=host --privileged -v ~/.cache/hugging
   
 参考资料：
 SGLang部署deepseek-ai/DeepSeek-R1-Distill-Qwen-32B实测比VLLM快30%，LMDeploy比VLLM快50% https://blog.csdn.net/weixin_46398647/article/details/145588854
-
 ```
+
+实测使用SGLang速率为30.47 tokens/s，VLLM速率为23.23 tokens/s，快30%
+LMDeploy速率为34.96 tokens/s，比VLLM快50%
+
 SGLang启动
 CUDA_VISIBLE_DEVICES=5,6,7,8 python3 -m sglang.launch_server --model ~/.cache/modelscope/hub/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B/ --tp 4 --host 0.0.0.0 --port 8000
 
