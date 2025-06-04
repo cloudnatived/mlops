@@ -279,7 +279,150 @@ INFO:     Uvicorn running on http://0.0.0.0:8080 (Press CTRL+C to quit)
 #本地物理机上使用浏览器访问http://<公网IP地址>:8080，首次登录时，请根据提示创建管理员账号。
 ```
 
-  
+参考资料：
+手把手教你用SGLang部署DeepSeek-70B大模型（附避坑指南）  https://blog.csdn.net/2501_91377542/article/details/147441180
+```
+
+一、环境准备
+1.1 硬件配置建议
+显卡：至少需要8张A100 80G
+内存：建议128G以上
+硬盘：预留500G空间
+如果显存不足，可以试试量化版本（比如4bit量化）
+
+1.2 软件依赖安装
+# 安装万能依赖包
+sudo apt-get update && sudo apt-get install -y git curl wget python3-pip
+
+二、模型下载（两种方式任选）
+2.1 官方推荐方法（ModelScope）
+# 安装工具包
+pip install modelscope -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+# 创建模型仓库
+mkdir -p /data/deepseek-ai/models/deepseek-70b
+
+# 开下！(记得连好VPN)
+modelscope download --local_dir /data/deepseek-ai/models/deepseek-70b \
+    --model deepseek-ai/DeepSeek-R1-Distill-Llama-70B
+
+2.2 HuggingFace备份方案
+# 安装huggingface-cli
+pip install huggingface_hub
+
+# 下载模型（需要Access Token）
+huggingface-cli download deepseek-ai/DeepSeek-R1-Distill-Llama-70B \
+    --local-dir /data/deepseek-ai/models/deepseek-70b
+
+三、Docker环境配置
+3.1 安装Docker全家桶
+# 一键安装脚本
+curl -fsSL https://get.docker.com | bash -s docker
+
+# 配置镜像加速（解决下载慢问题）
+sudo tee /etc/docker/daemon.json <<-'EOF'
+{
+  "registry-mirrors": [
+    "https://docker.211678.top",
+    "https://docker.m.daocloud.io"
+  ]
+}
+EOF
+
+# 重启服务
+sudo systemctl restart docker
+
+3.2 验证GPU支持
+# 运行测试容器 docker run --rm --gpus all nvidia/cuda:11.8.0-base-ubuntu22.04 nvidia-smi #看到显卡信息就成功啦！
+
+四、SGLang服务部署
+4.1 拉取最新镜像
+docker pull lmsysorg/sglang:latest
+
+4.2 单命令启动（适合快速测试）
+docker run -itd --name sglang_ds70 \
+    --gpus all --ipc=host --shm-size=16g \
+    -v /data/deepseek-ai:/data \
+    --network=host lmsysorg/sglang:latest \
+    python3 -m sglang.launch_server \
+    --model "/data/models/deepseek-70b" \
+    --tp 8 --mem-fraction-static 0.8 \
+    --trust-remote-code --dtype bfloat16 \
+    --host 0.0.0.0 --port 30000 \
+    --api-key token-abc123 \
+    --served-model-name DeepSeek-70B
+
+4.3 生产级部署（推荐docker-compose）
+# docker-compose.yml
+version: '3.9'
+services:
+  sglang:
+    image: lmsysorg/sglang:latest
+    volumes:
+      - /data/deepseek-ai:/data
+    ports:
+      - "30000:30000"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 8
+              capabilities: [gpu]
+    command: --model-path /data/models/deepseek-70b
+             --tp 8 --port 30000
+             --api-key my-secret-token
+docker-compose up -d
+
+五、服务验证与测试
+5.1 健康检查
+curl http://localhost:30000/health
+# 返回{"status":"healthy"}就成功啦！
+
+5.2 API调用示例
+import requests
+
+url = "http://localhost:30000/v1/chat/completions"
+headers = {
+    "Authorization": "Bearer my-secret-token",
+    "Content-Type": "application/json"
+}
+
+data = {
+    "model": "DeepSeek-70B",
+    "messages": [
+        {"role": "user", "content": "用鲁迅的风格写一篇关于秋天的散文"}
+    ],
+    "temperature": 0.7,
+    "max_tokens": 500
+}
+
+response = requests.post(url, json=data, headers=headers)
+print(response.json()['choices'][0]['message']['content'])
+
+六、常见问题排雷指南
+报错：CUDA out of memory
+解决方案：
+减少--tp参数值（比如从8改为4）
+使用--dtype float16代替bfloat16
+添加--quantization awq启用4bit量化
+
+模型下载中断
+解决方案：
+# 续传下载（ModelScope专用）
+modelscope download --local-dir /data/deepseek-ai/models/deepseek-70b \
+    --model deepseek-ai/DeepSeek-R1-Distill-Llama-70B \
+    --resume-download
+
+七、性能优化小技巧
+开启FlashAttention：添加--flash-attn参数
+调整批处理大小：设置--max-num-batched-tokens 4096
+使用vLLM后端：添加--backend vllm参数
+监控GPU状态：watch -n 1 nvidia-smi
+
+```
+
+
 Sglang部署大模型常用参数详解    
 ```
 常用启动命令
