@@ -113,7 +113,7 @@ docker compose up -d --build
 
 启动dify容器
 
-在这个输出中，你应该可以看到包括 3 个业务服务 api / worker / web，以及 6 个基础组件 weaviate / db / redis / nginx / ssrf_proxy / sandbox 。
+在这个输出中，可以看到包括 3 个业务服务 api / worker / web，以及 6 个基础组件 weaviate / db / redis / nginx / ssrf_proxy / sandbox 。
 
 首先访问地址,进行初始化配置，记得替换为你的ip和端口，这里配置的第一个默认账号为超级管理员，切记注意保存。
 
