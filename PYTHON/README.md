@@ -165,7 +165,7 @@ BMTrain 用于训练数百亿规模参数大模型:
 2.加速训练手段:支持 DeepSpeed 中并行策略深度优化;
 ```
 
-参考资料：
+参考资料：  
 分布式并行框架介绍 #大模型 #分布式并行 #训练    https://www.bilibili.com/video/BV1op421C7wp/  
 deepspeed、MegatronLM和Megatron-deepspeed的关系    https://blog.csdn.net/m0_49448331/article/details/145910339  
 训练大模型的九大深度学习库，哪一个最适合你？　　https://zhuanlan.zhihu.com/p/614199520  
@@ -188,7 +188,7 @@ deepspeed、MegatronLM和Megatron-deepspeed的关系    https://blog.csdn.net/m0
 | HuggingFace TGI | 生产级推理服务、标准化 RESTful APl、OpenAl兼容接口       | 生态成熟、稳定集成可靠、易于云端                       | 高并发定制化优化能力稍弱，部分功能依赖云端服务      | 云端部署、API推理、企业竞级生产功        |
 | MLC-LLM         | 基于 Apache TVM 的编译优化、低 TTFT、实验性原型验证      | 在低并发、低延迟场景下表现突出，展示编译优化潜力       | 当前版本稳定性待提高，部署流程较复杂                | 处于研发出其、实验性应用、未大规模部署   |
 
-参考资料：
+参考资料：  
 一文详解八款主流大模型推理框架　　　　https://zhuanlan.zhihu.com/p/32055623013    
 大模型推理引擎vllm，sglang，transformer，exllama详细介绍和区别　　　　https://blog.csdn.net/qq_40999403/article/details/142098606    
 【大模型推理】大模型推理整体知识，大模型推理必看指南    https://www.bilibili.com/video/BV1dyqDYvEv2/    
