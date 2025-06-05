@@ -11,7 +11,7 @@ LeNet-5：输入层（32x32 的图像）=> 卷积层 1（6 个 5x5 的卷积核�
 # MNIST 数据集
 
   
-github上的一些参考：
+github上的一些参考：  
 https://github.com/tm9161/MNIST/tree/main                      # 有一些基于MNIST手写数字的图像分类的示例。  
 https://github.com/TiezhuXing01/LeNet5_in_PyTorch/tree/main    # 这是一个用 LeNet5 实现手写数字识别的项目。数据集用的是MNIST。  
 https://github.com/lvyufeng/denoising-diffusion-mindspore      # 手撕 CNN 经典网络系列  
