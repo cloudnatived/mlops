@@ -120,9 +120,9 @@ GitHub：http://github.com/Microsoft/CNTK
 6. X2 Paddle：辅助工具，将其他框架模型转换成Paddle模型，转换格式后可以方便的使用上述5个工具；
 ```
 
-参考资料：
-深度学习模型训练推理框架一览！大盘点　　　　https://zhuanlan.zhihu.com/p/676152530
-深度学习框架比较（Caffe, TensorFlow, MXNet, Torch, Theano）　　　　https://www.cnblogs.com/candlia/p/11920236.html
+参考资料：  
+深度学习模型训练推理框架一览！大盘点　　　　https://zhuanlan.zhihu.com/p/676152530  
+深度学习框架比较（Caffe, TensorFlow, MXNet, Torch, Theano）　　　　https://www.cnblogs.com/candlia/p/11920236.html  
 
 
 
