@@ -1,5 +1,8 @@
 
-# DRL深度学习的demo
+# DRL深度学习的入门任务
+
+参考资料：  
+MNIST手写体识别  https://docs.swanlab.cn/examples/mnist.html
 
 LeNet 是一系列网络的合称，包括 LeNet-1、LeNet-4、LeNet-5 等，LeNet-5 是 LeNet 系列中最受欢迎和经典的版本。通常所说的 LeNet 和 LeNet-5 有以下区别：  
   
