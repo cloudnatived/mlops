@@ -9,10 +9,12 @@ LeNet-5：输入层（32x32 的图像）=> 卷积层 1（6 个 5x5 的卷积核�
 在实际应用中，如果是简单的图像识别任务，LeNet 可能就能够满足需求，并且由于其结构简单，训练速度可能会更快。但如果是较为复杂的图像任务，如高精度的手写数字识别或者其他类似的图像分类场景，LeNet-5 可能会是更好的选择，不过训练时间可能会相对较长。  
 
 # MNIST 数据集
+
   
-https://github.com/tm9161/MNIST/tree/main                      # 有一些基于MNIST手写数字的图像分类的示例。
-https://github.com/TiezhuXing01/LeNet5_in_PyTorch/tree/main    # 这是一个用 LeNet5 实现手写数字识别的项目。数据集用的是MNIST。
-https://github.com/lvyufeng/denoising-diffusion-mindspore      # 手撕 CNN 经典网络系列
+github上的一些参考：
+https://github.com/tm9161/MNIST/tree/main                      # 有一些基于MNIST手写数字的图像分类的示例。  
+https://github.com/TiezhuXing01/LeNet5_in_PyTorch/tree/main    # 这是一个用 LeNet5 实现手写数字识别的项目。数据集用的是MNIST。  
+https://github.com/lvyufeng/denoising-diffusion-mindspore      # 手撕 CNN 经典网络系列  
 
 
 
