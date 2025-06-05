@@ -1,6 +1,8 @@
 
 # Qwen3大模型微调入门实战（完整代码，显存要求约32GB）
 
+参考文档： https://github.com/Zeyi-Lin/Qwen3-Medical-SFT
+
 Qwen3是阿里通义实验室最近开源的大语言模型，发布时便登顶了开源LLM榜单第一名。同时，Qwen系列模型也超越LLaMA，成为了HuggingFace上最受欢迎的开源LLM。
 可以说，不论是进行研究学习，还是应用落地，Qwen已经逐渐成为开发者的最优选项之一。
 
@@ -29,7 +31,6 @@ SwanLab：https://swanlab.cn
 ```
 1. 环境安装
 
-swanlab
 modelscope==1.22.0
 transformers>=4.50.0
 datasets==3.2.0
