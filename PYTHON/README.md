@@ -166,10 +166,10 @@ BMTrain 用于训练数百亿规模参数大模型:
 ```
 
 参考资料：
-分布式并行框架介绍 #大模型 #分布式并行 #训练    https://www.bilibili.com/video/BV1op421C7wp/
-deepspeed、MegatronLM和Megatron-deepspeed的关系    https://blog.csdn.net/m0_49448331/article/details/145910339
-训练大模型的九大深度学习库，哪一个最适合你？　　https://zhuanlan.zhihu.com/p/614199520
-当前主流的大模型训练与推理框架的全面汇总    https://blog.csdn.net/shenhonglei1234/article/details/146136471
+分布式并行框架介绍 #大模型 #分布式并行 #训练    https://www.bilibili.com/video/BV1op421C7wp/  
+deepspeed、MegatronLM和Megatron-deepspeed的关系    https://blog.csdn.net/m0_49448331/article/details/145910339  
+训练大模型的九大深度学习库，哪一个最适合你？　　https://zhuanlan.zhihu.com/p/614199520  
+当前主流的大模型训练与推理框架的全面汇总    https://blog.csdn.net/shenhonglei1234/article/details/146136471  
 
 
 
@@ -189,9 +189,9 @@ deepspeed、MegatronLM和Megatron-deepspeed的关系    https://blog.csdn.net/m0
 | MLC-LLM         | 基于 Apache TVM 的编译优化、低 TTFT、实验性原型验证      | 在低并发、低延迟场景下表现突出，展示编译优化潜力       | 当前版本稳定性待提高，部署流程较复杂                | 处于研发出其、实验性应用、未大规模部署   |
 
 参考资料：
-一文详解八款主流大模型推理框架　　　　https://zhuanlan.zhihu.com/p/32055623013  
-大模型推理引擎vllm，sglang，transformer，exllama详细介绍和区别　　　　https://blog.csdn.net/qq_40999403/article/details/142098606  
-【大模型推理】大模型推理整体知识，大模型推理必看指南    https://www.bilibili.com/video/BV1dyqDYvEv2/  
+一文详解八款主流大模型推理框架　　　　https://zhuanlan.zhihu.com/p/32055623013    
+大模型推理引擎vllm，sglang，transformer，exllama详细介绍和区别　　　　https://blog.csdn.net/qq_40999403/article/details/142098606    
+【大模型推理】大模型推理整体知识，大模型推理必看指南    https://www.bilibili.com/video/BV1dyqDYvEv2/    
 【AI】推理系统和推理引擎的整体架构　　　　https://blog.csdn.net/weixin_45651194/article/details/132872588  
 
 
