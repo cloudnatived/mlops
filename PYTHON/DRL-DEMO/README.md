@@ -24,7 +24,7 @@ https://github.com/lvyufeng/denoising-diffusion-mindspore      # 手撕 CNN 经�
 ```
 
 
-## 01-MNIST-XHH   -- 小黑黑 mnist_network
+## /01-MNIST-XHH   -- 小黑黑 mnist_network
 ### 三层神经网络训练手写数字识别
 
 ```
@@ -100,8 +100,31 @@ lenet5_mnist.py
 
 ```
 
+## 02-MNIST-LeNet5
+```
+pip3 install -r CNN1.requirements.txt;
+python3 CNN1.py;
 
 
+python3 LeNet5_0.py;
+
+
+python3 LeNet5_1.py;
+
+
+python3 LeNet5_787.py;
+
+
+python3 LeNet5_787_optimization.py;
+
+
+python3 LeNet5_in_PyTorch.py;
+
+
+python3 lenet5_mnist.py;
+
+
+```
 
 ## /03-MNIST-CHATGPT -- 
 
