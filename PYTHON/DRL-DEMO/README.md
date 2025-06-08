@@ -244,11 +244,11 @@ tensorflow 自己制作Mnist数据集，用训练好的模型来测试准确度�
 
 
 ## /04-MNIST-LeNet5   -- CIFAR10 图像
-
-视频讲解：https://www.bilibili.com/video/BV1W7411T7qc/    # 2.1 pytorch官方demo(Lenet)
+  
+视频讲解：https://www.bilibili.com/video/BV1W7411T7qc/    # 2.1 pytorch官方demo(Lenet)  
 参考资料：https://blog.csdn.net/qq_37541097/category_9488472_2.html  
-这个up主发了好多能动手实验的教程。太阳花的小绿豆。
-
+这个up主发了好多能动手实验的教程。太阳花的小绿豆。  
+  
 参考资料： 
 pytorch图像分类篇：2.pytorch官方demo实现一个分类器(LeNet)    https://blog.csdn.net/m0_37867091/article/details/107136477  
 
