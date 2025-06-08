@@ -246,6 +246,10 @@ https://blog.csdn.net/qq_37541097/category_9488472_2.html
 
 
 ## /04-MNIST-LeNet5   -- CIFAR10 图像
+
+参考资料：https://blog.csdn.net/qq_37541097/category_9488472_2.html  
+这个up主发了好多能动手实验的教程。太阳花的小绿豆。
+
 参考资料： 
 pytorch图像分类篇：2.pytorch官方demo实现一个分类器(LeNet)    https://blog.csdn.net/m0_37867091/article/details/107136477  
 
@@ -321,6 +325,7 @@ wget http://download.tensorflow.org/example_images/flower_photos.tgz
 ## /09-AlexNet-flower-tensorflow -- 使用tensorflow搭建AlexNet并训练花分类数据集
 
 ```
+参考资料：https://github.com/WZMIAOMIAO/deep-learning-for-image-processing/tree/master/tensorflow_classification/Test2_alexnet
 参考资料：
 
 数据集下载地址，数据集包含 5 中类型的花，每种类型有600~900张图像不等。  
