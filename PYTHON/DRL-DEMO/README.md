@@ -245,8 +245,8 @@ https://blog.csdn.net/qq_37541097/category_9488472_2.html
 这个up主发了好多能动手实验的教程。太阳花的小绿豆。
 
 
-## /LeNet-Pytorch   -- CIFAR10 图像
-参考资料：Pytorch官方demo（LeNet）  https://zhuanlan.zhihu.com/p/1887640705884746376  
+## /04-MNIST-LeNet5   -- CIFAR10 图像
+参考资料： 
 pytorch图像分类篇：2.pytorch官方demo实现一个分类器(LeNet)    https://blog.csdn.net/m0_37867091/article/details/107136477  
 
 ```
@@ -303,16 +303,33 @@ truck 类别准确率: 80.20%
 ```
 
   
-## /AlexNet-flower-Pytorch -- 使用pytorch搭建AlexNet并训练花分类数据集
+## /08-AlexNet-flower-Pytorch -- 使用pytorch搭建AlexNet并训练花分类数据集
+
+```
+参考资料：https://github.com/WZMIAOMIAO/deep-learning-for-image-processing/tree/master/pytorch_classification/Test2_alexnet  
 参考资料：pytorch图像分类篇：3.搭建AlexNet并训练花分类数据集    https://blog.csdn.net/m0_37867091/article/details/107150142  
 
 数据集下载地址，数据集包含 5 中类型的花，每种类型有600~900张图像不等。  
 wget http://download.tensorflow.org/example_images/flower_photos.tgz  
 
 
-## /AlexNet-flower-tensorflow -- 使用tensorflow搭建AlexNet并训练花分类数据集
+/08-AlexNet-flower-Pytorch/split_data.py # 用来拆分数据集
+
+```
+
+
+## /09-AlexNet-flower-tensorflow -- 使用tensorflow搭建AlexNet并训练花分类数据集
+
+```
 参考资料：
 
 数据集下载地址，数据集包含 5 中类型的花，每种类型有600~900张图像不等。  
 wget http://download.tensorflow.org/example_images/flower_photos.tgz  
+
+/09-AlexNet-flower-tensorflow/split_data.py # 用来拆分数据集
+
+
+```
+
+
 
