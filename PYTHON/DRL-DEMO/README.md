@@ -103,7 +103,7 @@ lenet5_mnist.py
 
 
 
-## /MNIST-CHATGPT -- 
+## /03-MNIST-CHATGPT -- 
 
 ```
 # CHATGPT写的一个手写数字识别
