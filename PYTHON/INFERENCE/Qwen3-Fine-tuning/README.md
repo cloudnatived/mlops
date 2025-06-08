@@ -72,4 +72,15 @@ python3 medical_dataset_splitter_DOUBAO.py \
   --train_ratio 0.85 \
   --seed 42
 
+全参数微调：
+python3 train_DOUBAO_optimization.py
+
+LoRA微调：
+python3 train_lora_DOUBAO_optimization.py
+
+
+
+
+
+
 ```
