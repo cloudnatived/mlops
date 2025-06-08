@@ -1,5 +1,5 @@
 
-# DRL深度学习的入门任务
+# DL、RL、DRL 学习的一些入门任务
 
 参考资料：  
 MNIST手写体识别  https://docs.swanlab.cn/examples/mnist.html
@@ -14,14 +14,14 @@ LeNet-5：输入层（32x32 的图像）=> 卷积层 1（6 个 5x5 的卷积核�
   
 在实际应用中，如果是简单的图像识别任务，LeNet 可能就能够满足需求，并且由于其结构简单，训练速度可能会更快。但如果是较为复杂的图像任务，如高精度的手写数字识别或者其他类似的图像分类场景，LeNet-5 可能会是更好的选择，不过训练时间可能会相对较长。  
 
-# MNIST 数据集
+# MNIST 数据集 相关的3个demo，01-MNIST-XHH，02-MNIST-LeNet5，03-MNIST-CHATGPT
 
-  
+```
 github上的一些参考：  
 https://github.com/tm9161/MNIST/tree/main                      # 有一些基于MNIST手写数字的图像分类的示例。  
 https://github.com/TiezhuXing01/LeNet5_in_PyTorch/tree/main    # 这是一个用 LeNet5 实现手写数字识别的项目。数据集用的是MNIST。  
 https://github.com/lvyufeng/denoising-diffusion-mindspore      # 手撕 CNN 经典网络系列  
-
+```
 
 
 ## 01-MNIST-XHH   -- 小黑黑 mnist_network
@@ -245,6 +245,7 @@ tensorflow 自己制作Mnist数据集，用训练好的模型来测试准确度�
 
 ## /04-MNIST-LeNet5   -- CIFAR10 图像
 
+视频讲解：https://www.bilibili.com/video/BV1W7411T7qc/    # 2.1 pytorch官方demo(Lenet)
 参考资料：https://blog.csdn.net/qq_37541097/category_9488472_2.html  
 这个up主发了好多能动手实验的教程。太阳花的小绿豆。
 
@@ -308,6 +309,7 @@ truck 类别准确率: 80.20%
 ## /08-AlexNet-flower-Pytorch -- 使用pytorch搭建AlexNet并训练花分类数据集
 
 ```
+视频讲解：https://www.bilibili.com/video/BV187411T7Ye  # 3.2 使用pytorch搭建AlexNet并训练花分类数据集
 参考资料：https://github.com/WZMIAOMIAO/deep-learning-for-image-processing/tree/master/pytorch_classification/Test2_alexnet  
 参考资料：pytorch图像分类篇：3.搭建AlexNet并训练花分类数据集    https://blog.csdn.net/m0_37867091/article/details/107150142  
 
@@ -323,6 +325,7 @@ wget http://download.tensorflow.org/example_images/flower_photos.tgz
 ## /09-AlexNet-flower-tensorflow -- 使用tensorflow搭建AlexNet并训练花分类数据集
 
 ```
+视频讲解：https://www.bilibili.com/video/BV1s7411T7vs # 3.3 使用tensorflow2搭建Alexnet
 参考资料：https://github.com/WZMIAOMIAO/deep-learning-for-image-processing/tree/master/tensorflow_classification/Test2_alexnet
 参考资料：
 
