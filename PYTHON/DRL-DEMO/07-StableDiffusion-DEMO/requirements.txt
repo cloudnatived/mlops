@@ -1,0 +1,14 @@
+transformers>=4.37.0
+accelerate>=0.27.0
+modelscope>=1.9.5
+numpy>=1.22.3
+torch>=1.11.0
+gradio>=4.8.0
+diffusers>=0.26.3
+opencv-python>=4.9.0.80
+safetensors>=0.4.2
+addict
+datasets==2.21.0
+simplejson
+sortedcontainers
+diffusers
