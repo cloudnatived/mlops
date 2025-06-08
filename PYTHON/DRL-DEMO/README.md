@@ -24,7 +24,7 @@ https://github.com/lvyufeng/denoising-diffusion-mindspore      # 手撕 CNN 经�
 
 
 
-## /MNIST-XHH   -- 小黑黑 mnist_network
+## 01-MNIST-XHH   -- 小黑黑 mnist_network
 ### 三层神经网络训练手写数字识别
 
 ```
