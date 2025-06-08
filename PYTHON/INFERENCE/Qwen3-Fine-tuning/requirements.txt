@@ -1,0 +1,9 @@
+modelscope
+transformers>=4.50.0
+datasets
+accelerate
+pandas
+addict
+torch
+tqdm
+tf-keras
