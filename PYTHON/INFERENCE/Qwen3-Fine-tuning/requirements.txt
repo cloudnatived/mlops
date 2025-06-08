@@ -7,3 +7,4 @@ addict
 torch
 tqdm
 tf-keras
+peft
