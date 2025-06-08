@@ -162,25 +162,25 @@ print(f"验证数据加载完成，共{len(eval_dataset)}条样本")
 print("配置训练参数...")
 args = TrainingArguments(
     output_dir="./output/Qwen3-1.7B",
-    per_device_train_batch_size=2,
+    per_device_train_batch_size=2,      # 尝试增加批量大小
     per_device_eval_batch_size=2,
-    gradient_accumulation_steps=8,
+    gradient_accumulation_steps=8,      # 平衡显存使用
     eval_strategy="steps",
     eval_steps=100,
     logging_steps=10,
-    num_train_epochs=3,
+    num_train_epochs=3,                 # 增加训练轮次
     save_steps=400,
-    learning_rate=5e-5,
-    weight_decay=0.01,
-    warmup_ratio=0.1,
-    fp16=False,
+    learning_rate=5e-5,                 # 微调学习率
+    weight_decay=0.01,                  # 添加权重衰减
+    warmup_ratio=0.1,                   # 增加预热比例
+    fp16=False,                         # 使用bf16而非fp16
     bf16=True,
-    save_total_limit=3,
+    save_total_limit=3,                 # 限制保存的检查点数量
     load_best_model_at_end=True,
     run_name="qwen3-1.7B-medical",
     dataloader_num_workers=2,
-    group_by_length=True,
-    gradient_checkpointing=True,
+    group_by_length=True,               # 按序列长度分组，提高效率
+    gradient_checkpointing=True,        # 启用梯度检查点
 )
 
 # 创建训练器
