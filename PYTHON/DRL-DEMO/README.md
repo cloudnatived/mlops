@@ -304,13 +304,28 @@ truck 类别准确率: 80.20%
 
 
 ```
+## /05-ChatBot-DEMO
+参考资料在这里：https://github.com/cloudnatived/mlops/tree/main/PYTHON/DRL-DEMO/05-ChatBot-DEMO
 
-  
+## /06-OCR-DEMO
+参考资料在这里：
+https://github.com/cloudnatived/mlops/tree/main/PYTHON/DRL-DEMO/06-OCR-DEMO
+
+## /07-StableDiffusion-DEMO
+参考资料在这里：
+https://github.com/cloudnatived/mlops/tree/main/PYTHON/DRL-DEMO/07-StableDiffusion-DEMO
+
+
+
 ## /08-AlexNet-flower-Pytorch -- 使用pytorch搭建AlexNet并训练花分类数据集
 
 ```
 视频讲解：https://www.bilibili.com/video/BV187411T7Ye  # 3.2 使用pytorch搭建AlexNet并训练花分类数据集
-参考资料：https://github.com/WZMIAOMIAO/deep-learning-for-image-processing/tree/master/pytorch_classification/Test2_alexnet  
+参考资料：https://github.com/WZMIAOMIAO/deep-learning-for-image-processing/tree/master/pytorch_classification/Test2_alexnet
+AlexNet网络结构详解与模型的搭建    https://blog.csdn.net/qq_37541097/article/details/104409156
+参考资料：https://blog.csdn.net/qq_37541097/category_9488472_2.html
+这个up主发了好多能动手实验的教程。太阳花的小绿豆。  
+
 参考资料：pytorch图像分类篇：3.搭建AlexNet并训练花分类数据集    https://blog.csdn.net/m0_37867091/article/details/107150142  
 
 数据集下载地址，数据集包含 5 中类型的花，每种类型有600~900张图像不等。  
@@ -327,7 +342,9 @@ wget http://download.tensorflow.org/example_images/flower_photos.tgz
 ```
 视频讲解：https://www.bilibili.com/video/BV1s7411T7vs # 3.3 使用tensorflow2搭建Alexnet
 参考资料：https://github.com/WZMIAOMIAO/deep-learning-for-image-processing/tree/master/tensorflow_classification/Test2_alexnet
-参考资料：
+AlexNet网络结构详解与模型的搭建    https://blog.csdn.net/qq_37541097/article/details/104409156
+参考资料：https://blog.csdn.net/qq_37541097/category_9488472_2.html  
+这个up主发了好多能动手实验的教程。太阳花的小绿豆。  
 
 数据集下载地址，数据集包含 5 中类型的花，每种类型有600~900张图像不等。  
 wget http://download.tensorflow.org/example_images/flower_photos.tgz  
