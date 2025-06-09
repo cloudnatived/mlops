@@ -49,7 +49,7 @@ https://github.com/ifromeast/cuda_learning/tree/main
 
 
 
-# project list:
+### project list:
 - custom op [Done]
     - [CUDA 编程基础]
 - memory & reduction [Done]
@@ -72,8 +72,8 @@ https://github.com/ifromeast/cuda_learning/tree/main
 - DeepSeek infra cases
 
 
-## CUDA（一）：CUDA 编程基础
-## 01_cuda_op/  
+#### CUDA（一）：CUDA 编程基础
+#### 01_cuda_op/  
 实践：PyTorch自定义CUDA算子，pytorch构造CUDA算子库扩展。
 
 算子构建
@@ -202,7 +202,7 @@ make;
 python3 run_time.py --compiler cmake
 ```
 
-# CUDA（二）：GPU的内存体系及其优化指南
+### CUDA（二）：GPU的内存体系及其优化指南
 ```
 3 种方式都完成后，我们可以编译运行代码
 
