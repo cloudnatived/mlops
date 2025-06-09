@@ -4,6 +4,23 @@
 
 
 ```
+
+生产环境H200部署DeepSeek 671B 满血版全流程实战（一）：系统初始化
+生产环境H200部署DeepSeek 671B 满血版全流程实战（二）：vLLM 安装详解
+生产环境H200部署DeepSeek 671B 满血版全流程实战（三）：SGLang 安装详解
+生产环境H200部署DeepSeek 671B 满血版全流程实战（四）：vLLM 与 SGLang 的性能大比拼
+H200部署DeepSeek R1，SGLang调优性能提升2倍，每秒狂飙4000+ Tokens
+猫哥手把手教你基于vllm大模型推理框架部署Qwen3-MoE
+基于vLLM v1测试BFloat16 vs FP8 Qwen3-MoE模型吞吐性能的重大发现!
+转载: Qwen 3 + KTransformers 0.3 (+AMX) = AI 工作站/PC
+
+```
+
+
+
+
+
+```
 检查 CUDA 是否安装和可用：
 python3 -c "import torch; print(torch.cuda.is_available())"
 
