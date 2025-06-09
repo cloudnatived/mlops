@@ -449,6 +449,23 @@ Sglang部署大模型常用参数详解
 TensorRT&Triton学习笔记(一)：triton和模型部署+client https://zhuanlan.zhihu.com/p/482170985
 TensorRT详细入门指北，如果你还不了解TensorRT，过来看看吧  https://blog.csdn.net/IAMoldpan/article/details/117908232
 Triton + TensorRT 推理模型部署  https://blog.csdn.net/weixin_39403185/article/details/147105599
+深度学习模型部署 - Triton 篇 https://juejin.cn/post/7221444501956067388
+AI模型部署：Triton Inference Server模型部署框架简介和快速实践 https://www.jianshu.com/p/a7fc654f678c
+
+Triton Inference Server简介
+Triton Inference Server是一款开源的推理服务框架，它的核心库基于C++编写的，旨在在生产环境中提供快速且可扩展的AI推理能力，具有以下优势
+
+支持多种深度学习框架：包括PyTorch，Tensorflow，TensorRT，ONNX，OpenVINO等产出的模型文件
+至此多种机器学习框架：支持对树模型的部署，包括XGBoost，LightGBM等
+支持多种推理协议：支持HTTP，GRPC推理协议
+服务端支持模型前后处理：提供后端API，支持将数据的前处理和模型推理的后处理在服务端实现
+支持模型并发推理：支持多个模型或者同一模型的多个实例在同一系统上并行执行
+支持动态批处理（Dynamic batching）：支持将一个或多个推理请求合并成一个批次，以最大化吞吐量
+支持多模型的集成流水线：支持将多个模型进行连接组合，将其视作一个整体进行调度管理
+Triton Inference Server架构如下图所示，从客户端请求开始，到模型调度处理，模型仓库管理和推理，响应返回，服务状态监控等。
+
+
+
 
 CPU版本的启动：
 docker run --rm -p8000:8000 -p8001:8001 -p8002:8002 -v/full/path/to/docs/examples/model_repository:/models nvcr.io/nvidia/tritonserver:22.01-py3 tritonserver --model-repository=/models
