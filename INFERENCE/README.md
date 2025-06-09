@@ -450,6 +450,17 @@ TensorRT&Triton学习笔记(一)：triton和模型部署+client https://zhuanlan
 TensorRT详细入门指北，如果你还不了解TensorRT，过来看看吧  https://blog.csdn.net/IAMoldpan/article/details/117908232
 Triton + TensorRT 推理模型部署  https://blog.csdn.net/weixin_39403185/article/details/147105599
 
+CPU版本的启动：
+docker run --rm -p8000:8000 -p8001:8001 -p8002:8002 -v/full/path/to/docs/examples/model_repository:/models nvcr.io/nvidia/tritonserver:22.01-py3 tritonserver --model-repository=/models
+docker run --rm -p8000:8000 -p8001:8001 -p8002:8002 -v/full/path/to/docs/examples/model_repository:/models nvcr.io/nvidia/tritonserver:25.02-trtllm-python-py3 tritonserver --model-repository=/models
+
+
+GPU版本的启动，使用1个gpu：
+docker run --gpus=1 --rm -p8000:8000 -p8001:8001 -p8002:8002 -v/full/path/to/docs/examples/model_repository:/models nvcr.io/nvidia/tritonserver:22.01-py3 tritonserver --model-repository=/models
+
+
+
+
 
 ```
 
