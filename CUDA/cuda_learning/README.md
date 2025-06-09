@@ -1,3 +1,47 @@
+# CUDA
+## https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html
+```
+CUDA C++ Programming Guide
+
+Version Changes
+12.9 Added section Error Log Management and CUDA_LOG_FILE to CUDA Environment Variables
+12.8 Added section TMA Swizzle
+
+
+1. Revision History
+2. Introduction
+3. Programming Model
+4. Programming Interface
+5. Hardware Implementation
+6. Performance Guidelines
+7. CUDA-Enabled GPUs
+8. C++ Language Extensions
+9. Cooperative Groups
+10. Cluster Launch Control
+11. CUDA Dynamic Parallelism
+12. Virtual Memory Management
+13. Stream Ordered Memory Allocator
+14. Graph Memory Nodes
+15. Mathematical Functions
+16. C++ Language Support
+17. Texture Fetching
+18. Compute Capabilities
+19. Driver API
+20. CUDA Environment Variables
+21. Error Log Management
+22. Unified Memory Programming
+23. Lazy Loading
+24. Extended GPU Memory
+25. Notices
+
+
+```
+
+
+
+
+
+
 https://github.com/ifromeast/cuda_learning/tree/main
 
 # cuda_learning
