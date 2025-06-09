@@ -447,6 +447,8 @@ Sglang部署大模型常用参数详解
 
 ```
 TensorRT&Triton学习笔记(一)：triton和模型部署+client https://zhuanlan.zhihu.com/p/482170985
+TensorRT详细入门指北，如果你还不了解TensorRT，过来看看吧  https://blog.csdn.net/IAMoldpan/article/details/117908232
+Triton + TensorRT 推理模型部署  https://blog.csdn.net/weixin_39403185/article/details/147105599
 
 
 ```
