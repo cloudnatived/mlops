@@ -1,49 +1,56 @@
-import torch
-from torchvision import datasets, transforms
-from torch.utils.data import DataLoader
-import torch.optim as optim
-from matplotlib import pyplot as plt
-import torch.nn as nn
-import numpy as np
-import random
+# From https://blog.csdn.net/2403_83575015/article/details/143755629
+# chatgpt优化
+import torch                                         # 导入PyTorch库
+from torchvision import datasets, transforms         # 从torchvision导入数据集和数据转换工具
+from torch.utils.data import DataLoader              # 导入DataLoader，用于加载数据
+import torch.optim as optim                          # 导入优化器工具
+from matplotlib import pyplot as plt                 # 导入matplotlib，用于绘图
+import torch.nn as nn                                # 导入PyTorch的神经网络模块
+import numpy as np                                   # 导入NumPy，用于数组操作
+import random                                        # 导入random，用于随机操作
 
-# 优化后的LeNet5模型（使用ReLU和MaxPool）
-class LeNet5(nn.Module):
-    def __init__(self):
+
+# 定义LeNet5网络模型,优化后的LeNet5模型（使用ReLU和MaxPool）
+class LeNet5(nn.Module):                             # 继承自nn.Module类，定义LeNet5网络结构
+    def __init__(self):                              # 初始化网络结构
         super(LeNet5, self).__init__()
-        self.conv1 = nn.Conv2d(1, 6, 5)
-        self.relu = nn.ReLU()  # 替换Sigmoid为ReLU
-        self.pool1 = nn.MaxPool2d(2, 2)  # 最大池化
-        self.conv2 = nn.Conv2d(6, 16, 5)
-        self.pool2 = nn.MaxPool2d(2, 2)
-        self.conv3 = nn.Conv2d(16, 120, 5)
-        self.flatten = nn.Flatten()
-        self.fc1 = nn.Linear(120, 84)
-        self.fc2 = nn.Linear(84, 10)
+        self.conv1 = nn.Conv2d(1, 6, 5)              # 第一层卷积：输入1个通道，输出6个通道，卷积核大小5x5
+        #self.Sigmoid = nn.Sigmoid()                 # Sigmoid激活函数
+        self.relu = nn.ReLU()                        # 替换Sigmoid为ReLU
+        self.pool1 = nn.MaxPool2d(2, 2)              # 第二层池化：2x2大小的平均池化
+        self.conv2 = nn.Conv2d(6, 16, 5)             # 第三层卷积：输入6个通道，输出16个通道，卷积核大小5x5
+        self.pool2 = nn.MaxPool2d(2, 2)              # 第四层池化：2x2大小的平均池化     
+        self.conv3 = nn.Conv2d(16, 120, 5)           # 第五层卷积：输入16个通道，输出120个通道，卷积核大小5x5
+        self.flatten = nn.Flatten()                  # 展平层：将卷积层的输出（多维数据）展平为一维，便于全连接层输入
+        self.fc1 = nn.Linear(120, 84)                # 第六层全连接：输入120个特征，输出84个特征
+        self.fc2 = nn.Linear(84, 10)                 # 输出层：最终的全连接层，输出10个类别（MNIST有10个数字分类）
 
     def forward(self, x):
-        x = self.relu(self.conv1(x))  # 卷积+ReLU
-        x = self.pool1(x)  # 池化
-        x = self.relu(self.conv2(x))
-        x = self.pool2(x)
-        x = self.conv3(x)
-        x = self.flatten(x)
-        x = self.relu(self.fc1(x))  # 在全连接层添加ReLU（可选优化）
-        x = self.fc2(x)
+        #x = self.Sigmoid(self.c1(x))                # 第一层卷积后加激活函数
+        x = self.relu(self.conv1(x))                 # 卷积+ReLU，第一层卷积后加激活函数
+        x = self.pool1(x)                            # 第一层池化
+        x = self.relu(self.conv2(x))                 # 第二层卷积后加激活函数
+        x = self.pool2(x)                            # 第二层池化
+        x = self.conv3(x)                            # 第三层卷积
+        x = self.flatten(x)                          # 展平操作
+        x = self.relu(self.fc1(x))                   # 在全连接层添加ReLU（可选优化）
+        x = self.fc2(x)                              # 输出层   
         return x
 
-# 数据预处理（保持不变）
-transform = transforms.Compose([
-    transforms.Resize((32, 32)),
-    transforms.ToTensor(),
-    transforms.Normalize((0.5,), (0.5,))
+# 数据预处理，包括调整图片大小、转换为Tensor并进行归一化
+transform = transforms.Compose([               
+    transforms.Resize((32, 32)),                     # 将图片大小调整为32x32像素
+    transforms.ToTensor(),                           # 将PIL图片或NumPy ndarray转换为Tensor
+    transforms.Normalize((0.5,), (0.5,))             # 归一化，将图像像素值从[0, 1]区间调整到[-1, 1]
 ])
 
 # 加载数据集
 train_dataset = datasets.MNIST('./MNIST', train=True, download=True, transform=transform)
 test_dataset = datasets.MNIST('./MNIST', train=False, download=True, transform=transform)
-train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
-test_loader = DataLoader(test_dataset, batch_size=64, shuffle=False)
+
+# 创建数据加载器，使用DataLoader将数据分批处理
+train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)   # 训练集，批次大小64，数据打乱
+test_loader = DataLoader(test_dataset, batch_size=64, shuffle=False)    # 测试集，批次大小64，不打乱数据
 
 # 设备配置
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
