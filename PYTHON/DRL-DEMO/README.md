@@ -5,6 +5,8 @@
 MNIST手写体识别  https://docs.swanlab.cn/examples/mnist.html
 github上的一个参考：https://github.com/tm9161/MNIST  
 
+https://github.com/QunBB/DeepLearning   # 这里有一些深度学习的示例。
+
 LeNet 是一系列网络的合称，包括 LeNet-1、LeNet-4、LeNet-5 等，LeNet-5 是 LeNet 系列中最受欢迎和经典的版本。通常所说的 LeNet 和 LeNet-5 有以下区别：  
   
 网络结构：   
