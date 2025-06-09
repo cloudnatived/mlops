@@ -1,4 +1,4 @@
-# kubespray-2.27.0 部署笔记
+# kubespray-2.27.0 部署笔记、Kubeflow manifests-1.9.1 部署笔记
 
 ### 4.1.kubespray-2.27.0 部署笔记
 
