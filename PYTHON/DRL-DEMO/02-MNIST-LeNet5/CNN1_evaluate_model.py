@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import sys
 import os
 
-# 模型路径（可根据实际情况修改）
-MODEL_PATH = 'CNN1_saved_model'  # 或 'saved_model'
+# 模型路径
+MODEL_PATH = 'CNN1/best_model.h5'
 
 # 输入形状和类别数
 INPUT_SHAPE = (28, 28, 1)
@@ -76,4 +76,3 @@ def evaluate(model_path):
 
 if __name__ == '__main__':
     evaluate(MODEL_PATH)
-
