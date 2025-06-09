@@ -42,10 +42,12 @@ Version Changes
 
 
 
-https://github.com/ifromeast/cuda_learning/tree/main
-
 # cuda_learning
 learning how CUDA works
+
+https://github.com/ifromeast/cuda_learning/tree/main
+
+
 
 # project list:
 - custom op [Done]
