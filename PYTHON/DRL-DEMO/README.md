@@ -378,5 +378,20 @@ wget http://download.tensorflow.org/example_images/flower_photos.tgz
 
 ```
 
+## /10-Reinforcement-learning-with-tensorflow/01_treasure_on_right.py
+  
+```
+参考资料：
+https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow/
+https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow/blob/master/contents/1_command_line_reinforcement_learning/treasure_on_right.py
+https://mofanpy.com/tutorials/
+
+
+
+
+```
+
+
+
 
 
