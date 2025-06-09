@@ -457,7 +457,7 @@ docker run --rm -p8000:8000 -p8001:8001 -p8002:8002 -v/full/path/to/docs/example
 
 GPU版本的启动，使用1个gpu：
 docker run --gpus=1 --rm -p8000:8000 -p8001:8001 -p8002:8002 -v/full/path/to/docs/examples/model_repository:/models nvcr.io/nvidia/tritonserver:22.01-py3 tritonserver --model-repository=/models
-
+docker run --gpus=1 --rm -p8000:8000 -p8001:8001 -p8002:8002 -v/full/path/to/docs/examples/model_repository:/models nvcr.io/nvidia/tritonserver:25.02-trtllm-python-py3 tritonserver --model-repository=/models
 
 
 
