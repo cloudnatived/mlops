@@ -139,3 +139,65 @@ CHECK_OFF;
 
 
 ```
+
+
+# AWK
+
+```
+参考资料：
+http://bbs.chinaunix.net/thread-833305-1-1.html
+
+#心形图形实例
+awk 'BEGIN{while(u<20){print sin(u)*sin(v),cos(u)*sin(v+u);v=v+0.01;u=u+0.01}}' |awk -f ColorPlot.awk
+#爱心型
+awk 'BEGIN{while(u<20){print sin(u)*sin(v),rand()*cos(u)*sin(v+u);v=v+0.01;u=u+0.01}}'|awk -f ColorPlot.awk
+#绳结
+awk 'BEGIN{while(u<10){print sin(u+v)*sin(v),cos(u+v)*sin(v);v=v+0.01;u=u+0.01}}'|awk -f ColorPlot.awk
+#蝴蝶
+awk 'BEGIN{while(u<10){print sin(u+v)*sin(v),cos(u)*sin(v);v=v+0.01;u=u+0.01}}'|awk -f ColorPlot.awk
+#花瓣
+awk 'BEGIN{while(u<10){print sin(u+w)*cos(v)*sin(w+u),sin(u)*sin(v+u)*sin(w);v=v+0.01;u=u+0.01;w=w+0.01}}'|awk -f ColorPlot.awk
+#蝙蝠
+awk 'BEGIN{while(u<10){print sin(u+w)*cos(v+w)*sin(w+u),sin(u)*sin(v+u)*sin(w);v=v+0.01;u=u+0.01;w=w+0.01}}'|awk -f ColorPlot.awk
+#螺旋
+awk 'BEGIN{while(w<20){print sin(w)*w,cos(w)*w;w=w+0.01}}'|awk -f ColorPlot.awk
+#花蕊
+awk 'BEGIN{while(u<10){print sin(u)*cos(v+u)*sin(u+v),cos(v+u)*cos(u)*sin(v+u);v=v+0.01;u=u+0.01}}' | awk -f ColorPlot.awk
+#剪刀
+awk 'BEGIN{while(u<10){print sin(u+v)*cos(v+u)*sin(u+v),cos(v+u)*cos(u)*sin(v+u);v=v+0.01;u=u+0.01}}'| awk -f ColorPlot.awk
+#圆：      
+awk 'BEGIN{while(k<10){print sin(k),cos(k);k=k+0.01}}'   |  awk -f ColorPlot.awk
+#正弦线:   
+awk 'BEGIN{while(k<10){print sin(k),k;k=k+0.01}}'        |  awk -f ColorPlot.awk
+#抛物线：  
+awk 'BEGIN{k=-10;while(k<10){print k^2,k;k=k+0.01}}'     |  awk -f ColorPlot.awk
+#直线：    
+paste <(seq 1 0.01 10)  <(seq 1 0.01 10)                 |  awk -f ColorPlot.awk
+#圆盘:    
+awk 'BEGIN{while(k<100){print sin(k),rand()*cos(k);k=k+0.01}}' |awk -f ColorPlot.awk
+
+花圈:    awk 'BEGIN{srand()
+                        while(k++<20000){
+                           x=2-3*rand()
+                           y=2-4*rand()
+                           if(x^2+y^2>0.6&&x^2+y^2<1||x^2+y^2<0.3&&x^2+y^2>0.1)
+                              print x,y
+                           }
+                       }'       | awk -f ColorPlot.awk
+
+awk 'BEGIN{srand() while(k++<20000){x=2-3*rand() y=2-4*rand() if(x^2+y^2>0.6&&x^2+y^2<1||x^2+y^2<0.3&&x^2+y^2>0.1) print x,y }}‘ | awk -f ColorPlot.awk
+
+菱圈:    awk 'BEGIN{srand()
+                        while(k++<20000){
+                           x=1-2*rand()
+                           y=1-2*rand()
+                           if(x+y<=1&&x-y<=1&&-x+y<=1&&-x-y<=1&&x^2+y^2>=1/2)
+                              print x,y
+                           }
+                       }'       | awk -f ColorPlot.awk
+
+```
+
+
+
+
