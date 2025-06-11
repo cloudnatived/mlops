@@ -1,3 +1,39 @@
+# SHELL
+
+#### shell 十三問
+
+shell 十三問
+参考文档：
+http://bbs.chinaunix.net/thread-218853-1-1.html
+
+1) 為何叫做 shell ？
+http://bbs.chinaunix.net/viewthr ... p;page=2#pid1454336
+2) shell prompt(PS1) 與 Carriage Return(CR) 的關係？ (2008-10-30 02:05 最後更新)
+http://bbs.chinaunix.net/viewthr ... p;page=2#pid1467910
+3) 別人 echo、你也 echo ，是問 echo 知多少？( 2008-10-30 02:08 最後更新)
+http://bbs.chinaunix.net/viewthr ... p;page=3#pid1482452
+4) " "(雙引號) 與 ' '(單引號)差在哪？  (2008-10-30 02:07 最後更新)
+http://bbs.chinaunix.net/viewthr ... p;page=4#pid1511745
+5) var=value？export 前後差在哪？ (2008-10-30 02:12 最後更新)
+http://bbs.chinaunix.net/viewthr ... p;page=5#pid1544391
+6) exec 跟 source 差在哪？ (2008-10-30 02:17 最後更新)
+http://bbs.chinaunix.net/viewthr ... p;page=6#pid1583329
+7) ( ) 與 { } 差在哪？
+http://bbs.chinaunix.net/viewthr ... p;page=6#pid1595135
+8) $(( )) 與 $( ) 還有${ } 差在哪？ (2008-10-30 02:20 最後更新)
+http://bbs.chinaunix.net/viewthr ... p;page=7#pid1617953
+9) $@ 與 $* 差在哪？
+http://bbs.chinaunix.net/viewthr ... p;page=7#pid1628522
+10) && 與 || 差在哪？ (2008-10-30 02:21 最後更新)
+http://bbs.chinaunix.net/viewthr ... p;page=7#pid1634118
+11) > 與 < 差在哪？ (2008-10-30 02:24 最後更新)
+http://bbs.chinaunix.net/viewthr ... p;page=7#pid1636825
+12) 你要 if 還是 case 呢？ (2008-10-30 02:25最後更新)
+http://bbs.chinaunix.net/viewthr ... p;page=8#pid1679488
+13) for what? while 與 until 差在哪？ (2008-10-30 02:26最後更新)
+http://bbs.chinaunix.net/viewthr ... p;page=8#pid1692457
+
+
 
 
 
