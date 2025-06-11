@@ -45,7 +45,7 @@ Version Changes
 # cuda_learning
 learning how CUDA works
 
-https://github.com/ifromeast/cuda_learning/tree/main
+https://github.com/ifromeast/cuda-learning/tree/main
 
 
 
