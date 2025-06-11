@@ -51,29 +51,29 @@ https://github.com/ifromeast/cuda_learning/tree/main
 
 ### project list:
 - custom op [Done]
-    - [CUDA 编程基础]
+    - [CUDA（一）：CUDA 编程基础] /01_cuda_op
 - memory & reduction [Done]
-    - [GPU的内存体系及其优化指南]
+    - [CUDA（二）：GPU的内存体系及其优化指南] /02_reduce
 - Gemm [Done]
-    - [通用矩阵乘法：从入门到熟练]
+    - [通用矩阵乘法：从入门到熟练] /03_gemm
 - Transformer [Done]
     - 基础算子：
-        - [LayerNorm 算子的 CUDA 实现与优化]
-        - [SoftMax 算子的 CUDA 实现与优化]
-        - [Cross Entropy 的 CUDA 实现]
-        - [AdamW 优化器的 CUDA 实现]
-        - [激活函数与残差连接的 CUDA 实现]
-        - [embedding 层与 LM head 层的 CUDA 实现]
+    - [LayerNorm 算子的 CUDA 实现与优化]
+    - [SoftMax 算子的 CUDA 实现与优化]
+    - [Cross Entropy 的 CUDA 实现]
+    - [AdamW 优化器的 CUDA 实现]
+    - [激活函数与残差连接的 CUDA 实现]
+    - [embedding 层与 LM head 层的 CUDA 实现]
     - 核心模块
-        - [self-attention 的 CUDA 实现及优化 (上)]
-        - [self-attention 的 CUDA 实现及优化 (下)]
+    - [self-attention 的 CUDA 实现及优化 (上)]
+    - [self-attention 的 CUDA 实现及优化 (下)]
     
 - CUDA mode lectures 
 - DeepSeek infra cases
 
 
 #### CUDA（一）：CUDA 编程基础
-#### 01_cuda_op/  
+#### /01_cuda_op
 实践：PyTorch自定义CUDA算子，pytorch构造CUDA算子库扩展。
 
 算子构建
@@ -202,7 +202,7 @@ make;
 python3 run_time.py --compiler cmake
 ```
 
-### CUDA（二）：GPU的内存体系及其优化指南
+### CUDA（二）：GPU的内存体系及其优化指南 /02_reduce
 ```
 3 种方式都完成后，我们可以编译运行代码
 
@@ -219,10 +219,10 @@ nvcc reduce_gpu.cu -DUSE_DP -o reduce_dp
 
 ```
 
-# CUDA（三）：通用矩阵乘法，从入门到熟练
+# CUDA（三）：通用矩阵乘法，从入门到熟练 /03_gemm
 
 
-# CUDA（四）：使用 CUDA 实现 Transformer 结构
+# CUDA（四）：使用 CUDA 实现 Transformer 结构 /04_transformer
 ```
 python prepro_tinyshakespeare.py
 
