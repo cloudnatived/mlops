@@ -42,22 +42,25 @@ Binary Search
 
 ```
 
+![](IMAGES/python-built-in-function-en.png)
 
+![](IMAGES/python-built-in-function-cn.png)
 
 ```
 
 
-https://w3schools.tech/zh-cn/tutorial/python/python_modules  
-Python模块  
-Python内置模块  
-Python - 内置函数  
+https://w3schools.tech/zh-cn/tutorial/python/python_modules
+Python模块
+Python内置模块
+Python - 内置函数
 
-python内置函数：https://docs.python.org/3/library/functions.html   
-Built-in Functions  
-Python 69个 常用 内置函数  
-Python中30个常见内置函数讲解  
+python内置函数：https://docs.python.org/3/library/functions.html
+Built-in Functions
+Python 69个 常用 内置函数
+68个Python内置函数最全总结
+Python中30个常见内置函数讲解
 
-Built-in Modules in Python：https://www.geeksforgeeks.org/built-in-modules-in-python/  
+Built-in Modules in Python：https://www.geeksforgeeks.org/built-in-modules-in-python/
 Python 最常用的 18 个内置模块：https://www.51cto.com/article/817543.html
 
 ```
