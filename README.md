@@ -1,6 +1,60 @@
 # MLOps
 
 
+![](IMAGES/20-AI-Concepts.jpg)
+
+```
+Top 20 AI Concepts You Should Know
+1 - Machine Learning: Core algorithms, statistics, and model training techniques.
+2 - Deep Learning: Hierarchical neural networks learning complex representations automatically.
+3 - Neural Networks: Layered architectures efficiently model nonlinear relationships accurately.
+4 - NLP: Techniques to process and understand natural language text.
+5 - Computer Vision: Algorithms interpreting and analyzing visual data effectively
+6 - Reinforcement Learning: Distributed traffic across multiple servers for reliability.
+7 - Generative Models: Creating new data samples using learned data.
+8 - LLM: Generates human-like text using massive pre-trained data.
+9 - Transformers: Self-attention-based architecture powering modern AI models.
+10 - Feature Engineering: Designing informative features to improve model performance significantly.
+11 - Supervised Learning: Learns useful representations without labeled data.
+12 - Bayesian Learning: Incorporate uncertainty using probabilistic model approaches.
+13 - Prompt Engineering: Crafting effective inputs to guide generative model outputs.
+14 - AI Agents: Autonomous systems that perceive, decide, and act.
+15 - Fine-Tuning Models: Customizes pre-trained models for domain-specific tasks.
+16 - Multimodal Models: Processes and generates across multiple data types like images, videos, and text.
+17 - Embeddings: Transforms input into machine-readable vector formats.
+18 - Vector Search: Finds similar items using dense vector embeddings.
+19 - Model Evaluation: Assessing predictive performance using validation techniques.
+20 - AI Infrastructure: Deploying scalable systems to support AI operations.
+Over to you: Which other AI concept will you add to the list?
+
+您应该了解的 20 大 AI 概念
+1 - 机器学习：核心算法、统计和模型训练技术。
+2 - 深度学习：分层神经网络自动学习复杂的表示。
+3 - 神经网络：分层架构可以有效地准确地对非线性关系进行建模。
+4 - NLP：处理和理解自然语言文本的技术。
+5 - 计算机视觉：有效解释和分析视觉数据的算法
+6 - 强化学习：跨多个服务器分配流量以实现可靠性。
+7 - 生成模型：使用学习的数据创建新的数据样本。
+8 - LLM：使用大量预训练数据生成类似人类的文本。
+9 - Transformers：基于自我注意的架构，为现代 AI 模型提供支持。
+10 - 特征工程：设计信息丰富的特征以显著提高模型性能。
+11 - 监督学习：在没有标记数据的情况下学习有用的表示。
+12 - 贝叶斯学习：使用概率模型方法整合不确定性。
+13 - 提示工程：制作有效的输入来指导生成模型输出。
+14 - AI 代理：感知、决策和行动的自主系统。
+15 - 微调模型：为特定于域的任务自定义预训练模型。
+16 - 多模态模型：处理和生成多种数据类型，如图像、视频和文本。
+17 - 嵌入：将输入转换为机器可读的矢量格式。
+18 - 向量搜索：使用密集向量嵌入查找相似项目。
+19 - 模型评估：使用验证技术评估预测性能。
+20 - AI 基础设施：部署可扩展的系统以支持 AI 运营。
+交给您：您还会将哪个其他 AI 概念添加到列表中？
+
+```
+
+
+
+
 ```
 export PATH=$PATH:/usr/local/cuda/bin
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64
