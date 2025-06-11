@@ -39,6 +39,17 @@ Binary Search
 
 
 
+# 运行当前目录下py结尾的文件，看是否有错误输出
+find ./ -name "*.py"|xargs -i python3 {}|egrep "rror|File"
+
+# 把当前目录下**.c的文件，编译成名为**的可执行文件
+A=`find ./ -name "*.c"`; for a in $A ; do gcc $a -o "`echo $a|awk -F '.' '{ print $2 }'|awk -F '/' '{ print $2 }'`"; done
+A=`find ./ -name "*.c"`; for a in $A ; do gcc $a -o "`echo $a|awk -F '.' '{ print $2 }'|awk -F '/' '{ print $2 }'`"; ./"`echo $a|awk -F '.' '{ print $2 }'|awk -F '/' '{ print $2 }'`" ; done
+
+# 
+find  ./ -type f -executable |xargs -i rm -rf {}
+
+
 
 ```
 
