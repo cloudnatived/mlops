@@ -1,7 +1,7 @@
 # SHELL
 
 #### shell 十三問
-
+```
 shell 十三問
 参考文档：
 http://bbs.chinaunix.net/thread-218853-1-1.html
@@ -32,7 +32,7 @@ http://bbs.chinaunix.net/viewthr ... p;page=7#pid1636825
 http://bbs.chinaunix.net/viewthr ... p;page=8#pid1679488
 13) for what? while 與 until 差在哪？ (2008-10-30 02:26最後更新)
 http://bbs.chinaunix.net/viewthr ... p;page=8#pid1692457
-
+```
 
 
 
