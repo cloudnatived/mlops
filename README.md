@@ -1,7 +1,7 @@
 # MLOps
 
 
-![](IMAGES/20-AI-Concepts.jpg)
+![](IMAGES/20-AI-Concepts.jpeg)
 
 ```
 Top 20 AI Concepts You Should Know
