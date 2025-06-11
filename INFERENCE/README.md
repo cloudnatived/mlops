@@ -18,7 +18,7 @@ H200部署DeepSeek R1，SGLang调优性能提升2倍，每秒狂飙4000+ Tokens
 
 
 
-## 检查CUDA、NCCL、驱动
+## 检查CUDA、NCCL、驱动，多机、多卡、容器
 
 ```
 检查 CUDA 是否安装和可用：
