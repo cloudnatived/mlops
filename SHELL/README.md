@@ -185,7 +185,7 @@ awk 'BEGIN{while(k<100){print sin(k),rand()*cos(k);k=k+0.01}}' |awk -f ColorPlot
                            }
                        }'       | awk -f ColorPlot.awk
 
-awk 'BEGIN{srand() while(k++<20000){x=2-3*rand() y=2-4*rand() if(x^2+y^2>0.6&&x^2+y^2<1||x^2+y^2<0.3&&x^2+y^2>0.1) print x,y }}‘ | awk -f ColorPlot.awk
+awk 'BEGIN{srand();while(k++<20000){x=2-3*rand();y=2-4*rand();if(x^2+y^2>0.6&&x^2+y^2<1||x^2+y^2<0.3&&x^2+y^2>0.1) print x,y }}'| awk -f ColorPlot.awk
 
 菱圈:    awk 'BEGIN{srand()
                         while(k++<20000){
@@ -196,8 +196,105 @@ awk 'BEGIN{srand() while(k++<20000){x=2-3*rand() y=2-4*rand() if(x^2+y^2>0.6&&x^
                            }
                        }'       | awk -f ColorPlot.awk
 
+awk 'BEGIN{srand();while(k++<20000){x=1-2*rand();y=1-2*rand();if(x+y<=1&&x-y<=1&&-x+y<=1&&-x-y<=1&&x^2+y^2>=1/2) print x,y}}'| awk -f ColorPlot.awk
 ```
 
+#### ColorCat.awk
+```
+ColorCat.awk
+##############
+#!/usr/bin/awk
+#  Write by dbcat
+#  EMail:deeperbluecat@Gmail.com
+#  run : awk -f ColorCat.awk YourFile
 
+BEGIN{
+        srand()
+        }
 
+{
+        split($0,Myth,"")
+        ColorPrint(Myth,length($0))
+}
+
+function ColorPrint(Myth,xlen)
+{
+   for(i=1;i<=xlen;i++)
+    {
+       Color="\033[1;"int(31+7*rand())
+       printf "%s;3m%s\033[0m",Color,Myth[i]
+    }
+    printf "\n"
+}
+##############
+```
+
+#### ColorPlot.awk
+```
+##############
+#! /usr/bin/awk
+# GAWK彩色作图程序
+# 作者: dbcat
+# Email: deeperbluecat@Gmail.Com
+# 日期: 2006-9-25
+# 测试环境: Gawk 3.1.4, bash 3.00.16(1), SUSE 9.3
+# 运行方法: awk 'BEGIN{while(k<10){print sin(k),cos(k);k=k+0.01}}' >datafile
+#           awk -f ColorPlot.awk datafile
+
+BEGIN{
+          srand()
+          xlen=35
+          ylen=35
+          InitGraph(Myth,xlen,ylen)
+  }
+  
+  {
+          X_Max=X_Max>$1?X_Max:$1
+          X_Min=X_Min<$1?X_Min:$1
+          Y_Max=Y_Max>$2?Y_Max:$2
+          Y_Min=Y_Min<$2?Y_Min:$2
+          X_Label[NR]=$1
+          Y_Label[NR]=$2
+  }
+  
+  
+END{
+          CreateGraph(Myth,NR)
+          PrintGraph(Myth)
+  }
+  
+  function InitGraph(Myth,xlen,ylen,i,j)
+   {
+     for(i=1;i<=xlen;i++)
+       for(j=1;j<=ylen;j++)
+          Myth[i,j]=" "
+   }
+  
+  function CreateGraph(Myth,Len,i)
+   {
+  
+         for(i=1;i<=Len;i++)
+            {
+             X_Label[i]=int((X_Label[i]-X_Min)/(X_Max-X_Min)*(xlen-1) + 1)
+             Y_Label[i]=int((Y_Label[i]-Y_Min)/(Y_Max-Y_Min)*(ylen-1) + 1)
+             Myth[X_Label[i],Y_Label[i]]=int(40+60*rand())
+            }
+  
+   }
+  
+  function PrintGraph(Myth,i,j)
+   {
+     for(i=1;i<=xlen;i++)
+      {
+        for(j=1;j<=ylen;j++)
+           {
+            color="\033[1;"int(31+7*rand())
+            printf " %s;1m%c\033[0m",color,Myth[i,j]
+           }
+        printf "\n"
+      }
+   }
+
+##############
+```
 
