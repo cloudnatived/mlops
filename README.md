@@ -1,5 +1,7 @@
 # MLOps
 
+参考资料：
+https://www.linkedin.com/in/alexxubyte/recent-activity/all/
 
 ![](IMAGES/20-AI-Concepts.jpeg)
 
