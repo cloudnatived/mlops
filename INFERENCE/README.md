@@ -4,7 +4,7 @@
 
 
 ```
-
+参考资料：
 生产环境H200部署DeepSeek 671B 满血版全流程实战（一）：系统初始化
 生产环境H200部署DeepSeek 671B 满血版全流程实战（二）：vLLM 安装详解
 生产环境H200部署DeepSeek 671B 满血版全流程实战（三）：SGLang 安装详解
@@ -18,7 +18,7 @@ H200部署DeepSeek R1，SGLang调优性能提升2倍，每秒狂飙4000+ Tokens
 
 
 
-
+## 检查CUDA、NCCL、驱动
 
 ```
 检查 CUDA 是否安装和可用：
@@ -62,10 +62,10 @@ test_communication.py
 
 ```
 
-# VLLM
+## VLLM
   
   
-## vLLM + DeepSeek-R1 671B 多机部署
+### vLLM + DeepSeek-R1 671B 多机部署
 
 ```
 NGC的PyTorch镜像。
@@ -120,9 +120,11 @@ CUDA_VISIBLE_DEVICES=5,6,7,8 lmdeploy serve api_server  ~/.cache/modelscope/hub/
 
 ```
 
+### Docker 安装 sglang 完整部署 DeepSeek 满血版
+```
 参考资料：
 Docker 安装 sglang 完整部署 DeepSeek 满血版    https://zhuanlan.zhihu.com/p/29442431271
-```
+
 由于 DeepSeek-R1 参数量有 671B，在FP8 精度下，仅存储模型参数就需要 625GB 显存，加上KV cache 缓存及其他运行时的开销，单GPU 无法支持完全加载或高校运行，因此推荐容器分布式推理方案，更好的支持大模型的推理。
 
 满血版定义：671B参数的deepseek不管是V3/R1，只要满足671B参数就叫满血版。
@@ -296,9 +298,13 @@ INFO:     Uvicorn running on http://0.0.0.0:8080 (Press CTRL+C to quit)
 #本地物理机上使用浏览器访问http://<公网IP地址>:8080，首次登录时，请根据提示创建管理员账号。
 ```
 
+
+
+### SGLang部署DeepSeek-70B大模型
+
+```
 参考资料：
 手把手教你用SGLang部署DeepSeek-70B大模型（附避坑指南）  https://blog.csdn.net/2501_91377542/article/details/147441180
-```
 
 一、环境准备
 1.1 硬件配置建议
@@ -443,7 +449,7 @@ modelscope download --local-dir /data/deepseek-ai/models/deepseek-70b \
 Sglang部署大模型常用参数详解    
 
 
-# TensorRT Triton
+## TensorRT Triton
 
 ```
 TensorRT&Triton学习笔记(一)：triton和模型部署+client https://zhuanlan.zhihu.com/p/482170985
