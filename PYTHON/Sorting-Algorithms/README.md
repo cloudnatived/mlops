@@ -42,9 +42,9 @@ Binary Search
 
 ```
 
-![](IMAGES/python-built-in-function-en.png)
+![](../../IMAGES/python-built-in-function-en.png)
 
-![](IMAGES/python-built-in-function-cn.png)
+![](../../IMAGES/python-built-in-function-cn.png)
 
 ```
 
