@@ -1585,3 +1585,17 @@ Kubeflow 和 Volcano两个开源项目的结合充分简化和加速了Kubernete
 参考资料：  
 基于Kubernetes和DeepSpeed进行分布式训练的实战教程    https://blog.csdn.net/myTomorrow_better/article/details/139515425  
 Kubeflow+Volcano：使用K8s轻松完成AI计算    https://zhuanlan.zhihu.com/p/657157700  
+
+
+#### milvus
+
+
+```
+https://github.com/milvus-io/milvus/tree/master/scripts
+https://github.com/milvus-io/milvus/blob/master/scripts/standalone_embed.sh
+
+
+
+```
+
+
