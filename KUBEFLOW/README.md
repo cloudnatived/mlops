@@ -1591,10 +1591,70 @@ Kubeflow+Volcano：使用K8s轻松完成AI计算    https://zhuanlan.zhihu.com/p
 
 
 ```
+milvus文档：
 https://github.com/milvus-io/milvus/tree/master/scripts
 https://github.com/milvus-io/milvus/blob/master/scripts/standalone_embed.sh
+参考资料：
+https://blog.csdn.net/lsb2002/article/details/132222947    为AI而生的数据库：Milvus详解及实战
+https://zhuanlan.zhihu.com/p/634255317   Milvus 完整指南：开源向量数据库，AI 应用开发的基础设施（逐行解释代码，小白适用）
+https://www.milvus-io.com/getstarted/standalone/install_standalone-helm   用 Kubernetes 安装独立运行的 Milvus
+
+wget https://github.com/milvus-io/milvus/releases/download/v2.2.13/milvus-standalone-docker-compose.yml -O docker-compose.yml
+
+docker-compose up -d
+docker-compose ps
+
+export http_proxy=http://192.168.1.2:7890;
+export https_proxy=https://192.168.1.2:7890;
+
+docker镜像：
+docker pull minio/minio:RELEASE.2023-03-20T20-16-18Z
+docker pull milvusdb/milvus:v2.2.11
+
+docker pull dhub.kubesre.xyz/milvusdb/milvus:v2.2.11
+docker pull dhub.kubesre.xyz/minio/minio:RELEASE.2023-03-20T20-16-18Z
+
+docker tag dhub.kubesre.xyz/milvusdb/milvus:v2.2.11 milvusdb/milvus:v2.2.11
+docker tag dhub.kubesre.xyz/minio/minio:RELEASE.2023-03-20T20-16-18Z minio/minio:RELEASE.2023-03-20T20-16-18Z
+
+WARN[0000] /Data/BBC/Milvus/docker-compose.yml: `version` is obsolete
+NAME                IMAGE                                      COMMAND                  SERVICE      CREATED         STATUS                   PORTS
+milvus-etcd         quay.io/coreos/etcd:v3.5.5                 "etcd -advertise-cli…"   etcd         5 minutes ago   Up 5 minutes             2379-2380/tcp
+milvus-minio        minio/minio:RELEASE.2023-03-20T20-16-18Z   "/usr/bin/docker-ent…"   minio        5 minutes ago   Up 5 minutes (healthy)   9000/tcp
+milvus-standalone   milvusdb/milvus:v2.2.11                    "/tini -- milvus run…"   standalone   5 minutes ago   Up 5 minutes             0.0.0.0:9091->9091/tcp, 0.0.0.0:19530->19530/tcp
+
+# 启动和查看milvus
+docker-compose up -d
+docker-compose ps
+
+docker pull docker.chenby.cn/zilliz/attu
+docker pull dhub.kubesre.xyz/zilliz/attu:v2.2.6
+
+docker tag dhub.kubesre.xyz/zilliz/attu:v2.2.6 zilliz/attu:v2.2.6
+docker pull dhub.kubesre.xyz/zilliz/attu:v2.4.4
+
+mkdir -p /etc/docker
+tee /etc/docker/daemon.json <<EOF
+{
+    "registry-mirrors": [
+        "https://docker.anyhub.us.kg",
+        "https://dockerhub.icu",
+        "https://docker.awsl9527.cn"
+    ]
+}
+EOF
+systemctl daemon-reload
+systemctl restart docker
 
 
+http://192.168.1.103:8000/
+zilliz:zilliz
+
+```
+
+```
+wget https://raw.githubusercontent.com/milvus-io/pymilvus/v2.2.8/examples/hello_milvus.py
+python3 hello_milvus.py
 
 ```
 
