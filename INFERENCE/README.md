@@ -1,5 +1,5 @@
 
-# VLLM  SGLang  Ray TensorRT Triton
+# VLLM  SGLang  Ray TensorRT Triton dify
 
 
 
@@ -486,4 +486,136 @@ docker run --gpus=1 --rm -p8000:8000 -p8001:8001 -p8002:8002 -v/full/path/to/doc
 
 
 ```
+
+
+
+## dify
+```
+git clone https://github.com/langgenius/dify.git  
+cd dify/docker 
+copy .env.example .env;
+
+cat >> .env<<EOF
+CONSOLE_URL=http://localhost
+SERVICE_API_URL=http://localhost
+EOF
+
+sed -i 's#UPLOAD_FILE_SIZE_LIMIT=15#UPLOAD_FILE_SIZE_LIMIT=1500#' .env;
+sed -i 's#UPLOAD_FILE_BATCH_LIMIT=5#UPLOAD_FILE_BATCH_LIMIT=500#' .env;
+sed -i 's#UPLOAD_IMAGE_FILE_SIZE_LIMIT=10#UPLOAD_IMAGE_FILE_SIZE_LIMIT=1000#' .env;
+sed -i 's#UPLOAD_VIDEO_FILE_SIZE_LIMIT=100#UPLOAD_VIDEO_FILE_SIZE_LIMIT=10000#' .env;
+sed -i 's#UPLOAD_AUDIO_FILE_SIZE_LIMIT=50#UPLOAD_AUDIO_FILE_SIZE_LIMIT=5000#' .env;
+sed -i 's#WORKFLOW_FILE_UPLOAD_LIMIT=10#WORKFLOW_FILE_UPLOAD_LIMIT=1000#' .env;
+
+nerdctl compose up -d  
+nerdctl compose restart 
+
+
+# bge-m3 nomic-embed-text
+ollama pull bge-m3
+
+# ollama
+pip3 install ollama
+curl -fsSL https://ollama.com/install.sh | sh
+
+# /etc/systemd/system/ollama.service
+Environment="OLLAMA_HOST=0.0.0.0:11434"
+ExecStart=/usr/local/bin/ollama serve
+
+
+# ollama in docker
+nerdctl pull ollama/ollama:latest
+nerdctl pull dhub.kubesre.xyz/ollama/ollama:latest
+
+root@250:/Data/DIFI# nerdctl image inspect dhub.kubesre.xyz/ollama/ollama:latest | grep -i version
+        "DockerVersion": "",
+                "org.opencontainers.image.version": "20.04"
+
+
+#nerdctl run -d --gpus=all --restart=always -v /root/project/docker/ollama:/root/project/.ollama -p 11434:11434 --name ollama ollama/ollama
+# gpu机器上。
+nerdctl run -d --gpus=all --restart=always -v /root/project/docker/ollama:/root/project/.ollama -p 11434:11434 --name ollama ollama/ollama:20.04
+
+# cpu机器上。
+nerdctl run -d --restart=always -v /root/project/docker/ollama:/root/project/.ollama -p 11434:11434 --name ollama ollama/ollama:20.04
+docker run -d --restart=always -v /root/project/docker/ollama:/root/project/.ollama -p 11434:11434 --name ollama ollama/ollama:20.04
+
+
+# 进入ollama容器
+nerdctl exec -it f9d215c9b0a0 /bin/bash
+
+bge-m3 
+ollama pull bge-m3
+
+ollama pull deepseek-r1:7b
+ollama pull deepseek-r1:1.5b
+
+# 跑起来那个windows11
+nerdctl run 25dc03aa3976
+
+http://10.22.0.2:11434/
+http://10.0.10.250:11434
+
+
+
+set OLLAMA_HOST=0.0.0.0:11434
+ollama serve
+
+OLLAMA_HOST
+
+/root/datapipe 10.0.10.248 80 10.0.10.250 80
+/root/datapipe 10.0.10.250 11434 10.22.0.22 11434
+
+这里是解决weaviate的启动。
+https://blog.csdn.net/xmbpc/article/details/144467990
+https://cloud.tencent.com/developer/news/1552212
+https://docs.dify.ai/zh-hans/getting-started/install-self-hosted/local-source-code
+https://docs.dify.ai/zh-hans/getting-started/install-self-hosted/docker-compose
+https://z0yrmerhgi8.feishu.cn/wiki/JYsNwWXZpiZzJYkem57cOiFPnhQ
+https://blog.csdn.net/ssw_1990/article/details/140258162
+https://z0yrmerhgi8.feishu.cn/wiki/PLLHwT9iDiLI5xkKKThczUbtnqe
+
+https://zhuanlan.zhihu.com/p/691190576
+
+
+cd ../docker
+cp middleware.env.example middleware.env
+nerdctl compose -f docker-compose.middleware.yaml --profile weaviate -p dify up -d
+
+
+387b38da07b2    docker.io/library/postgres:15-alpine          "docker-entrypoint.s…"    6 seconds ago     Up        0.0.0.0:5432->5432/tcp                            dify-db-1
+27a78410ed9e    docker.io/ubuntu/squid:latest                 "sh -c cp /docker-en…"    8 seconds ago     Up        0.0.0.0:3128->3128/tcp, 0.0.0.0:8194->8194/tcp    dify-ssrf_proxy-1
+f4350a4c46a6    docker.io/langgenius/dify-sandbox:0.2.10      "/main"                   11 seconds ago    Up                                                          dify-sandbox-1
+6a4c592f3123    docker.io/semitechnologies/weaviate:1.19.0    "/bin/weaviate --hos…"    13 seconds ago    Up        0.0.0.0:8080->8080/tcp                            dify-weaviate-1
+8bc3cd16cfc9    docker.io/library/redis:6-alpine              "docker-entrypoint.s…"    14 seconds ago    Up        0.0.0.0:6379->6379/tcp                            dify-redis-1
+ad227a5d4c03    docker.io/ubuntu/squid:latest                 "sh -c cp /docker-en…"    2 minutes ago     Up                                                          docker-ssrf_proxy-1
+19663adf3dae    docker.io/library/nginx:latest                "sh -c cp /docker-en…"    3 minutes ago     Up        0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp          docker-nginx-1
+2dd3f27e8977    docker.io/langgenius/dify-api:0.15.3          "/bin/bash /entrypoi…"    3 minutes ago     Up                                                          docker-api-1
+1b200be89b3a    docker.io/langgenius/dify-sandbox:0.2.10      "/main"                   3 minutes ago     Up                                                          docker-sandbox-1
+1abf4a5a0ba0    docker.io/langgenius/dify-api:0.15.3          "/bin/bash /entrypoi…"    3 minutes ago     Up                                                          docker-worker-1
+8fe0f76b2ba9    docker.io/library/redis:6-alpine              "docker-entrypoint.s…"    3 minutes ago     Up                                                          docker-redis-1
+c1fe7524a0ec    docker.io/langgenius/dify-web:0.15.3          "/bin/sh ./entrypoin…"    3 minutes ago     Up                                                          docker-web-1
+107b83060ab2    docker.io/library/postgres:15-alpine          "docker-entrypoint.s…"    3 minutes ago     Up                                                          docker-db-1
+f9d215c9b0a0    docker.io/ollama/ollama:20.04                 "/bin/ollama serve"       39 hours ago      Up        0.0.0.0:11434->11434/tcp                          ollama
+
+
+
+nerdctl compose -f docker-compose.yaml up -d
+8e8a0370c633    docker.io/ubuntu/squid:latest               "sh -c cp /docker-en…"    19 seconds ago    Up                                                    docker-ssrf_proxy-1
+9273cae5bb0a    docker.io/langgenius/dify-api:0.15.3        "/bin/bash /entrypoi…"    21 seconds ago    Up                                                    docker-worker-1
+fc1b61e29c27    docker.io/langgenius/dify-sandbox:0.2.10    "/main"                   22 seconds ago    Up                                                    docker-sandbox-1
+432fe41bf203    docker.io/library/nginx:latest              "sh -c cp /docker-en…"    23 seconds ago    Up        0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp    docker-nginx-1
+9b0c7a1b3483    docker.io/langgenius/dify-api:0.15.3        "/bin/bash /entrypoi…"    24 seconds ago    Up                                                    docker-api-1
+aee5d5aa0172    docker.io/library/redis:6-alpine            "docker-entrypoint.s…"    25 seconds ago    Up                                                    docker-redis-1
+7d8c9e26222c    docker.io/library/postgres:15-alpine        "docker-entrypoint.s…"    26 seconds ago    Up                                                    docker-db-1
+31917c52173b    docker.io/langgenius/dify-web:0.15.3        "/bin/sh ./entrypoin…"    27 seconds ago    Up                                                    docker-web-1
+f9d215c9b0a0    docker.io/ollama/ollama:20.04               "/bin/ollama serve"       39 hours ago      Up        0.0.0.0:11434->11434/tcp                    ollama
+
+
+
+```
+
+
+
+
 
