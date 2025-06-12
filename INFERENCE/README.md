@@ -615,7 +615,57 @@ f9d215c9b0a0    docker.io/ollama/ollama:20.04               "/bin/ollama serve" 
 
 ```
 
+## docker-ce
+```
+https://linux.cn/article-14871-1.html  #用这个文档安装docker-ce
 
+apt -y install apt-transport-https ca-certificates curl software-properties-common gnupg lsb-release;
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg;
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null;
+apt -y update;
+
+
+#选择版本
+apt-cache madison docker-ce
+apt install docker-ce=5:20.10.16~3-0~ubuntu-jammy docker-ce-cli=5:20.10.16~3-0~ubuntu-jammy containerd.io
+
+# 直接安装。
+apt -y install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
+cat <<-EOF > /etc/docker/daemon.json
+{
+  "registry-mirrors": [
+        "https://docker.1ms.run",
+        "https://docker.xuanyuan.me"
+        ]
+}
+EOF
+systemctl daemon-reload
+systemctl restart docker
+
+#测试docker-ce
+docker run hello-world
+```
+
+
+## wind
+```
+  weaviate:
+    image: semitechnologies/weaviate:1.19.0
+    ports:
+      - "8000:8000"
+    profiles:
+      - ''
+      - weaviate
+    restart: always
+    volumes:
+      # Mount the Weaviate data directory to the con tainer.
+      - ./volumes/weaviate:/var/lib/weaviate
+    environment:
+
+docker compose -f docker-compose.yaml up -d;
+docker compose -f docker-compose.yaml up -d;
+```
 
 
 
