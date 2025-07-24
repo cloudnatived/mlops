@@ -245,6 +245,21 @@ spec:
 ########################################
 
 
+root@node1:/Data/kube-prometheus/kube-prometheus-0.15.0/manifests# kubectl -n monitoring get service
+NAME                    TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)                         AGE
+alertmanager-main       NodePort    10.233.41.200   <none>        9093:30200/TCP,8080:30453/TCP   29d
+alertmanager-operated   ClusterIP   None            <none>        9093/TCP,9094/TCP,9094/UDP      29d
+blackbox-exporter       ClusterIP   10.233.41.201   <none>        9115/TCP,19115/TCP              29d
+grafana                 NodePort    10.233.2.60     <none>        3000:30300/TCP                  29d
+kube-state-metrics      ClusterIP   None            <none>        8443/TCP,9443/TCP               29d
+node-exporter           ClusterIP   None            <none>        9100/TCP                        29d
+prometheus-adapter      ClusterIP   10.233.40.142   <none>        443/TCP                         29d
+prometheus-k8s          NodePort    10.233.45.87    <none>        9090:31922/TCP,8080:31540/TCP   29d
+prometheus-operated     ClusterIP   None            <none>        9090/TCP                        29d
+prometheus-operator     ClusterIP   None            <none>        8443/TCP                        29d
 
+
+增加其它CPU节点的监控，增加GPU卡的监控，增加模型训练推理的监控。
+增加数据库，对象存储的监控。
 
 ```
