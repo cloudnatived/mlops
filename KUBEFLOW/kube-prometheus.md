@@ -23,12 +23,19 @@ prometheus-service.yaml
 
 按照官网，执行部署的命令：
 kubectl apply --server-side -f manifests/setup
+
 kubectl wait \
 	--for condition=Established \
 	--all CustomResourceDefinition \
 	--namespace=monitoring
+
+kubectl wait --for condition=Established --all CustomResourceDefinition --namespace=monitoring
 kubectl apply -f manifests/
 
+
+kubectl delete -f manifests/setup   #直接删除了namespace
+kubectl wait --for condition=Established --all CustomResourceDefinition --namespace=monitoring
+kubectl delete -f manifests/
 
 如果条件允许，在机房部署2-3个管理服务器，这样可以部署各种工具平台。而且可以管理训练网络，业务网络，数据网络，带外网络。
 
