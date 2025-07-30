@@ -26,7 +26,7 @@ Ray 的三个核心概念：
 
 
 
-Ray 官方文档的安装文档：https://docs.ray.io/en/latest/ray-overview/installation.html
+Ray 官方文档的安装文档：https://docs.ray.io/en/latest/ray-overview/installation.html  
 Ray 中文参考文档：https://scale-py.godaai.org/index.html
 
 在物理服务器上部署ray，直接pip install即可，注意不同安装命令会安装不同的库，
