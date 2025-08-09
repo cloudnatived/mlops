@@ -82,7 +82,7 @@ Step 1: Create a Kubernetes cluster                                       # 使�
 kind create cluster --image=kindest/node:v1.26.0
 
 Step 2: Install KubeRay operator
-Method 1: Helm (Recommended)                                              # 方法一
+Method 1: Helm (Recommended)                                              # 方法一 使用Helm部署
 helm repo add kuberay https://ray-project.github.io/kuberay-helm/
 helm repo update
 # Install both CRDs and KubeRay operator v1.3.0.
@@ -93,7 +93,7 @@ Method 2: Kustomize                                                       # 方�
 kubectl create -k "github.com/ray-project/kuberay/ray-operator/config/default?ref=v1.3.0" 
 
 Step 3: Validate Installation
-kubectl get pods                                                          # 检查kuberay-operator是否正常运行
+kubectl get pods|grep ray                                                 # 检查kuberay-operator是否正常运行
 
 
 2. 部署 RayCluster
@@ -141,7 +141,6 @@ kubectl exec curl -- curl -sS -X POST -H 'Content-Type: application/json' rayser
 kubectl exec curl -- curl -sS -X POST -H 'Content-Type: application/json' rayservice-sample-serve-svc:8000/fruit/ -d '["MANGO", 2]'
 
 Example
-
 kubectl apply -f https://raw.githubusercontent.com/ray-project/ray/releases/2.0.0/doc/source/cluster/kubernetes/configs/xgboost-benchmark.yaml
 
 # Train a PyTorch model on Fashion MNIST with CPUs on Kubernetes
