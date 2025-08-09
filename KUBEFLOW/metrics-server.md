@@ -33,10 +33,14 @@ kubectl get --raw /apis/metrics.k8s.io/v1beta1/nodes
 
 ```
 
-Metrics Server与其他工具的对比
+
+
+## Metrics Server与其他工具的对比
+
 以下表格展示了Metrics Server与其他监控工具的对比：
 
-工具	功能	数据存储	可视化支持
-Metrics Server	集群资源度量API	不支持	不支持
-Prometheus	完整监控和报警系统	支持	支持
-Grafana	数据可视化工具	不支持	支持
+| 工具           | 功能               | 数据存储 | 可视化支持 |
+| -------------- | ------------------ | -------- | ---------- |
+| Metrics Server | 集群资源度量API    | 不支持   | 不支持     |
+| Prometheus     | 完整监控和报警系统 | 支持     | 支持       |
+| Grafana        | 数据可视化工具     | 不支持   | 支持       |
