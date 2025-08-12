@@ -43,6 +43,7 @@ https://github.com/NVIDIA/cuda-samples/releases/tag/v12.4.1
 https://github.com/NVIDIA/cuda-samples/archive/refs/tags/v12.4.1.tar.gz
 
 # cuda-samples的v12.4.1编译。
+/Data/cuda-samples-12.4.1
 make
 
 # 运行示例
@@ -61,5 +62,6 @@ Samples/0_Introduction/matrixMul/matrixMul
 
 
 ```
+
 
 
