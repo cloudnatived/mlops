@@ -35,6 +35,13 @@ Samples that demonstrate performance optimization.
 Samples that demonstrate the use of libNVVVM and NVVM IR.
 演示 libNVVVM 和 NVVM IR 用法的示例。
 
+# cuda-12.4的路径。
+/usr/local/cuda-12.4/
+
+# 下载cuda-samples的对应版本v12.4.1
+https://github.com/NVIDIA/cuda-samples/releases/tag/v12.4.1
+https://github.com/NVIDIA/cuda-samples/archive/refs/tags/v12.4.1.tar.gz
+
 # cuda-samples的v12.4.1编译。
 make
 
@@ -54,4 +61,5 @@ Samples/0_Introduction/matrixMul/matrixMul
 
 
 ```
+
 
