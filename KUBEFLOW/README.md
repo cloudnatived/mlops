@@ -1659,3 +1659,14 @@ python3 hello_milvus.py
 ```
 
 
+手动安装 containerd 
+```
+apt install containerd
+
+
+```
+
+
+
+
+
