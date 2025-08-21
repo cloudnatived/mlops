@@ -1661,10 +1661,39 @@ python3 hello_milvus.py
 
 手动安装 containerd 
 ```
+https://blog.csdn.net/qq_44625641/article/details/139346116    nerdctl命令在进行端口映射时报错
 apt install containerd
 
+# 创建目录
+sudo mkdir -p /opt/cni/bin
+
+# 下载 CNI 插件 amd
+wget https://github.com/containernetworking/plugins/releases/download/v1.1.1/cni-plugins-linux-amd64-v1.1.1.tgz
+
+vim /etc/cni/net.d/10-bridge.conf
+{
+    "cniVersion": "0.4.0",
+    "name": "bridge",
+    "type": "bridge",
+    "bridge": "cni0",
+    "isGateway": true,
+    "ipMasq": true,
+    "ipam": {
+        "type": "host-local",
+        "ranges": [
+            [{"subnet": "10.22.0.0/16"}]
+        ],
+        "routes": [
+            {"dst": "0.0.0.0/0"}
+        ]
+    }
+}
+
+# 生成默认配置文件
+containerd config default | sudo tee /etc/containerd/config.toml
 
 ```
+
 
 
 
