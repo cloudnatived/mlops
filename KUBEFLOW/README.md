@@ -1683,10 +1683,11 @@ containerd config default > /etc/containerd/config.toml
 # 创建目录
 sudo mkdir -p /opt/cni/bin
 # 下载 CNI 插件 amd
+cd /opt/cni/bin
 wget https://github.com/containernetworking/plugins/releases/download/v1.1.1/cni-plugins-linux-amd64-v1.1.1.tgz
+tar zxf cni-plugins-linux-amd64-v1.1.1.tgz
 
-
-vim /etc/cni/net.d/10-bridge.conf
+cat > /etc/cni/net.d/10-bridge.conf <<EOF
 {
     "cniVersion": "0.4.0",
     "name": "bridge",
@@ -1704,11 +1705,10 @@ vim /etc/cni/net.d/10-bridge.conf
         ]
     }
 }
-
-# 生成默认配置文件
-containerd config default | sudo tee /etc/containerd/config.toml
+EOF
 
 ```
+
 
 
 
