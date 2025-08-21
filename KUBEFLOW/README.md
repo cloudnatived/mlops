@@ -1662,13 +1662,29 @@ python3 hello_milvus.py
 手动安装 containerd 
 ```
 https://blog.csdn.net/qq_44625641/article/details/139346116    nerdctl命令在进行端口映射时报错
+
+# apt 安装:
 apt install containerd
+#  生成默认配置
+containerd config default > /etc/containerd/config.toml
+
+# 下载 nerdctl ，nerdctl 与 docker 使用方式几乎完全一致。
+wget https://github.com/containerd/nerdctl/releases/download/v1.7.6/nerdctl-full-1.7.6-linux-amd64.tar.gz
+tar -xvf nerdctl-full-1.7.6-linux-amd64.tar.gz -C /usr/local/bin/
+
+# 验证安装：
+nerdctl version
+nerdctl ps -a
+nerdctl images
+
+#  生成默认配置
+containerd config default > /etc/containerd/config.toml
 
 # 创建目录
 sudo mkdir -p /opt/cni/bin
-
 # 下载 CNI 插件 amd
 wget https://github.com/containernetworking/plugins/releases/download/v1.1.1/cni-plugins-linux-amd64-v1.1.1.tgz
+
 
 vim /etc/cni/net.d/10-bridge.conf
 {
@@ -1693,6 +1709,7 @@ vim /etc/cni/net.d/10-bridge.conf
 containerd config default | sudo tee /etc/containerd/config.toml
 
 ```
+
 
 
 
