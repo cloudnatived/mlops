@@ -1,3 +1,110 @@
+
+
+```
+确保所有f-string的引号都正确配对
+建议的调试方法
+在运行之前，可以先用Python的语法检查工具检查：
+# 使用pyflakes检查语法
+pip install pyflakes
+pyflakes advanced_nccl_test_0.py
+
+# 或者使用flake8
+pip install flake8
+flake8 advanced_nccl_test_0.py
+
+# 或者简单地用Python编译检查
+python3 -m py_compile advanced_nccl_test_0.py
+
+advanced_nccl_test_0.py 这是一个​​分布式NCCL性能测试工具​​，用于评估多GPU节点间的通信性能。主要功能包括：
+​​测试各种集合通信操作​​：All-Reduce、All-Gather、Reduce-Scatter、Broadcast、All-to-All
+​​测量通信性能​​：计算带宽和延迟
+​​验证分布式环境​​：检查节点间连通性
+​​生成性能报告​​：汇总测试结果
+
+参数详解：
+​​1.rank​​ (整数)
+当前进程的全局排名
+范围：0 到 world_size-1
+示例：0, 1, 2, 3
+​​
+2.world_size​​ (整数)
+参与测试的总进程数（通常等于总GPU数量）
+示例：4（4个GPU）, 8（8个GPU）
+​​
+3.master_addr​​ (字符串)
+主节点的IP地址或主机名
+示例："192.168.1.100", "localhost", "cluster-node-01"
+
+​​4.master_port​​ (整数)
+主节点监听的端口号
+示例：29500, 12345, 54321
+
+
+advanced_nccl_test_0.py
+# 单机多GPU测试（2个GPU）
+# 一个终端运行
+python3 advanced_nccl_test_0.py 0 2 localhost 12355
+# 另一个终端运行
+python3 advanced_nccl_test_0.py 1 2 localhost 12355
+
+# 多机多GPU测试（2节点，每节点4GPU）：
+节点1 (172.18.8.208)​​：
+python3 advanced_nccl_test_0.py 0 6 172.18.8.208 12355
+python3 advanced_nccl_test_0.py 1 6 172.18.8.208 12355
+
+节点2 (172.18.8.209)​​：
+python3 advanced_nccl_test_0.py 2 6 172.18.8.208 12355
+python3 advanced_nccl_test_0.py 3 6 172.18.8.208 12355
+
+节点3 (172.18.8.210)​​：
+python3 advanced_nccl_test_0.py 4 6 172.18.8.208 12355
+python3 advanced_nccl_test_0.py 5 6 172.18.8.208 12355
+
+
+```
+
+PyTorch安装与NCCL库版本不兼容。
+```
+完整解决方案​​
+​​1. 验证当前NCCL版本​​
+# 检查系统NCCL版本
+dpkg -l | grep nccl  # Ubuntu
+rpm -qa | grep nccl  # CentOS
+
+# 或者直接查询库版本
+strings /usr/lib/x86_64-linux-gnu/libnccl.so.2 | grep NCCL_
+​​2. 重新安装匹配的PyTorch和NCCL​​
+​​方案A：升级NCCL（推荐）​​
+
+# Ubuntu/Debian
+sudo apt install libnccl2 libnccl-dev=2.18.3-1+cuda11.8
+
+# CentOS/RHEL 
+sudo yum install nccl-2.18.3-1.cuda11.8
+​​方案B：降级PyTorch​​
+
+pip install torch==2.0.1+cu118 torchvision==0.15.2+cu118 --extra-index-url https://download.pytorch.org/whl/cu118
+​​3. 完全清理后重新安装​​
+# 彻底卸载PyTorch和NCCL
+pip uninstall torch torchvision torchaudio
+sudo apt purge libnccl*
+
+# 重新安装（以CUDA 11.8为例）
+sudo apt install libnccl2=2.18.3-1+cuda11.8 libnccl-dev=2.18.3-1+cuda11.8
+pip install torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 --index-url https://download.pytorch.org/whl/cu118
+​​4. 验证修复​​
+import torch
+print(torch.cuda.nccl.version())  # 应该输出(2, 18, 3)
+
+​​版本匹配原则​​：
+PyTorch 2.1+ 需要 NCCL >= 2.12
+CUDA 11.x 对应 NCCL 2.12-2.18
+CUDA 12.x 对应 NCCL 2.18+
+
+```
+
+
+
 ```
 ############################################################################################################################    NCCL
 https://developer.nvidia.com/nccl/nccl-download
@@ -108,7 +215,21 @@ mpirun -np 2 -pernode \
 
 # apt-get install mpich
 
+mpirun -np 16 \
+  -H 172.18.8.209:2,172.18.8.210:2 \
+  --allow-run-as-root -bind-to none -map-by slot \
+  -x NCCL_DEBUG=INFO \
+  -x NCCL_IB_GID_INDEX=3 \
+  -x NCCL_IB_DISABLE=0 \
+  -x NCCL_SOCKET_IFNAME=eth0 \
+  -x NCCL_NET_GDR_LEVEL=2 \
+  -x NCCL_IB_QPS_PER_CONNECTION=4 \
+  -x NCCL_IB_TC=160 \
+  -x LD_LIBRARY_PATH -x PATH \
+  -mca coll_hcoll_enable 0 -mca pml ob1 -mca btl_tcp_if_include eth0 -mca btl ^openib \
+  all_reduce_perf -b 32M -e 1G -i 1000 -f 2 -g 1
 
+mpirun --allow-run-as-root -bind-to none -map-by slot all_reduce_perf_mpi -b 2048M -e 8192M -f 2 -g 1
 
 ############################################################################################################################
 多机多卡运行nccl-tests和channel获取
