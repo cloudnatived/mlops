@@ -68,10 +68,14 @@ https://github.com/NVIDIA/nccl-tests
 NCCL 测试依赖于 MPI 在多个进程上工作，因此需要多个节点。如果要使用 MPI 支持编译测试，则需要设置 MPI=1 并将 MPI_HOME 设置为 MPI 的安装路径。
 make MPI=1 MPI_HOME=/path/to/mpi CUDA_HOME=/path/to/cuda NCCL_HOME=/path/to/nccl
 
-# 编译支持mpi的test
+# 编译支持mpi的test，Tesla V100-PCIE-16GB
 make MPI=1 MPI_HOME=/usr/lib/x86_64-linux-gnu/openmpi
 
-make CUDA_HOME=/usr/local/cuda NCCL_HOME=/usr/local/lib/python3.10/dist-packages/nvidia/nccl -lnccl  # /usr/local/lib/python3.10/dist-packages/nvidia/nccl 这个目录一直没找到，也没安装好这个库。
+make CUDA_HOME=/usr/local/cuda NCCL_HOME=/usr/local/lib/python3.10/dist-packages/nvidia/nccl -lnccl        # /usr/local/lib/python3.10/dist-packages/nvidia/nccl 下面这个命令能找到。
+
+pip install nvidia-nccl-cu11
+https://pypi.tuna.tsinghua.edu.cn/packages/ac/9a/8b6a28b3b87d5fddab0e92cd835339eb8fbddaa71ae67518c8c1b3d05bae/nvidia_nccl_cu11-2.21.5-py3-none-manylinux2014_x86_64.whl
+
 
 
 root@y248:/Data/BBC/nccl-tests# ls build/*
@@ -134,7 +138,7 @@ mpirun --version
 git clone https://github.com/NVIDIA/nccl-tests.git
 cd nccl-tests
 
-# 编译支持mpi的test
+# 编译支持mpi的test，Tesla V100-PCIE-16GB
 make MPI=1 MPI_HOME=/usr/lib/x86_64-linux-gnu/openmpi
 
 NCCL测试可以在多个进程、多个线程和每个线程上的多个CUDA设备上运行。进程的数量由MPI进行管理，因此不作为参数传递给测试（可以通过mpirun -np n（n为进程数）来指定）。
