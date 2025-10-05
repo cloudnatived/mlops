@@ -7,6 +7,145 @@ DCGM Exporter       https://github.com/NVIDIA/dcgm-exporter
 
 
 
+4. 配置DCGM+Prometheus+Grafana的GPU监控方案
+
+系统架构：
+云主机：172.18.8.208 2个V100-PCIE-16GB
+云主机：172.18.8.209 2个V100-PCIE-16GB
+云主机：172.18.8.210 2个V100-PCIE-16GB
+服务器：172.18.6.64  服务器上无GPU，运行一个nvcr.io/nvidia/k8s/dcgm-exporter:3.3.9-3.6.1-ubuntu22.04的容器，容器内运行：3个dcgm-exporter进程，从3个GPU云服务器获取信息。服务上，运行1个prometheu进程，运行1个grafana进程。
+
+dcgm-exporter 
+
+ # 目前dcgm的版本
+root@x:~# dcgmi --version
+dcgmi  version: 3.3.9
+
+# 安装完成之后，dcgm.service其实并不能顺利执行，nv-hostengine --service-account nvidia-dcgm -b ALL这条命令。
+#systemctl enable dcgm.service 
+#systemctl restart dcgm.service 
+
+root@x:/Data# systemctl list-unit-files |grep dcgm
+dcgm.service                                 disabled        enabled
+nvidia-dcgm.service                          disabled        enabled
+
+# 配置rc-local，来执行开机启动'nv-hostengine --service-account nvidia-dcgm -b ALL'
+vim /etc/systemd/system/rc-local.service  # 创建这个文件
+
+touch /etc/systemd/system/rc-local.service
+touch /etc/rc.local
+chmod 775 /etc/rc.local
+cat >> /etc/systemd/system/rc-local.service << EOF
+[Unit]
+Description=/etc/rc.local Compatibility
+ConditionPathExists=/etc/rc.local
+[Service]
+Type=forking
+ExecStart=/etc/rc.local start
+TimeoutSec=0
+StandardOutput=tty
+RemainAfterExit=yes
+#SysVStartPriority=99
+[Install]
+WantedBy=multi-user.target
+EOF
+
+cat >> /etc/rc.local << EOF
+#!/bin/bash
+nv-hostengine --service-account nvidia-dcgm -b ALL
+EOF
+
+systemctl enable rc-local.service
+systemctl restart rc-local.service
+
+# 测试dcgmi
+dcgmi discovery --host 172.18.8.208 -l
+dcgmi discovery --host 172.18.8.209 -l
+dcgmi discovery --host 172.18.8.210 -l
+
+# 常用命令示例
+# 实时监控GPU指标（每2秒刷新）：
+# -e 指定指标ID（203=GPU利用率，252=显存使用率）
+# -i 指定GPU索引（0表示第一块GPU）
+dcgmi discovery --host 172.18.8.210 dmon -i 0 -e 203,252 -c 5
+dcgmi dmon -i 0 -e 203,252 -c 5
+
+# 查看GPU健康状态：
+# 检查GPU 0的健康状态（-c 表示全面检测）
+dcgmi health -g 0 -c
+
+# 统计NVLink带宽：
+# 显示GPU 0的NVLink状态及带宽
+dcgmi nvlink -i 0 -s
+
+ # 下载dcgm的镜像。
+docker pull nvcr.io/nvidia/k8s/dcgm-exporter:3.3.9-3.6.1-ubuntu22.04  # 容器里的dcgm为3.3.9
+docker pull nvidia/dcgm-exporter:4.4.0-4.5.0-ubuntu22.04
+docker pull nvcr.io/nvidia/k8s/dcgm-exporter:4.4.0-4.5.0-ubuntu22.04
+
+# 如果使用带GPU的服务器来运行dcgm-exporter容器。
+docker run -d --gpus all --cap-add SYS_ADMIN --name dcgm -p 9400:9400 -p 9401:9401 -p 9403:9403 -p 9405:9405 nvcr.io/nvidia/k8s/dcgm-exporter:3.3.9-3.6.1-ubuntu22.04
+docker run -d --gpus all --cap-add SYS_ADMIN --name dcgm -p 9400:9400 -p 9401:9401 -p 9403:9403 -p 9405:9405 nvcr.io/nvidia/k8s/dcgm-exporter:4.4.0-4.5.0-ubuntu22.04
+
+# 找了一个cpu服务器来运行
+docker run -d --name dcgm -p 9400:9400 -p 9401:9401 -p 9403:9403 -p 9405:9405 nvcr.io/nvidia/k8s/dcgm-exporter:3.3.9-3.6.1-ubuntu22.04
+docker run -d --name dcgm -p 9400:9400 -p 9401:9401 -p 9403:9403 -p 9405:9405 nvcr.io/nvidia/k8s/dcgm-exporter:4.4.0-4.5.0-ubuntu22.04
+
+docker exec -it dcgm  /bin/bash     # 进入dcgm-exporter容器
+dcgm-exporter -a :9401 -r "172.18.8.208:5555" &  # 让命令在后台持续运行。
+dcgm-exporter -a :9403 -r "172.18.8.209:5555" &  # 让命令在后台持续运行。
+dcgm-exporter -a :9405 -r "172.18.8.210:5555" &  # 让命令在后台持续运行。
+
+curl 172.18.8.210:5555
+
+# curl 测试
+curl 172.18.6.64:9401
+curl 172.18.6.64:9403
+curl 172.18.6.64:9405
+
+# 在172.18.6.64，下载 prometheus
+https://github.com/prometheus/prometheus/releases/download/v3.6.0-rc.0/prometheus-3.6.0-rc.0.linux-amd64.tar.gz
+
+# 修改配置，
+./prometheus.yml
+++++++++++++++++++++++++++++++++++++++++++++++++
+    static_configs:
+      - targets: ["172.18.8.208:9090"]
+       # The label name is added as a label `label_name=<label_value>` to any timeseries scraped from this config.
+        labels:
+          app: "prometheus"
+
+  - job_name: "DCGM_exporter"
+    static_configs:
+      #- targets: ["172.18.8.208:9400", "172.18.8.208:9403", "172.18.8.208:9405"]
+      - targets: ["172.18.8.208:9401", "172.18.8.208:9403", "172.18.8.208:9405"]
+        labels:
+          app: "DCGM_exporter"
+++++++++++++++++++++++++++++++++++++++++++++++++
+
+# 运行prometheus
+./prometheus --config.file=./prometheus.yml
+
+# 查看prometheus刚才的配置是否生效:
+http://172.18.6.64:9090/targets
+curl http://172.18.6.64:9090/targets
+
+# 安装grafana
+sudo apt-get install -y adduser libfontconfig1 musl
+wget https://dl.grafana.com/grafana-enterprise/release/12.1.1/grafana-enterprise_12.1.1_16903967602_linux_amd64.deb
+sudo dpkg -i grafana-enterprise_12.1.1_16903967602_linux_amd64.deb
+
+systemctl enable grafana-server.service
+systemctl restart grafana-server.service
+
+# 在grafana的网站查找 NVIDIA DCGM Exporter。
+https://grafana.com/search/ 
+12239
+22515
+
+
+
+
 
 ## GPU监控工具DCGM
 
@@ -238,4 +377,5 @@ DCGM核心价值：提供从硬件状态到任务粒度的全方位GPU监控，�
 通过DCGM，运维团队可快速定位GPU相关问题，提升集群稳定性和资源利用率。
 
 ```
+
 
