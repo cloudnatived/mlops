@@ -1,0 +1,9 @@
+gradio==5.44.1
+numpy
+pandas==2.3.2
+Pillow==11.3.0
+torch==2.8.0
+transformers==4.56.0
+opencv-python
+opencv-contrib-python 
+opencv-python-headless
