@@ -1,5 +1,194 @@
 
 
+
+```
+11. 分布式训练与集群通信，检查和测试GPU的nccl通信
+分布式通信测试 (NCCL)
+在进行分布式训练前，必须确保节点间GPU的通信（特别是通过10G网络）是健康和高效的。
+
+https://blog.csdn.net/rjc_lihui/article/details/146154987    nccl-tests 调用参数 (来自deepseek)
+https://www.sensecore.cn/help/docs/cloud-foundation/compute/acp/acpBestPractices/Job-nccl_test    【NGC 镜像】nccl-test 通信库检测最佳实践
+https://zhuanlan.zhihu.com/p/682530828                 多机多卡运行nccl-tests和channel获取
+https://cloud.tencent.com/developer/article/2361710          nccl-test 使用指引  
+
+检查和测试GPU的nccl通信
+方法1. 使用nccl-tests项目测试 NCCL 基础功能
+方法2. 使用python的torch.distributed库
+
+1. 使用nccl-tests
+    在nvcr.io/nvidia/pytorch:23.10-py3等包含完整CUDA开发环境的容器中进行。
+    克隆NVIDIA官方的nccl-tests项目，编译并运行性能测试脚本，如all_reduce_perf。
+    观察输出的带宽（Bus B/W），评估其是否接近10G网络的理论上限。
+
+2. 使用PyTorch Distributed测试
+    编写Python脚本，利用torch.distributed库在多个进程/节点间进行张量广播、归约等操作。
+    这可以更贴近实际训练场景，验证PyTorch分布式后端的通信能力。
+
+# 使用的容器镜像是：pytorch:23.10-py3
+docker run -it -d --shm-size=4G --gpus all --network host -v /Data:/Data nvcr.io/nvidia/pytorch:23.10-py3
+
+11.1 使用nccl-tests项目测试 NCCL 基础功能
+# 如果容器中已安装cuda
+cat >> /etc/profile <<EOF
+export PATH=/usr/local/cuda/bin${PATH:+:${PATH}}
+export LD_LIBRARY_PATH=/usr/local/cuda/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+export LIBRARY_PATH=$LIBRARY_PATH:/usr/local/cuda/lib64
+EOF
+
+# 使用nccl-tests项目测试 NCCL 基础功能
+https://github.com/NVIDIA/nccl-tests 
+git clone https://github.com/NVIDIA/nccl-tests.git
+cd nccl-tests
+make -j
+./build/all_reduce_perf -b 8 -e 128M -f 2
+./build/all_reduce_perf -b 8 -e 128M -f 2 -g 2 -c 0
+./build/broadcast_perf -b 128M -e 1G -f 2 -g 2 -c 1
+
+# 如果出错，需要重新编译
+make clean
+
+nccl-tests 的常用参数
+参数	说明
+-b	起始数据大小（例如 128M 表示 128 MB）。
+-e	结束数据大小（例如 1G 表示 1 GB）。
+-f	数据大小的增长因子（例如 2 表示每次测试数据大小翻倍）。
+-g	使用的 GPU 数量。
+-c	检查结果的正确性（启用数据验证）。
+-n	迭代次数（默认 100）。
+-w	预热次数（默认 10）。
+-o	集合操作类型（例如 all_reduce、broadcast、reduce 等）。
+-d	数据类型（例如 float、double、int 等）。
+-t	线程模式（0 表示单线程，1 表示多线程）。
+-a	聚合模式（0 表示禁用，1 表示启用）。
+-m	消息对齐（默认 0）。
+-p	打印性能结果（默认启用）。
+-l	指定 GPU 列表（例如 0,1,2,3 表示使用 GPU 0、1、2、3）。
+-r	指定 rank 的数量（多节点测试时使用）。
+-s	指定节点数量（多节点测试时使用）。
+
+# 本次实验的目录：/Data/DEMO/CODE/NCCL/nccl-tests/
+cd /Data/DEMO/CODE/NCCL/nccl-tests/
+mpirun --allow-run-as-root ./build/all_reduce_perf -b 8 -e 128M -f 2  # 使用mpirun运行。
+mpirun --allow-run-as-root ./build/broadcast_perf -b 128M -e 1G -f 2 -g 2 -c 1  # V100-PCIE-16GB GPU内存不足，会报错。
+mpirun --allow-run-as-root ./build/broadcast_perf -b 128M -e 512M -f 2 -g 2 -c 1  # 可以完成
+mpirun --allow-run-as-root -np 64 -N 8 ./build/all_reduce_perf -b 8 -e 8G -f 2 -g 1
+
+# 先在同一节点测试是否能运行
+mpirun --allow-run-as-root \
+ -np 2 \
+ -x NCCL_DEBUG=INFO \
+ -x CUDA_VISIBLE_DEVICES=0,1 \
+ ./build/all_reduce_perf -b 8 -e 128M -f 2 -g 2 -c 0
+
+# 多迭代测试​
+# 增加迭代次数以获得更稳定的性能数据
+mpirun --allow-run-as-root ./build/all_reduce_perf -b 1M -e 64M -f 2 -g 2 -i 100
+
+# 减少预热迭代
+mpirun --allow-run-as-root ./build/broadcast_perf -b 1M -e 64M -f 2 -g 2 -w 0 -i 50
+
+# ​故障排除专用测试
+# 最小数据量测试（排除内存问题）
+mpirun --allow-run-as-root ./build/all_reduce_perf -b 1 -e 1 -f 1 -g 2
+
+# 单字节测试
+mpirun --allow-run-as-root ./build/broadcast_perf -b 1 -e 1 -f 1 -g 2
+
+# 24.2. mpirun 选项
+https://docs.redhat.com/zh-cn/documentation/red_hat_enterprise_linux/8/html/building_running_and_managing_containers/con_the-mpirun-options_assembly_using-podman-in-hpc-environment
+
+以下 mpirun 选项用于启动容器：
+--mca orte_tmpdir_base /tmp/podman-mpirun line 告诉 Open MPI 在 /tmp/podman-mpirun 中创建所有临时文件，而不是在 /tmp 中创建。如果使用多个节点，则在其他节点上这个目录的名称会不同。这需要将完整的 /tmp 目录挂载到容器中，而这更为复杂。
+mpirun 命令指定要启动的命令（ podman 命令）。以下 podman 选项用于启动容器：
+
+run 命令运行容器。
+--env-host 选项将主机中的所有环境变量复制到容器中。
+-v /tmp/podman-mpirun:/tmp/podman-mpirun 行告诉 Podman 挂载目录，Open MPI 在该目录中创建容器中可用的临时目录和文件。
+--userns=keep-id 行确保容器内部和外部的用户 ID 映射。
+--net=host --pid=host --ipc=host 行设置同样的网络、PID 和 IPC 命名空间。
+mpi-ring 是容器的名称。
+/home/ring 是容器中的 MPI 程序。
+
+
+# 多节点运行nccl-tests，未完成。
+mpirun --allow-run-as-root -np 2 -pernode \
+-hostfile hostfile \
+-mca btl_tcp_if_include enp4s1 \
+-x NCCL_SOCKET_IFNAME=enp4s1  \
+-x NCCL_DEBUG=INFO  \
+-x NCCL_IGNORE_DISABLED_P2P=1 \
+-x CUDA_VISIBLE_DEVICES=0,1 \
+./build/all_reduce_perf -b 8 -e 128M -f 2 -g 2 -c 0
+
+
+
+
+
+11.2 使用python的torch.distributed库测试 NCCL 基础功能
+# 5个python程序，测试 NCCL 基础功能
+ddp_test.py
+ddp_test_0.py
+cuda_p2p_test.py
+multi_node_nccl_test.py
+advanced_nccl_test_0.py
+
+11.2.1 ddp_test.py
+python3 ddp_test.py
+
+
+11.2.2 ddp_test_0.py
+python3 ddp_test_0.py
+
+
+11.3 cuda_p2p_test.py
+python3 cuda_p2p_test.py
+
+
+11.4 multi_node_nccl_test.py
+# 单机测试单个GPU
+python3 multi_node_nccl_test.py 0 1 172.18.8.209 29500
+
+# 单机测试多个GPU（2个GPU）
+# 一个终端运行
+python3 multi_node_nccl_test.py 0 2 172.18.8.209 29500
+# 另一个终端运行
+python3 multi_node_nccl_test.py 1 2 172.18.8.209 29500
+
+
+11.5 advanced_nccl_test_0.py
+# 单机测试单个GPU
+python3 advanced_nccl_test_0.py 0 1 localhost 12355
+
+# 单机测试多个GPU（2个GPU）
+# 一个终端运行
+python3 advanced_nccl_test_0.py 0 2 localhost 12355
+# 另一个终端运行
+python3 advanced_nccl_test_0.py 1 2 localhost 12355
+
+# 多机多GPU测试（2节点，每节点4GPU）：
+节点1 (172.18.8.208)​​：
+python3 advanced_nccl_test_0.py 0 6 172.18.8.208 12355
+python3 advanced_nccl_test_0.py 1 6 172.18.8.208 12355
+
+节点2 (172.18.8.209)​​：
+python3 advanced_nccl_test_0.py 2 6 172.18.8.208 12355
+python3 advanced_nccl_test_0.py 3 6 172.18.8.208 12355
+
+节点3 (172.18.8.210)​​：
+python3 advanced_nccl_test_0.py 4 6 172.18.8.208 12355
+python3 advanced_nccl_test_0.py 5 6 172.18.8.208 12355
+
+
+NCCL 调优
+设置 NCCL_DEBUG、NCCL_IB_DISABLE、NCCL_P2P_DISABLE、NCCL_SOCKET_IFNAME 等参数的作用。
+
+
+```
+
+
+
+
+
 ```
 确保所有f-string的引号都正确配对
 建议的调试方法
