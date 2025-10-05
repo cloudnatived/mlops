@@ -2,6 +2,347 @@
 # VLLM  SGLang  Ray TensorRT Triton dify
 
 
+```
+
+
+
+6. 在单机2个V100-PCIE-16GB的GPU上，部署模型进行推理
+包含6个开源模型的部署，需要下载模型，并为每个部署创建一个python虚拟环境
+单个GPU节点（例如172.18.8.209）的容器内，为不同类型的AI任务部署独立的推理服务。
+准备工作: 启动一个CUDA容器，并将宿主机数据目录挂载进去。为每个模型创建一个独立的Python虚拟环境以隔离依赖。
+模型下载: 使用huggingface-cli并设置镜像端点HF_ENDPOINT=https://hf-mirror.com来下载模型权重。
+
+6.1 图像分类 (ViT): 部署google/vit-base-patch16-224模型，提供Web服务。
+6.2 文生图 (Stable Diffusion): 部署stable-diffusion-v1-5模型。
+6.3 文字识别 (OCR): 部署microsoft/trocr-base-printed模型。
+6.4 语音识别 (Whisper): 部署openai/whisper-large-v3模型。
+6.5 文字转语音 (TTS): 部署coqui/XTTS-v2模型。
+6.6 目标检测 (YOLO): 部署YOLOv13模型。
+
+以下是在1个GPU的云主机上运行1个nvcr.io/nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04的容器，在容器内部署几个模型，并提供推理服务。
+目前下面的3个模型，都部署在172.18.8.209这个云主机里的容器中。172.18.8.209这个云主机的配置为8C，32G memory，1000G disk。
+# 运行这个命令，这样把宿主机的/Data目录共享给容器的/Data目录。
+docker run -it -d --shm-size=4G --gpus all --network host --cap-add SYS_ADMIN -v /Data:/Data nvcr.io/nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04
+docker run -it -d --shm-size=4G --gpus all --network host --cap-add SYS_ADMIN -v /Data:/Data nvcr.io/nvidia/pytorch:23.10-py3     # 推荐使用这个镜像
+
+
+# 进入容器。
+docker exec -it 3cb448814bfc9392db74341d1e4f5e27ecfac107600d76ca21c0919164fcc972 /bin/bash
+
+# 使用清华的apt源，更新，安装所需的操作系统包
+# 使用清华的python源，并安装所需的python库
+
+
+6.1. 部署图像分类模型推理。图像分类（识别整体内容类别）,google/vit-base-patch16-224
+图像分类（识别整体内容类别）,google/vit-base-patch16-224
+# 这里有比较详细的介绍： 
+https://zhuanlan.zhihu.com/p/713616890
+基于 Vision Transformer 的图像分类模型，在 ImageNet 上预训练，支持 1000 类物体分类（如猫、狗、汽车等）。
+python3 -m venv /Data/DEMO/CODE/VIT/VIT
+source /Data/DEMO/CODE/VIT/VIT/bin/activate
+pip download -r vit_0.py.requirements.txt --dest /Data/IMAGES/whl -v   # 把requirements.txt文件中列出的包全都先下载到/Data/IMAGES/whl目录，不安装。
+pip install -r vit_0.py.requirements.txt --find-links=/Data/IMAGES/whl --no-index #从/Data/IMAGES/whl寻找安装包安装，不要連接到 PyPI。
+python3 /Data/DEMO/CODE/VIT/vit_0.py
+deactivate
+
+cat > vit_0.py.requirements.txt <<EOF
+gradio==5.44.1
+numpy==2.3.2
+pandas==2.3.2
+Pillow==11.3.0
+torch==2.8.0
+transformers==4.56.0
+opencv-python
+opencv-contrib-python 
+opencv-python-headless
+EOF
+
+# 程序报错，及需要安装的包
+ModuleNotFoundError: No module named 'cv2'   # pip3 install opencv-python opencv-contrib-python opencv-python-headless
+ImportError: libGL.so.1: cannot open shared object file: No such file or directory # apt install -y libgl1
+ImportError: libgthread-2.0.so.0: cannot open shared object file: No such file or directory # apt install -y libglib2.0-0
+ModuleNotFoundError: No module named 'PIL'  # pip3 install Pillow
+
+curl -I https://huggingface.co/google/vit-base-patch16-224
+curl -I https://hf-mirror.com/google/vit-base-patch16-224
+
+# 基本用法-下载模型
+huggingface-cli download bigscience/bloom-560m --local-dir bloom-560m
+# 基本用法-下载数据集
+huggingface-cli download --repo-type dataset lavita/medical-qa-shared-task-v1-toy
+
+# 图像分类模型。google/vit-base-patch16-224
+export HF_ENDPOINT=https://hf-mirror.com
+huggingface-cli download google/vit-base-patch16-224 --local-dir /Data/DEMO/MODEL/google/vit-base-patch16-224  # 图像分类
+python3 /Data/DEMO/CODE/VIT/image_2.py
+port:7860
+# 外网直接访问：
+http://121.40.245.182:7503/
+
+
+6.2. 部署文生图模型推理。stable-diffusion-v1-5/stable-diffusion-v1-5
+当前使用的stable-diffusion-v1-5/stable-diffusion-v1-5模型，是英文的，所以目前只支持英文的提示词。
+
+7861
+python3 -m venv /Data/DEMO/CODE/TXT2IMG/TXT2IMG
+source /Data/DEMO/CODE/TXT2IMG/TXT2IMG/bin/activate
+pip download -r text2img_server.py.requirements.txt --dest /Data/IMAGES/whl -v   # 把requirements.txt文件中列出的包全都先下载到/Data/IMAGES/whl目录，不安装。
+pip install -r text2img_server.py.requirements.txt --find-links=/Data/IMAGES/whl --no-index #从/Data/IMAGES/whl寻找安装包安装，不要連接到 PyPI。
+python3 /Data/DEMO/CODE/TXT2IMG/text2img_server.py
+deactivate
+
+export HF_ENDPOINT=https://hf-mirror.com
+huggingface-cli download stable-diffusion-v1-5/stable-diffusion-v1-5 --local-dir /Data/DEMO/MODEL/stable-diffusion-v1-5/stable-diffusion-v1-5  # 文生圖
+python3 /Data/DEMO/CODE/TXT2IMG/text2img_server.py 7861
+port:7861
+# 文生图模型外网直接访问外网直接访问：
+http://121.40.245.182:7504/
+
+cat > requirements.txt.text2img_server <<EOF
+gradio==5.44.1
+numpy==2.3.2
+pandas==2.3.2
+Pillow==11.3.0
+torch==2.8.0
+diffusers
+accelerate
+transformers
+EOF
+
+# 运行以下命令检查关键依赖：
+pip list | grep -E "torch|diffusers|transformers|xformers"
+
+
+# 如果需要的话，强制升级所有依赖：
+pip install --upgrade torch diffusers transformers accelerate
+
+
+
+6.3. 部署OCR模型推理。OCR（文字识别）,microsoft/trocr-base-printed
+OCR（文字识别）
+microsoft/trocr-base-printed，目前这个模型好像有问题，无法准确识别，正在测试其它的OCR模型。
+端到端 OCR 模型，支持印刷体文字识别，可直接输出图像中的文本内容。
+
+export HF_ENDPOINT=https://hf-mirror.com
+huggingface-cli download microsoft/trocr-base-printed --local-dir /Data/DEMO/MODEL/microsoft/trocr-base-printed  # 印刷文本识别
+python3 /Data/DEMO/CODE/OCR/ocr_0.py
+port:7862
+# 外网直接访问：
+http://121.40.245.182:7505/
+
+python3 -m venv /Data/DEMO/CODE/OCR/OCR
+source /Data/DEMO/CODE/OCR/OCR/bin/activate
+pip download -r ocr_0.py.requirements.txt --dest /Data/IMAGES/whl -v   # 把ocr_0.py.requirements.txt文件中列出的包全都先下载到/Data/IMAGES/whl目录，不安装。
+pip3 install -r ocr_0.py.requirements.txt --find-links=/Data/IMAGES/whl --no-index #从/Data/IMAGES/whl寻找安装包安装，不要連接到 PyPI。
+python3 /Data/DEMO/CODE/OCR/ocr_0.py
+deactivate
+
+cat > ocr_0.py.requirements.txt <<EOF
+transformers==4.44.2
+torch==2.3.1
+opencv-python-headless>=4.5.0
+pandas>=2.0.0
+pillow>=10.0.0
+gradio>=4.0.0
+opencv-python
+opencv-contrib-python 
+opencv-python-headless
+EOF
+
+pip freeze > ocr_0.py.requirements.txt  # 保存全部的whl包名称
+
+
+6.4. 部署开源语音识别模型。openai/whisper-large-v3
+# 这个介绍比较详细：
+https://www.cnblogs.com/liupiaos/p/18465221    python系列&deep_study系列：Whisper OpenAI开源语音识别模型
+https://zhuanlan.zhihu.com/p/662906303         OpenAI Whisper 新一代语音技术(更新至v3-turbo)
+  
+export HF_ENDPOINT=https://hf-mirror.com
+huggingface-cli download openai/whisper-large-v3 --local-dir /Data/DEMO/MODEL/openai/whisper-large-v3  # 开源语音识别模型
+pythone3 /Data/DEMO/CODE/WHISPER/whisper_gradio_asr_8.py
+port:7863
+# 外网直接访问：
+http://121.40.245.182:7506/
+
+7863
+python3 -m venv /Data/DEMO/CODE/WHISPER/WHISPER
+source /Data/DEMO/CODE/WHISPER/WHISPER/bin/activate
+pip download -r whisper_gradio_asr_8.py.requirements.txt --dest /Data/IMAGES/whl -v   # 把requirements.txt文件中列出的包全都先下载到/Data/IMAGES/whl目录，不安装。
+pip install -r whisper_gradio_asr_8.py.requirements.txt --find-links=/Data/IMAGES/whl --no-index #从/Data/IMAGES/whl寻找安装包安装，不要連接到 PyPI。
+python3 /Data/DEMO/CODE/WHISPER/whisper_gradio_asr_8.py
+deactivate
+
+
+6.5. 部署开源语音识别模型，文字转语音。coqui/XTTS-v2
+export HF_ENDPOINT=https://hf-mirror.com
+huggingface-cli download coqui/XTTS-v2 --local-dir /Data/DEMO/MODEL/coqui/XTTS-v2  # 开源语音识别模型，文字转语音
+python3 /Data/DEMO/CODE/TTS/xtts_tts_server_5.py
+port:7864
+# 开源语音识别模型，文字转语音。
+http://121.40.245.182:7507/
+
+cat > requirements.txt <<EOF
+gradio==5.45.0
+gradio_client==1.13.0
+torch==2.3.1
+torchaudio==2.3.1
+TTS==0.22.0
+numpy
+pandas
+EOF
+
+7864
+python3 -m venv /Data/DEMO/CODE/TTS/TTS
+source /Data/DEMO/CODE/TTS/TTS/bin/activate
+pip download -r xtts_tts_server_5.py.requirements.txt --dest /Data/IMAGES/whl -v   # 把requirements.txt文件中列出的包全都先下载到/Data/IMAGES/whl目录，不安装。
+pip install -r xtts_tts_server_5.py.requirements.txt --find-links=/Data/IMAGES/whl --no-index #从/Data/IMAGES/whl寻找安装包安装，不要連接到 PyPI。
+python3 /Data/DEMO/CODE/TTS/xtts_tts_server_5.py
+deactivate
+
+
+6.6. 开源语音识别模型，文字转语音。YOLO
+# 参考：
+https://blog.csdn.net/youcans/article/details/142510400    【跟我学YOLO】YOLO13（2）模型下载、环境配置与检测
+https://zhuanlan.zhihu.com/p/1920777603847021007
+
+https://docs.ultralytics.com/zh/
+https://github.com/iMoonLab/yolov13/
+https://github.com/iMoonLab/yolov13/releases/tag/yolov13    # 下载YOLOV13模型权重文件。
+port:7865
+# 外网直接访问：
+http://121.40.245.182:7508/
+
+
+# 优先安装指定版本的Gradio（避免最新版本Schema解析问题）yolov13，一定要使用这些库。
+pip3 install gradio==3.48.0 ultralytics==8.2.28 opencv-python==4.9.0.80 pandas==2.2.1 torch==2.2.1
+pip3 install gradio==3.48.0 ultralytics==8.2.28 opencv-python==4.9.0.80 pandas==2.2.1 torch==2.2.1+cu121 -f https://download.pytorch.org/whl/torch_stable.html
+
+apt install python3.10-venv  # 需要先安装venv
+pip install -i https://pypi.tuna.tsinghua.edu.cn/simple package_name
+
+7865
+python3 -m venv /Data/DEMO/CODE/YOLO/YOLO
+source /Data/DEMO/CODE/YOLO/YOLO/bin/activate
+pip3 install ./flash_attn-2.7.3+cu11torch2.2cxx11abiFALSE-cp310-cp310-linux_x86_64.whl  --no-dependencies
+pip download -r yolo_1.py.requirement.txt --dest /Data/IMAGES/whl -v   # 把requirements.txt文件中列出的包全都先下载到/Data/IMAGES/whl目录，不安装。
+pip install -r yolo_1.py.requirement.txt --find-links=/Data/IMAGES/whl --no-index #从/Data/IMAGES/whl寻找安装包安装，不要連接到 PyPI。
+
+python3 /Data/DEMO/CODE/YOLO/yolo_1.py
+deactivate
+
+# 错误提示和解决方法：
+错误：ImportError: libGL.so.1: cannot open shared object file: No such file or directory
+apt-get install -y libgl1-mesa-glx
+
+错误：ImportError: libgthread-2.0.so.0: cannot open shared object file: No such file or directory
+apt-get install -y libglib2.0-0
+
+# 这个版本不对
+(YOLO) root@anhua209:/Data/DEMO/CODE/YOLO/yolov13# pip3 list |grep thop
+thop                     0.1.1.post2209072238
+
+错误：ModuleNotFoundError: No module named 'thop'
+pip install thop
+
+# 运行以下命令检查关键依赖：
+pip list | grep -E "torch|diffusers|transformers|xformers|ultralytics|opencv-python|pandas|onnx|flash|gradio|huggingface|thop "
+
+
+(YOLO) root@anhua209:/Data/DEMO/CODE/YOLO/yolov13# cat requirements.txt 
+torch==2.2.2 
+torchvision==0.17.2
+#flash_attn-2.7.3+cu11torch2.2cxx11abiFALSE-cp311-cp311-linux_x86_64.whl
+timm==1.0.14
+albumentations==2.0.4
+onnx==1.14.0
+onnxruntime==1.15.1
+pycocotools==2.0.7
+PyYAML==6.0.1
+scipy==1.13.0
+onnxslim==0.1.31
+onnxruntime-gpu==1.18.0
+#gradio==4.44.1
+gradio==3.50.2
+opencv-python==4.9.0.80
+psutil==5.9.8
+py-cpuinfo==9.0.0
+huggingface-hub==0.23.2
+safetensors==0.4.3
+numpy==1.26.4
+supervision==0.22.0
+
+
+
+
+
+
+7. 在外网访问所部署的模型推理服务
+7.1. # 图像分类模型。google/vit-base-patch16-224
+export HF_ENDPOINT=https://hf-mirror.com
+huggingface-cli download google/vit-base-patch16-224 --local-dir /Data/google/vit-base-patch16-224  # 图像分类
+python3 /Data/DEMO/CODE/VIT/image_2.py
+port:7860
+# 外网直接访问：
+http://121.40.245.182:7503/
+
+
+7.2. # 文生图模型。stable-diffusion-v1-5/stable-diffusion-v1-5
+export HF_ENDPOINT=https://hf-mirror.com
+huggingface-cli download stable-diffusion-v1-5/stable-diffusion-v1-5 --local-dir /Data/stable-diffusion-v1-5/stable-diffusion-v1-5  # 文生圖
+python3 /Data/DEMO/CODE/TXT2IMG/text2img_server.py 7861
+port:7861
+# 外网直接访问：
+http://121.40.245.182:7504/
+
+
+7.3. # OCR模型。microsoft/trocr-base-printed
+export HF_ENDPOINT=https://hf-mirror.com
+huggingface-cli download microsoft/trocr-base-printed --local-dir /Data/microsoft/trocr-base-printed  # 印刷文本识别
+python3 /Data/DEMO/CODE/OCR/ocr_0.py
+port:7862
+# 外网直接访问：
+http://121.40.245.182:7505/
+
+
+7.4. # 开源语音识别模型。openai/whisper-large-v3
+export HF_ENDPOINT=https://hf-mirror.com
+huggingface-cli download openai/whisper-large-v3 --local-dir /Data/DEMO/MODEL/openai/whisper-large-v3  # 开源语音识别模型
+pythone3 /Data/DEMO/CODE/WHISPER/whisper_gradio_asr_8.py
+port:7863
+# 外网直接访问：
+http://121.40.245.182:7506/
+
+
+7.5. # 开源语音识别模型，文字转语音。coqui/XTTS-v2
+export HF_ENDPOINT=https://hf-mirror.com
+huggingface-cli download coqui/XTTS-v2 --local-dir /Data/DEMO/MODEL/coqui/XTTS-v2  # 开源语音识别模型，文字转语音
+python3  /Data/DEMO/CODE/TTS/xtts_tts_server_5.py
+port:7864
+# 开源语音识别模型，文字转语音。
+http://121.40.245.182:7507/
+
+
+7.6. # 开源语音识别模型，文字转语音。YOLO
+https://docs.ultralytics.com/zh/
+https://github.com/iMoonLab/yolov13/
+https://github.com/iMoonLab/yolov13/releases/tag/yolov13  # 权重下载
+python3 /Data/DEMO/CODE/YOLO/yolo_1.py
+port:7865
+# 外网直接访问：
+http://121.40.245.182:7508/
+
+
+
+
+
+```
+
+
+
+
+
+
+
 
 ```
 参考资料：
@@ -786,6 +1127,7 @@ ENV DISK_SIZE="64G"
 
 ENTRYPOINT ["/usr/bin/tini", "-s", "/run/entry.sh"]
 ```
+
 
 
 
