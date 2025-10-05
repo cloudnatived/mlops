@@ -363,10 +363,10 @@ root@y248:/Data/BBC/nccl# ls -l build/pkg/deb/libnccl*
 -rw-r--r-- 1 root root 118245864 Apr 16 23:20 build/pkg/deb/libnccl-dev_2.26.2-1+cuda12.4_amd64.deb
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++   #貌似找不到文档了。
-https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/examples.html    
-nvcc nccl-example-1.cu -o nccl-example-1  -lnccl
-nvcc nccl-example-2.cu -o nccl-example-2  -lnccl  -lmpi -L /usr/lib64/mpich-3.2/lib/ -I /usr/include/mpich-3.2-x86_64
-nvcc nccl-example-3.cu -o nccl-example-3  -lnccl  -lmpi -L /usr/lib64/mpich-3.2/lib/ -I /usr/include/mpich-3.2-x86_64
+https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/examples.html
+nvcc nccl-official-example-1.cu -o nccl-official-example-1  -lnccl
+nvcc nccl-official-example-2.cu -o nccl-official-example-2  -lnccl  -lmpi -L /usr/lib64/mpich-3.2/lib/ -I /usr/include/mpich-3.2-x86_64
+nvcc nccl--official-example-3.cu -o nccl-official-example-3  -lnccl  -lmpi -L /usr/lib64/mpich-3.2/lib/ -I /usr/include/mpich-3.2-x86_64
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
