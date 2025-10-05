@@ -1,5 +1,16 @@
 
-// hello_mpi.c 
+// hello_mpi.c
+// check env in terminal: mpicc --version; mpirun --version
+// 检查库：ldconfig -p | grep libmpi
+// apt-get install openmpi-bin openmpi-common libopenmpi-dev libgtk2.0-dev
+// gcc hello_mpi.c -o hello_mpi -I/usr/lib/x86_64-linux-gnu/openmpi/include -L/usr/lib/x86_64-linux-gnu/openmpi/lib -Wl,-rpath,/usr/lib/x86_64-linux-gnu/openmpi/lib -lmpi -lm
+
+
+// 强烈推荐使用方案3（mpicc），因为它是MPI标准提供的编译器包装器，会自动处理所有必要的包含路径和库链接。
+// apt-get install openmpi-bin libopenmpi-dev
+// mpicc hello_mpi.c -o hello_mpi
+
+// mpirun -np 2 --allow-run-as-root ./hello_mpi
 #include <mpi.h> 
 #include <stdio.h> 
 int main(int argc, char** argv) 
