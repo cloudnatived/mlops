@@ -6,7 +6,7 @@ DCGM Go bindings    https://github.com/NVIDIA/go-dcgm
 DCGM Exporter       https://github.com/NVIDIA/dcgm-exporter
 
 
-
+```
 4. 配置DCGM+Prometheus+Grafana的GPU监控方案
 
 系统架构：
@@ -143,7 +143,7 @@ https://grafana.com/search/
 12239
 22515
 
-
+```
 
 
 
@@ -377,5 +377,6 @@ DCGM核心价值：提供从硬件状态到任务粒度的全方位GPU监控，�
 通过DCGM，运维团队可快速定位GPU相关问题，提升集群稳定性和资源利用率。
 
 ```
+
 
 
