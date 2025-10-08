@@ -388,6 +388,21 @@ make CUDA_HOME=/usr/local/cuda NCCL_HOME=/usr/local/lib/python3.10/dist-packages
 pip install nvidia-nccl-cu11
 https://pypi.tuna.tsinghua.edu.cn/packages/ac/9a/8b6a28b3b87d5fddab0e92cd835339eb8fbddaa71ae67518c8c1b3d05bae/nvidia_nccl_cu11-2.21.5-py3-none-manylinux2014_x86_64.whl
 
+pip install nvidia-nccl-cu12
+https://files.pythonhosted.org/packages/5d/24/11df42593d1a6d10b3ffef049cec064832f108e77bc5cac12726e4ec1cb2/nvidia_nccl_cu12-2.28.3-py3-none-manylinux_2_18_x86_64.whl.metadata
+
+make -j40 MPI=1 MPI_HOME=/usr/lib/x86_64-linux-gnu/openmpi CUDA_HOME=/usr/local/cuda NCCL_HOME=/usr/local/lib/python3.10/dist-packages/nvidia/nccl -lnccl # 测试这个命令。# 这样编译出来的这些命令，在使用mpirun去call的时候，会报错。
+make -j40 MPI=1 MPI_HOME=/usr/lib/x86_64-linux-gnu/openmpi CUDA_HOME=/usr/local/cuda -lnccl # 测试这个命令。# 这样编译出来的这些命令，在使用mpirun去call的时候，会报错。
+
+make MPI=1 MPI_HOME=/usr/lib/x86_64-linux-gnu/openmpi CUDA_HOME=/usr/local/cuda -lnccl    # 用这个可以编译成功。
+
+make MPI=1 MPI_HOME=/usr/lib/x86_64-linux-gnu/openmpi                                    # 不能加cuda的参数，不能加nccl，会版本冲突。
+
+make -j40 MPI=1 MPI_HOME=/path/to/mpi CUDA_HOME=/path/to/cuda NCCL_HOME=/path/to/nccl
+
+make -j40 MPI=1 MPI_HOME=/usr/lib/x86_64-linux-gnu/openmpi CUDA_HOME=/usr/local/cuda -lnccl
+
+
 
 
 root@y248:/Data/BBC/nccl-tests# ls build/*
