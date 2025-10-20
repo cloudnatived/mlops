@@ -1,3 +1,5 @@
+
+3. kube-prometheus
 ### kube-prometheus-0.15.0
 ### kube-prometheus-0.16.0
 
