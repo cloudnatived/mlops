@@ -6,6 +6,7 @@ windowhttps://zhuanlan.zhihu.com/p/686351917  # 把 Windows 装进 Docker 容器
 git clone https://github.com/dockur/windows.git
 cd windows
 nerdctl build -t dockurr/windows .
+docker build -t dockurr/windows .
 #需要启动 buildkit.service
 
 docker compose up  
@@ -114,8 +115,8 @@ VOLUME /storage
 EXPOSE 8006 3389
 
 ENV VERSION="10"    # windows10
-ENV RAM_SIZE="32G"
-ENV CPU_CORES="6"
+ENV RAM_SIZE="16G"
+ENV CPU_CORES="4"
 ENV DISK_SIZE="64G"
 
 ENTRYPOINT ["/usr/bin/tini", "-s", "/run/entry.sh"]
