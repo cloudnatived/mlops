@@ -31,7 +31,6 @@ services:
     restart: on-failure
 ------------------------------------
 
-```
 
 
 nerdctl container ls -a |grep windows
@@ -49,7 +48,7 @@ Value	Version	Size
 ve	Windows Vista Enterprise	3.0 GB
 xp	Windows XP Professional	0.6 GB
 
-compose.yml
+------------------------------------    compose.yml
 services:
   windows:
     image: dockurr/windows
@@ -67,8 +66,11 @@ services:
       - 3389:3389/udp
     restart: always
     stop_grace_period: 2m
+------------------------------------
 
-root@250:/opt/windows-10# cat Dockerfile 
+
+cat Dockerfile
+------------------------------------
 ARG VERSION_ARG="latest"
 FROM scratch AS build-amd64
 
@@ -117,3 +119,8 @@ ENV CPU_CORES="6"
 ENV DISK_SIZE="64G"
 
 ENTRYPOINT ["/usr/bin/tini", "-s", "/run/entry.sh"]
+------------------------------------
+
+
+```
+
