@@ -34,7 +34,7 @@ services:
 
 
 nerdctl container ls -a |grep windows
-
+docker container ls -a |grep windows
 
 Value	Version	Size
 11	Windows 11 Pro	5.4 GB
