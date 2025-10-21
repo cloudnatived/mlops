@@ -9,19 +9,19 @@ nerdctl build -t dockurr/windows .
 docker build -t dockurr/windows .
 #需要启动 buildkit.service
 
-docker compose up  
+docker compose up
 nerdctl compose up
 
 ------------------------------------ cat compose.yml
-version: "3"
 services:
   windows:
-    image: dockurr/windows
-    container_name: windows
+    image: hub.rat.dev/dockurr/windows
+    container_name: windows-10  # windows10
     environment:
-      VERSION: "win11"
+      VERSION: "10"   # windows10
     devices:
       - /dev/kvm
+      - /dev/net/tun
     cap_add:
       - NET_ADMIN
     ports:
@@ -29,7 +29,6 @@ services:
       - 3389:3389/tcp
       - 3389:3389/udp
     stop_grace_period: 2m
-    restart: on-failure
 ------------------------------------
 
 
@@ -75,7 +74,7 @@ cat Dockerfile
 ARG VERSION_ARG="latest"
 FROM scratch AS build-amd64
 
-COPY --from=qemux/qemu:6.20 / /
+COPY --from=hub.rat.dev/qemux/qemu:7.12 / /
 
 ARG DEBCONF_NOWARNINGS="yes"
 ARG DEBIAN_FRONTEND="noninteractive"
@@ -84,26 +83,21 @@ ARG DEBCONF_NONINTERACTIVE_SEEN="true"
 RUN set -eu && \
     apt-get update && \
     apt-get --no-install-recommends -y install \
-        bc \
-        jq \
-        curl \
-        7zip \
-        wsdd \
         samba \
-        xz-utils \
         wimtools \
         dos2unix \
         cabextract \
-        genisoimage \
         libxml2-utils \
-        libarchive-tools && \
+        libarchive-tools \
+        netcat-openbsd && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 COPY --chmod=755 ./src /run/
 COPY --chmod=755 ./assets /run/assets
 
-ADD --chmod=664 https://github.com/qemus/virtiso-whql/releases/download/v1.9.45-0/virtio-win-1.9.45.tar.xz /drivers.txz
+ADD --chmod=755 https://raw.githubusercontent.com/christgau/wsdd/refs/tags/v0.9/src/wsdd.py /usr/sbin/wsdd
+ADD --chmod=664 https://github.com/qemus/virtiso-whql/releases/download/v1.9.47-0/virtio-win-1.9.47.tar.xz /var/drivers.txz
 
 FROM dockurr/windows-arm:${VERSION_ARG} AS build-arm64
 FROM build-${TARGETARCH}
@@ -112,10 +106,10 @@ ARG VERSION_ARG="0.00"
 RUN echo "$VERSION_ARG" > /run/version
 
 VOLUME /storage
-EXPOSE 8006 3389
+EXPOSE 3389 8006
 
-ENV VERSION="10"    # windows10
-ENV RAM_SIZE="16G"
+ENV VERSION="10"
+ENV RAM_SIZE="8G"
 ENV CPU_CORES="4"
 ENV DISK_SIZE="64G"
 
