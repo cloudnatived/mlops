@@ -1,13 +1,18 @@
 ## Windows in Docker Container
 
+updated 2025-10-22
+
 ```
 windowhttps://zhuanlan.zhihu.com/p/686351917  # 把 Windows 装进 Docker 容器里
 
 git clone https://github.com/dockur/windows.git
+
 cd windows
+# 如果是containerd和nerdctl操作的话，需要启动 buildkit.service。
+# 如果是docker和containerd的话，不需要要buildkit.service。
+
 nerdctl build -t dockurr/windows .
 docker build -t dockurr/windows .
-#需要启动 buildkit.service
 
 docker compose up
 nerdctl compose up
@@ -31,8 +36,6 @@ services:
     stop_grace_period: 2m
 ------------------------------------
 
-
-
 nerdctl container ls -a |grep windows
 docker container ls -a |grep windows
 
@@ -47,26 +50,6 @@ Value	Version	Size
 7e	Windows 7 Enterprise	3.0 GB
 ve	Windows Vista Enterprise	3.0 GB
 xp	Windows XP Professional	0.6 GB
-
-------------------------------------    compose.yml
-services:
-  windows:
-    image: dockurr/windows
-    container_name: windows-10 # windows10
-    environment:
-      VERSION: "10"   # windows10
-    devices:
-      - /dev/kvm
-      - /dev/net/tun
-    cap_add:
-      - NET_ADMIN
-    ports:
-      - 8006:8006
-      - 3389:3389/tcp
-      - 3389:3389/udp
-    restart: always
-    stop_grace_period: 2m
-------------------------------------
 
 
 cat Dockerfile
