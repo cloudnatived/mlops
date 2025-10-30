@@ -1,0 +1,27 @@
+apiVersion: v1
+prometheus:
+  prometheusSpec:
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: prometheus-storage
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 40Gi
+alertmanager:
+  alertmanagerSpec:
+    storage:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: prometheus-storage
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 2Gi
+grafana:
+  persistence:
+    enabled: true
+    storageClassName: prometheus-storage
+    accessModes: ["ReadWriteOnce"]
+    size: 8Gi
