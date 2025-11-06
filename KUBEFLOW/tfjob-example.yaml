@@ -1,0 +1,51 @@
+apiVersion: kubeflow.org/v1beta1
+kind: Experiment
+metadata:
+  name: tfjob-example
+  namespace: kubeflow
+spec:
+  objective:
+    type: maximize
+    goal: 0.99
+    objectiveMetricName: accuracy
+  algorithm:
+    algorithmName: random
+  parameters:  # 必须添加参数定义
+    - name: learning-rate
+      parameterType: double
+      feasibleSpace:
+        min: "0.01"
+        max: "0.05"
+    - name: momentum
+      parameterType: double
+      feasibleSpace:
+        min: "0.5"
+        max: "0.9"
+  parallelTrialCount: 3
+  maxTrialCount: 12
+  trialTemplate:
+    primaryContainerName: tensorflow  # 必须指定主容器名称
+    trialParameters:
+      - name: learningRate
+        reference: learning-rate
+      - name: momentum
+        reference: momentum
+    trialSpec:
+      apiVersion: kubeflow.org/v1
+      kind: TFJob
+      spec:
+        tfReplicaSpecs:
+          Worker:
+            replicas: 1
+            template:
+              spec:
+                containers:
+                  - name: tensorflow  # 必须与 primaryContainerName 一致
+                    image: m.daocloud.io/docker.io/kubeflowkatib/tf-mnist-with-summaries:latest
+                    command:
+                      - "python"
+                      - "/opt/model.py"
+                      - "--tf-train-steps=100"
+                      - "--learning-rate=${trialParameters.learningRate}"
+                      - "--momentum=${trialParameters.momentum}"
+                restartPolicy: OnFailure
