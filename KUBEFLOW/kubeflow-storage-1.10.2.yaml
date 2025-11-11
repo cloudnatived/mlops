@@ -1,3 +1,4 @@
+# 在 Kubeflow manifests-1.10.2 部署了 local-path-storage.yaml 之后，不再需要部署本配置。 
 # for Kubeflow manifests-1.10.2
 ---
 kind: StorageClass
