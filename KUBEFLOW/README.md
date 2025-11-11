@@ -1,20 +1,124 @@
-# kubespray-2.27.0 部署笔记、Kubeflow manifests-1.9.1 部署笔记
 
-### 4.1.kubespray-2.27.0 部署笔记
 
-4.1.kubespray-2.27.0
 
-```text
-kubespary:
-https://github.com/kubernetes-sigs/kubespray/archive/refs/tags/v2.27.0.tar.gz
 
-ubuntu-22.04.5-live-server-amd64.iso
-ubuntu-24.10-live-server-amd64.iso  #完成测试，但是不习惯python的管理工具
-```
+1. kubespray, kubespray-2.29.0
+2. Kubernetes Metrics Server, 
+3. kube-prometheus, 
+4. krew, 
+5. istio, 
+6. kubeflow, kubeflow manifests-1.10.2
 
-设置基础环境
 
-```text
+
+
+1. kubespray
+kubespray-2.29.0
+
+# 参考资料：
+Kubespray部署 k8s v1.24.x集群    https://www.cnblogs.com/ggborn-001/p/18985663
+kubespray离线k8s部署方案        https://www.cnblogs.com/ggborn-001/p/18989590
+
+https://github.com/kubernetes-sigs/kubespray/releases/tag/v2.29.0                # 安装文档地址
+https://github.com/kubernetes-sigs/kubespray/archive/refs/tags/v2.29.0.tar.gz    # 配置文件下载地址
+
+# 相关组件的版本：
+    kubernetes 1.33.5
+    etcd 3.5.22
+    docker 28.3
+    containerd 2.1.4
+    cri-o 1.33.4
+    cni-plugins 1.8.0
+    calico 3.30.3
+    cilium 1.18.2
+    flannel 0.27.3
+    kube-ovn 1.12.21
+    kube-router 2.1.1
+    multus 4.2.2
+    kube-vip 0.8.0
+    cert-manager 1.15.3
+    coredns 1.12.0
+    ingress-nginx 1.13.3
+    argocd 2.14.5
+    helm 3.18.4
+    metallb 0.13.9
+    registry 2.8.1
+    aws-ebs-csi-plugin 0.5.0
+    azure-csi-plugin 1.10.0
+    cinder-csi-plugin 1.30.0
+    gcp-pd-csi-plugin 1.9.2
+    local-path-provisioner 0.0.32
+    local-volume-provisioner 2.5.0
+    node-feature-discovery 0.16.4
+
+
+# 安装完操作系统后，配置IP。
+ip link set enp2s0f0 up
+ip addr add 172.18.6.70/24 dev enp2s0f0
+ip route add default via 172.18.6.1
+
+# 写入网卡配置文件。
+cat > /etc/netplan/50-cloud-init.yaml <<EOF
+# network: {config: disabled}
+network:
+  ethernets:
+    #enp2s0f0:
+    eno1:
+      dhcp4: false
+      addresses:
+        #- 172.18.6.69/24
+        - 10.0.10.147/24
+      routes:
+        - to: default
+          #via: 172.18.6.1
+          via: 10.0.10.1
+      nameservers:
+         addresses: [8.8.8.8, 168.95.1.1]
+  version: 2
+EOF
+
+# 使用netplan应用网络配置
+netplan apply
+
+# 使用清华大学的ubuntu-24.04.3的源
+cat > /etc/apt/sources.list.d/ubuntu.sources <<EOF
+Types: deb
+URIs: https://mirrors.tuna.tsinghua.edu.cn/ubuntu/
+Suites: noble noble-updates noble-security
+Components: main restricted universe multiverse
+Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+EOF
+
+
+# 目前内核版本号
+root@x:~# uname -a
+Linux x 6.8.0-71-generic #71-Ubuntu SMP PREEMPT_DYNAMIC Tue Jul 22 16:52:38 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux
+
+# 升级之后将变成的版本号。
+root@x:~# uname -a
+Linux x 6.8.0-78-generic #78-Ubuntu SMP PREEMPT_DYNAMIC Tue Aug 12 11:34:18 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux
+
+# ubuntu-24.04.3默认操作系统版本信息。
+root@x:~# cat /etc/*releas*
+DISTRIB_ID=Ubuntu
+DISTRIB_RELEASE=24.04
+DISTRIB_CODENAME=noble
+DISTRIB_DESCRIPTION="Ubuntu 24.04.3 LTS"
+PRETTY_NAME="Ubuntu 24.04.3 LTS"
+NAME="Ubuntu"
+VERSION_ID="24.04"
+VERSION="24.04.3 LTS (Noble Numbat)"
+VERSION_CODENAME=noble
+ID=ubuntu
+ID_LIKE=debian
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+UBUNTU_CODENAME=noble
+LOGO=ubuntu-logo
+
+# 设置基础配置：
 sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config;
 sed -i 's/GSSAPIAuthentication yes/GSSAPIAuthentication no/g' /etc/ssh/sshd_config;
 echo "GSSAPIAuthentication no" >> /etc/ssh/sshd_config;
@@ -24,72 +128,7 @@ UseDNS no
 PermitRootLogin yes
 EOF
 
-systemctl restart sshd;
-
-cp /etc/apt/sources.list /etc/apt/sources.list.original;
-cat > /etc/apt/sources.list <<EOF
-# 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释
-deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy main restricted universe multiverse
-# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy main restricted universe multiverse
-deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
-# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
-deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
-# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
-deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-security main restricted universe multiverse
-# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-security main restricted universe multiverse
-
-# 预发布软件源，不建议启用
-# deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-proposed main restricted universe multiverse
-# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-proposed main restricted universe multiverse
-EOF
-
-apt update -y;
-apt list --upgradable;
-apt upgrade -y;
-
-# 为了解决这个WARNING：
-#########################################################
-root@x:~# netplan apply
-WARNING:root:Cannot call Open vSwitch: ovsdb-server.service is not running.
-#########################################################
-chmod 600 /etc/netplan/*
-touch /etc/cloud/cloud-init.disabled;
-apt -y install openvswitch-switch;
-systemctl disable openvswitch-switch.service;
-
-# 运行在init 3
-systemctl isolate multi-user.target;
-systemctl isolate runlevel3.target;
-ln -sf /lib/systemd/system/multi-user.target /etc/systemd/system/default.target;
-systemctl set-default multi-user.target;
-
-# 关闭不需要的服务：
-systemctl list-unit-files |awk '{ print $1,$2 }'|grep enable|egrep -v "ssh|multi|systemd-resolved|wpa_" |awk '{ print $1}'|xargs -i systemctl disable {};
-
-# 确认服务已关闭：
-systemctl list-unit-files |awk '{print $1,$2}'|grep enabled;
-
-apt install -y python3-pip python3 python3-netaddr wget git;
-apt install -y python3-dev;
-pip install --upgrade pip;
-
-pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple;
-mkdir -p /root/.config/pip;
-cat > /root/.config/pip/pip.conf <<EOF
-[global]
-index-url = https://pypi.tuna.tsinghua.edu.cn/simple
-EOF
-
-# 以下配置host及环境：
-cat > /etc/hostname <<EOF
-k101
-EOF
-
-cat >> /etc/hosts <<EOF
-192.168.32.101 k101
-EOF
-
-hostname k101;
+systemctl restart ssh;
 
 cat >> /etc/profile <<EOF
 ulimit -S -c 0 > /dev/null 2>&1
@@ -104,51 +143,202 @@ net.ipv4.conf.default.rp_filter=0
 net.ipv6.conf.all.disable_ipv6 = 1
 net.ipv6.conf.default.disable_ipv6 = 1
 net.ipv6.conf.lo.disable_ipv6 = 1
+net.ipv4.conf.all.forwarding = 1
+net.ipv6.conf.all.forwarding = 1
 
 net.bridge.bridge-nf-call-iptables = 1
 net.bridge.bridge-nf-call-ip6tables = 1
 
-fs.inotify.max_user_instances=2280
-fs.inotify.max_user_watches=655360
+vm.swappiness=0
+vm.overcommit_memory=1
+fs.inotify.max_user_watches=524288
+fs.inotify.max_user_instances=8192
+EOF
+
+创建 Kubernetes sysctl 配置
+cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
+net.ipv4.ip_forward = 1
+net.ipv4.conf.all.rp_filter = 0
+net.ipv4.conf.default.rp_filter = 0
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv6.conf.lo.disable_ipv6 = 1
+net.ipv4.conf.all.forwarding = 1
+net.ipv6.conf.all.forwarding = 1
+vm.swappiness = 0
+vm.overcommit_memory = 1
+fs.inotify.max_user_watches = 524288
+fs.inotify.max_user_instances = 8192
+kernel.keys.root_maxbytes = 25000000
+kernel.keys.root_maxkeys = 1000000
+kernel.panic = 10
+kernel.panic_on_oops = 1
+vm.panic_on_oom = 0
+net.ipv4.ip_local_reserved_ports = 30000-32767
+net.bridge.bridge-nf-call-iptables = 1
+net.bridge.bridge-nf-call-ip6tables = 1
 EOF
 
 ssh-keygen -t rsa -N "";
 cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys;
-```
+
+# 写入固定配置的resolv配置文件
+rm -rf /etc/resolv.conf
+
+cat > /etc/resolv.conf <<EOF
+nameserver 8.8.8.8
+nameserver 168.95.1.1
+EOF
+
+# 更新源
+# 可能会更新内核。注意，安装完nvidia的GPU驱动之后，不要升级内核，否则需要重新安装nvidia的GPU驱动。
+apt update -y;
+apt list --upgradable;
+apt upgrade -y;
+
+# 运行在init 3
+systemctl isolate multi-user.target;
+systemctl isolate runlevel3.target;
+ln -sf /lib/systemd/system/multi-user.target /etc/systemd/system/default.target;
+systemctl set-default multi-user.target;
+
+#关闭不需要的服务：
+systemctl list-unit-files |awk '{ print $1,$2 }'|grep enable|egrep -v "ssh|multi|systemd-resolved|wpa_" |awk '{ print $1}'|xargs -i systemctl disable {};
+
+#确认服务已关闭：
+systemctl list-unit-files |awk '{print $1,$2}'|grep enabled;
+
+uname -r         # 查看内核版本
+lsb_release -a   # 查看发行版信息（Ubuntu/Debian/CentOS等）
+
+# 确认安装了gcc make
+apt install -y gcc make g++ net-tools
+
+apt install -y python3-pip python3 python3-netaddr wget git;
+apt install -y python3-dev;
+pip install --upgrade pip;
+
+# 解决ubuntu24.04 使用pip时的信息提醒：error: externally-managed-environment
+mv /usr/lib/python3.12/EXTERNALLY-MANAGED /usr/lib/python3.12/EXTERNALLY-MANAGED.bk
+
+# 设置清华大学的apt源
+pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple;
+mkdir -p /root/.config/pip;
+cat > /root/.config/pip/pip.conf <<EOF
+[global]
+index-url = https://pypi.tuna.tsinghua.edu.cn/simple
+EOF
+
+cat >> /etc/hosts <<EOF
+10.0.10.148 xinhua148
+10.0.10.153 xinhua153
+10.0.10.155 xinhua155
+10.0.10.173 xinhua173
+10.0.10.210 xinhua210
+EOF
 
 
+# 重启一次。
+reboot
 
-下载和修改kubespary，安装
+# 时间同步
+apt-get install -y ntpdate
+ntpdate cn.pool.ntp.org ntp1.aliyun.com time1.apple.com
 
-```text
-wget https://github.com/kubernetes-sigs/kubespray/archive/refs/tags/v2.27.0.tar.gz
+# 配置 rc-local，来执行开机启动:
+vim /etc/systemd/system/rc-local.service  # 创建这个文件
+
+touch /etc/systemd/system/rc-local.service
+touch /etc/rc.local
+chmod 775 /etc/rc.local
+cat >> /etc/systemd/system/rc-local.service << EOF
+[Unit]
+Description=/etc/rc.local Compatibility
+ConditionPathExists=/etc/rc.local
+[Service]
+Type=forking
+ExecStart=/etc/rc.local start
+TimeoutSec=0
+StandardOutput=tty
+RemainAfterExit=yes
+#SysVStartPriority=99
+[Install]
+WantedBy=multi-user.target
+EOF
+
+touch /etc/rc.local
+chmod 0775 /etc/rc.local
+
+# 如果如要写入到 /etc/rc.local 文件:
+cat >> /etc/rc.local << EOF
+#!/bin/bash
+nv-hostengine --service-account nvidia-dcgm -b ALL
+EOF
+
+systemctl enable rc-local.service
+systemctl restart rc-local.service
+
+cd /opt;
+wget https://github.com/kubernetes-sigs/kubespray/archive/refs/heads/release-2.29.zip;   # 本次安装的版本
+wget https://github.com/kubernetes-sigs/kubespray/archive/refs/tags/v2.23.3.tar.gz;      # 历史版本
+wget https://github.com/kubernetes-sigs/kubespray/archive/refs/tags/v2.29.0.tar.gz;      # 本次安装的版本
 
 #安装 kubespray 依赖
-cd /opt/kubespray-2.27.0;
+cd /opt/kubespray-2.29.0;
 
 # 安装依赖
-pip3 install -r requirements.txt;
+pip install -r requirements.txt;
+
+# 本次安装，这两个命令都不需要运行：
+#apt install ansible-core
+#pip install ansible-core==2.17.3
+
+pip install -r requirements.txt
+
+# 出现报错：ERROR: Cannot uninstall cryptography 41.0.7, RECORD file not found. Hint: The package was installed by debian.
+# 先用 apt 卸载，再用 pip 安装
+apt remove python3-cryptography
+
+# 忽略已安装版本（不推荐）
+pip install --ignore-installed -r requirements.txt
+
+# 以下这部分问题，不一定会出现。如果在系统基础安装包，未安装好的情况下，会出现：
+----------------------------------------------------
+# 安装 ansible.posix 集合
+ansible-galaxy collection install ansible.posix
+
+# 安装其他Kubespray可能需要的集合
+ansible-galaxy collection install community.general
+ansible-galaxy collection install kubernetes.core
+
+# 安装 ansible.utils 集合
+ansible-galaxy collection install ansible.utils
+
+# 同时安装其他可能缺少的集合
+ansible-galaxy collection install ansible.posix community.general kubernetes.core
+----------------------------------------------------
+
 
 # 复制一份 自己的配置
-cd /opt/kubespray;
-cp -au /opt/kubespray-2.24.1/inventory/sample /opt/kubespray-2.27.0/inventory/bbc;
+cd /opt/kubespray-2.29.0;
+cp -au /opt/kubespray-2.29.0/inventory/sample /opt/kubespray-2.29.0/inventory/bbc;
 
 # 修改配置 hosts.yaml 是这样部署了。
-root@node1:/opt/kubespray-2.27.0/inventory/bbc# cat hosts.yaml
+vim /opt/kubespray-2.29.0/inventory/bbc/hosts.yaml 
 all:
   hosts:
     node1:
-      ansible_host: y133
-      ip: 10.0.10.133
-      access_ip: 10.0.10.133
+      ansible_host: anhua69
+      ip: 172.18.6.69
+      access_ip: 172.18.6.69
     node2:
-      ansible_host: y134
-      ip: 10.0.10.134
-      access_ip: 10.0.10.134
+      ansible_host: anhua70
+      ip: 172.18.6.70
+      access_ip: 172.18.6.70
     node3:
-      ansible_host: y135
-      ip: 10.0.10.135
-      access_ip: 10.0.10.135
+      ansible_host: anhua71
+      ip: 172.18.6.71
+      access_ip: 172.18.6.71     
   children:
     kube_control_plane:
       hosts:
@@ -172,25 +362,33 @@ all:
         calico_rr:
     calico_rr:
       hosts: {}
-#########################################################
 
-vim /opt/kubespray-2.27.0/inventory/bbc/group_vars/all/all.yml;
-#########################################################
+
+
+vim /opt/kubespray-2.23.3/inventory/bbc/group_vars/all/all.yml; #历史版本
+vim /opt/kubespray-2.24.1/inventory/bbc/group_vars/all/all.yml; #历史版本
+vim /opt/kubespray-2.29.0/inventory/bbc/group_vars/all/all.yml;
+++++++++++++++++++++++++++++++++++++++++
 # 打开下面这个选项:
 loadbalancer_apiserver_localhost: true
-#########################################################
+++++++++++++++++++++++++++++++++++++++++
 
 # 修改如下配置，海外的云服务器不要设置这两个镜像，海外的云服务器不要设置这两个镜像。: 
-vim /opt/kubespray-2.27.0/inventory/bbc/group_vars/all/docker.yml;
-#########################################################+
+vim /opt/kubespray-2.23.3/inventory/bbc/group_vars/all/docker.yml; #历史版本
+vim /opt/kubespray-2.24.1/inventory/bbc/group_vars/all/docker.yml; #历史版本
+vim /opt/kubespray-2.29.0/inventory/bbc/group_vars/all/docker.yml;
+
+++++++++++++++++++++++++++++++++++++++++
 docker_registry_mirrors:
   - https://registry.docker-cn.com
   - https://mirror.aliyuncs.com
-#########################################################
+++++++++++++++++++++++++++++++++++++++++
 
 # 以下两段都需要注释掉：
-vim /opt/kubespray-2.27.0/extra_playbooks/roles/kubernetes/preinstall/tasks/0040-verify-settings.yml;
-#########################################################
+vim /opt/kubespray-2.23.3/extra_playbooks/roles/kubernetes/preinstall/tasks/0040-verify-settings.yml; #历史版本
+vim /opt/kubespray-2.24.1/extra_playbooks/roles/kubernetes/preinstall/tasks/0040-verify-settings.yml; #历史版本
+vim /opt/kubespray-2.29.0/extra_playbooks/roles/kubernetes/preinstall/tasks/0040-verify-settings.yml;
+++++++++++++++++++++++++++++++++++++++++
 - name: Stop if either kube_control_plane or kube_node group is empty
   assert:
     that: "groups.get('{{ item }}')"
@@ -208,9 +406,7 @@ vim /opt/kubespray-2.27.0/extra_playbooks/roles/kubernetes/preinstall/tasks/0040
   when:
     - not ignore_assert_errors
     - etcd_deployment_type != "kubeadm"
-#########################################################  
-
-# 如果是云服务器，应该关闭内存检查。把以下内容全部注释掉，使其不生效。
+++++++++++++++++++++++++++++++++++++++++  # 如果是云服务器，应该关闭内存检查。把以下内容全部注释掉，使其不生效。
 - name: Stop if memory is too small for masters
   assert:
     that: ansible_memtotal_mb >= minimal_master_memory_mb
@@ -222,9 +418,11 @@ vim /opt/kubespray-2.27.0/extra_playbooks/roles/kubernetes/preinstall/tasks/0040
     that: ansible_memtotal_mb >= minimal_node_memory_mb
   ignore_errors: "{{ ignore_assert_errors }}"
   when: inventory_hostname in groups['kube-node']
-#########################################################
+++++++++++++++++++++++++++++++++++++++++
 
-cat > /opt/kubespray-2.27.0/inventory/bbc/group_vars/all/mirror.yml <<EOF
+vim /opt/kubespray-2.29.0/inventory/bbc/group_vars/all/mirror.yml
+
+cat > /opt/kubespray-2.29.0/inventory/bbc/group_vars/all/mirror.yml <<EOF
 gcr_image_repo: "gcr.m.daocloud.io"
 kube_image_repo: "k8s.m.daocloud.io"
 docker_image_repo: "docker.m.daocloud.io"
@@ -233,296 +431,768 @@ github_image_repo: "ghcr.m.daocloud.io"
 files_repo: "https://files.m.daocloud.io"
 EOF
 
-cat  > /opt/kubespray-2.27.0/inventory/bbc/group_vars/etcd.yml <<EOF
+cat  > /opt/kubespray-2.29.0/inventory/bbc/group_vars/etcd.yml <<EOF
 etcd_deployment_type: host
 EOF
 
-vim /opt/kubespray-2.27.0/inventory/bbc/group_vars/k8s_cluster/k8s-cluster.yml
+vim /opt/kubespray-2.29.0/inventory/bbc/group_vars/k8s_cluster/k8s-cluster.yml
 auto_renew_certificates: true
 
-# 可选，如果需要设置代理：
-vim /opt/kubespray-2.27.0/extra_playbooks/inventory/bbc/group_vars/all/all.yml; 
+# 本次安装，没有使用代理。如果需要设置代理：
+vim /opt/kubespray-2.23.3/extra_playbooks/inventory/bbc/group_vars/all/all.yml; #历史版本
+vim /opt/kubespray-2.24.1/extra_playbooks/inventory/bbc/group_vars/all/all.yml; #历史版本
 http_proxy: "http://192.168.1.5:7890"
 https_proxy: "http://192.168.1.5:7890"
 no_proxy: "http://localhost:8080/,192.168.*.*,*.local,*.localhost*,localhost,127.0.0.1,192.168.1.100"
 
-#########################################################
+# 本次安装，没有使用代理。如果需要设置代理：
+--------------------------
 export http_proxy=http://192.168.1.5:7890;
 export https_proxy=https://192.168.1.5:7890;
-#########################################################
+----------------------------
 
-# kubespray-2.27.0 
-cd /opt/kubespray-2.27.0/;
-# 使用cilium网络，不推荐，可能会造成重启网络时，网络协议栈无法完成重启。
+
+
+# 在所有节点上执行
+modprobe br_netfilter
+
+# 验证模块是否加载
+lsmod | grep br_netfilter
+
+# 确保模块在启动时自动加载
+echo 'br_netfilter' | sudo tee /etc/modules-load.d/k8s.conf
+
+# 1. 加载必要的内核模块
+modprobe br_netfilter
+modprobe overlay
+
+# 2. 验证模块加载
+echo "已加载的内核模块:"
+lsmod | grep -E '(br_netfilter|overlay)'
+
+
+
+# 在主节点生成密钥
+ssh-keygen -t rsa
+
+# 复制公钥到所有节点（包括自己）
+ssh-copy-id -o StrictHostKeyChecking=no root@172.18.6.69
+ssh-copy-id -o StrictHostKeyChecking=no root@172.18.6.70
+ssh-copy-id -o StrictHostKeyChecking=no root@172.18.6.71 
+
+ip="10.0.10.153 10.0.10.148 10.0.10.155 10.0.10.173 10.0.10.210"; for i in $ip ; do ssh $i "hostname" ; done
+ip="10.0.10.153 10.0.10.148 10.0.10.155 10.0.10.173 10.0.10.210"; for i in $ip ; do ssh $i "date" ; done
+ip="10.0.10.153 10.0.10.148 10.0.10.155 10.0.10.173 10.0.10.210"; for i in $ip ; do ssh $i "apt install -y ntpdate; ntpdate cn.pool.ntp.org ntp1.aliyun.com time1.apple.com" ; done
+
+
+# 需要按照后面的离线安装，下载文件和容器镜像，才能kubespray-2.29.0 顺利完成。 
+cd /opt/kubespray-2.29.0;
+# 使用cilium网络
 ansible-playbook -i inventory/bbc/hosts.yaml --become --become-user=root -e kube_network_plugin=cilium cluster.yml
 
-# 使用flannel网络。
+# 使用flannel网络
+ansible-playbook -i inventory/bbc/hosts.yaml --become --become-user=root -e kube_network_plugin=flannel cluster.yml   # 本次安装使用的命令。
+
+#重新安装，增加1个计算节点。
 ansible-playbook -i inventory/bbc/hosts.yaml --become --become-user=root -e kube_network_plugin=flannel cluster.yml
 
-# 重新安装，增加1个计算节点，重新运行安装命令。
-ansible-playbook -i inventory/bbc/hosts.yaml --become --become-user=root -e kube_network_plugin=flannel cluster.yml
+
+
+# 部署过程中会遇到的问题:
+
+参考资料:
+Kubespray部署k8s v1.24.x集群    https://www.cnblogs.com/ggborn-001/p/18985663
+kubespray离线k8s部署方案        https://www.cnblogs.com/ggborn-001/p/18989590
+
+# 使用kubespray:v2.29.0 容器镜像:
+docker pull quay.m.daocloud.io/kubespray/kubespray:v2.29.0      # 470MB
+
+# 查看containerd系统服务:
+journalctl -u containerd.service -f
+
+# 离线安装，下载文件和容器镜像:
+# 修改files.list文件，加上files.m.daocloud.io前缀
+cd /opt/kubespray-2.29.0/contrib/offline;
+bash generate_list.sh
+在temp目录下，生成 files.list 和 images.list，这2个文件。
+
+sed -i "s#https://#https://files.m.daocloud.io/#g" files.list
+ 
+# 修改images.list文件，修改成daocloud的镜像加速配置
+sed -i "s@quay.io@quay.m.daocloud.io@g" images.list
+sed -i "s@docker.io@docker.m.daocloud.io@g" images.list
+sed -i "s@registry.k8s.io@k8s.m.daocloud.io@g" images.list
+sed -i "s@ghcr.io@ghcr.m.daocloud.io@g" images.list
+
+# 执行以下命令将依赖的静态文件全部下载到 temp/files 目录下
+wget -x -P temp/files -i temp/files.list
+
+# 下载镜像:
+# 会下载52个镜像:
+cat images.list |xargs -i nerdctl pull {}
+cat images.list |xargs -i docker pull {}
+
+# 把文件拷贝到/tmp/releases/
+mkdir /tmp/releases/
+find ./ -type f|xargs -i cp {} /tmp/releases/
+
+# 未测试:
+nerdctl images | grep ghcr.m.daocloud.io | awk '{print $1":"$2}' | while read image; do
+new_image=$(echo $image | sed 's#旧标签#新标签#g')
+nerdctl tag $image $new_image
+done
+
+# 把下载到本机的docker镜像打包，已测试:
+while read -r A B _; do
+    #echo "第一列(A): $A"
+    #echo "第二列(B): $B"
+    #nerdctl save $A:$B -o `echo $A |awk -F '/' '{ print $NF}'`..$B
+    docker save $A:$B -o `echo $A |awk -F '/' '{ print $NF}'`..$B
+    # 处理完第一行后可以加 break 终止循环
+    #break
+#done < nerdctl images |grep -v -E 'none|PLATFORM'
+done < docker images |grep -v -E 'none|PLATFORM'
+
+# 把当面目录下的容器镜像导入到主机:
+ls |xargs -i nerdctl load -i {}
+
+
+cat >> /etc/profile <<EOF
+source <(kubectl completion bash)
+source <(nerdctl completion bash)
+EOF
+
+可能用到的命令行
+重新生成管理员令牌：
+# 重新生成 admin.conf
+sudo kubeadm init phase kubeconfig admin --config /etc/kubernetes/kubeadm-config.yaml
+
+# 或者重新生成整个配置
+sudo kubeadm init phase kubeconfig all --config /etc/kubernetes/kubeadm-config.yaml
+
+# 如果集群损坏严重:
+# 1. 清理现有 Kubernetes 集群（保留 OS，但移除所有 K8s 组件）
+ansible-playbook -i inventory/bbc/hosts.yaml \
+  --become --become-user=root \
+  reset.yml
+
+# 2. 重新部署集群（使用 flannel 网络插件）
+ansible-playbook -i inventory/bbc/hosts.yaml \
+  --become --become-user=root \
+  -e kube_network_plugin=flannel \
+  cluster.yml
+
+
+
+
+
+2. Kubernetes Metrics Server
+Kubernetes Metrics Server v0.8.0
+https://github.com/kubernetes-sigs/metrics-server
+
+官网的部署命令是：
+wget https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.8.0/components.yaml
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.8.0/components.yaml
+
+# 修改yaml文件中的镜像地址：
+需要下载yaml文件，修改一下，禁用证书验证。
+components.yaml
+################################
+  template:
+    metadata:
+      labels:
+        k8s-app: metrics-server
+    spec:
+      containers:
+      - args:
+        - --kubelet-insecure-tls    # 添加这一行
+        - --cert-dir=/tmp
+        - --secure-port=10250
+        - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
+        - --kubelet-use-node-status-port
+        - --metric-resolution=15s
+        - --kubelet-preferred-address-types=InternalIP,Hostname,InternalDNS,ExternalDNS,ExternalIP   # added
+        image: m.daocloud.io/registry.k8s.io/metrics-server/metrics-server:v0.8.0    # registry.k8s.io/metrics-server/metrics-server:v0.8.0
+################################
+registry.k8s.io/metrics-server/metrics-server:v0.8.0
+m.daocloud.io/registry.k8s.io/metrics-server/metrics-server:v0.8.0
+
+
+1. 基础状态检查命令
+检查Metrics Server部署状态
+# 检查Metrics Server Pod状态
+kubectl get pods -n kube-system -l k8s-app=metrics-server
+
+# 检查Metrics Server部署
+kubectl get deployment -n kube-system metrics-server
+
+# 检查Metrics Server服务
+kubectl get service -n kube-system metrics-server
+
+# 查看详细部署信息
+kubectl describe deployment -n kube-system metrics-server
+检查API资源是否注册
+# 检查Metrics API是否可用
+kubectl get --raw /apis/metrics.k8s.io/v1beta1 | jq .
+
+# 或者使用更简洁的方式
+kubectl get apiservices | grep metrics
+kubectl get --raw /apis/metrics.k8s.io/v1beta1/nodes
+
+2. 资源指标查询命令
+查看节点资源指标
+# 查看所有节点的资源使用情况
+kubectl top nodes
+
+# 查看特定节点的资源使用
+kubectl top node <node-name>
+
+# 以宽格式显示更多信息
+kubectl top nodes --use-protocol-buffers
+查看Pod资源指标
+# 查看所有命名空间的Pod资源使用
+kubectl top pods --all-namespaces
+
+# 查看特定命名空间的Pod资源使用
+kubectl top pods -n <namespace>
+
+# 查看特定Pod的资源使用
+kubectl top pod <pod-name> -n <namespace>
+
+# 包含标签信息
+kubectl top pods -l app=my-app
+
+3. 诊断和故障排除命令
+检查Metrics Server日志
+# 查看Metrics Server Pod日志
+kubectl logs -n kube-system -l k8s-app=metrics-server
+
+# 查看特定Pod的详细日志
+kubectl logs -n kube-system deployment/metrics-server
+
+# 实时查看日志
+kubectl logs -n kube-system -l k8s-app=metrics-server -f
+
+诊断API连接问题
+# 检查API服务状态
+kubectl get apiservice v1beta1.metrics.k8s.io -o yaml
+
+# 检查端点状态
+kubectl get endpoints -n kube-system metrics-server
+
+# 检查服务发现
+# 检查服务证书
+kubectl get --raw /api/v1/namespaces/kube-system/services/https:metrics-server:/proxy/healthz  # 执行后报错：Error from server (ServiceUnavailable): no endpoints available for service "https:metrics-server:"
+
+4. 高级测试命令
+直接访问Metrics API
+# 获取所有节点的metrics数据
+kubectl get --raw /apis/metrics.k8s.io/v1beta1/nodes | jq .
+
+# 获取所有pods的metrics数据
+kubectl get --raw /apis/metrics.k8s.io/v1beta1/pods | jq .
+
+# 获取特定命名空间的pods metrics
+kubectl get --raw /apis/metrics.k8s.io/v1beta1/namespaces/kube-system/pods | jq .
+
+# 检查Pod安全配置
+kubectl get pod -n kube-system -l k8s-app=metrics-server -o yaml | grep -A5 securityContext
+
+# 查看node的资源状况：
+kubectl top node
+NAME    CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+node1   604m         8%       2557Mi          4%          
+node2   512m         6%       2430Mi          3%          
+node3   493m         6%       2334Mi          3%         
+
+Metrics Server与其他工具的对比
+
+以下表格展示了Metrics Server与其他监控工具的对比：
+
+| 工具           | 功能               | 数据存储 | 可视化支持 |
+| -------------- | ------------------ | -------- | ---------- |
+| Metrics Server | 集群资源度量API    | 不支持   | 不支持     |
+| Prometheus     | 完整监控和报警系统 | 支持     | 支持       |
+| Grafana        | 数据可视化工具     | 不支持   | 支持       |
+
+
+
+
+3. kube-prometheus
+kube-prometheus-0.15.0
+kube-prometheus-0.16.0
+
 ```
+主要参考文档：
+https://www.cnblogs.com/niuben/p/18888238   主要是看的这个文档里的NFS。
+https://cloud.tencent.com/developer/article/1780158
 
 
+项目来自：
+https://github.com/prometheus-operator/kube-prometheus
 
-安装过程中可能会碰到的问题：
+wget https://github.com/prometheus-operator/kube-prometheus/archive/refs/tags/v0.16.0.tar.gz
 
-```text
-# 错误提示：bridge-nf-call-iptables: No such file or directory
-# 错误提示：bridge-nf-call-iptables: No such file or directory\nsysctl: cannot stat
-# 需要加载模块。
-modprobe br_netfilter;
+为什么要部署kube-prometheus，在物理机层面，在kubernetes层面，在istio层面，都有prometheus，部署kube-prometheus是因为其比较好的集成度和向上和向下的兼容。
 
-# 报错，
------------------------
-TASK [container-engine/containerd : Download_file | Validate mirrors] **************************************************************************************************
-failed: [k100] (item=None) => {"attempts": 4, "censored": "the output has been hidden due to the fact that 'no_log: true' was specified for this result", "changed": false}
-fatal: [k100 -> {{ download_delegate if download_force_cache else inventory_hostname }}]: FAILED! => {"censored": "the output has been hidden due to the fact that 'no_log: true' was specified for this result", "changed": false}
-...ignoring
-Thursday 11 April 2024  12:14:06 +0000 (0:03:22.953)       0:05:55.774 ******** 
+创建文件：
+kube-prometheus-pv.yaml
+kube-prometheus-storage-class.yaml
+kube-prometheus-values.yaml
 
-TASK [container-engine/containerd : Download_file | Get the list of working mirrors] ***********************************************************************************
-ok: [k100]
-Thursday 11 April 2024  12:14:07 +0000 (0:00:00.591)       0:05:56.365 ******** 
+修改了文件，把 ClusterIP 修改成 NodePort ：
+alertmanager-service.yaml
+grafana-service.yaml
+prometheus-service.yaml
 
-TASK [container-engine/containerd : Download_file | Download item] *****************************************************************************************************
-fatal: [k100]: FAILED! => {"censored": "the output has been hidden due to the fact that 'no_log: true' was specified for this result", "changed": false}
------------------------
+# 使用代理的镜像地址：
+cd /opt/kube-prometheus-0.16.0/manifests;
+sed -i "s#image: #image: m.daocloud.io/#g" *    # 大部分的使用 m.daocloud.io 代理进行下载。
 
-# 23.1 还会出这个问题。
-# 需要启动这个服务。要启动resolved服务：
-systemctl enable systemd-resolved.service;
-systemctl restart systemd-resolved.service;
+# grafana 需要使用 hub.rat.dev 的镜像:
+sed -i "s#m.daocloud.io/grafana/grafana:12.1.0#hub.rat.dev/grafana/grafana:12.1.0#g" grafana-deployment.yaml
+kubectl apply -f grafana-deployment.yaml
 
-# 需要enabled的系统服务：
-root@kubernetes-1:~# systemctl list-unit-files |awk '{print $1,$2}'|grep enabled;
-containerd.service enabled
-etcd.service enabled
-kubelet.service enabled
-multipathd.service enabled
-rc-local.service enabled
-ssh.service enabled
-systemd-fsck-root.service enabled-runtime #关闭会导致分区只读挂载
-systemd-networkd.service enabled-runtime
-systemd-remount-fs.service enabled-runtime #关闭会导致分区只读挂载
-systemd-resolved.service enabled
-systemd-timesyncd.service enabled
-multipathd.socket enabled
-```
+按照官网，执行部署的命令：
+# 步骤1
+kubectl apply --server-side -f manifests/setup
+
+# 步骤2
+kubectl wait \
+	--for condition=Established \
+	--all CustomResourceDefinition \
+	--namespace=monitoring
+
+# 步骤3
+kubectl apply -f manifests/
+
+# kubectl wait --for condition=Established --all CustomResourceDefinition --namespace=monitoring
 
 
+# 如果需要卸载： 
+kubectl delete -f manifests/setup   #直接删除了namespace
+kubectl wait --for condition=Established --all CustomResourceDefinition --namespace=monitoring
+kubectl delete -f manifests/
 
-部署完之后：
+如果条件允许，在机房部署2-3个管理服务器，这样可以部署各种工具平台。而且可以管理训练网络，业务网络，数据网络，带外网络。
 
-```text
-#检查启动的服务：
-root@kubernetes-101:/opt/kubespray-2.23.1# systemctl list-unit-files |awk '{ print $1,$2 }'|grep enable
-containerd.service enabled
-etcd.service enabled
-kubelet.service enabled
-multipathd.service enabled
-netplan-ovs-cleanup.service enabled-runtime
-ssh.service enabled
-systemd-fsck-root.service enabled-runtime
-systemd-networkd-wait-online.service enabled-runtime
-systemd-networkd.service enabled-runtime
-systemd-remount-fs.service enabled-runtime
-systemd-resolved.service enabled
-multipathd.socket enabled
-systemd-networkd.socket enabled
+NFS部分：
+1.NFS服务端：
+apt install -y nfs-kernel-server
+# 每个节点创建共享存储文件夹：
+mkdir /nfs;
+mkdir -p /nfs/alertmanager /nfs/grafana /nfs/prometheus
+chmod -R 0755 /nfs
+cat > /etc/exports <<EOF
+/nfs   *(rw,sync,insecure,no_subtree_check,no_root_squash)
+EOF
 
-#关闭代理
-vim /etc/apt/apt.conf;
-vim /etc/systemd/system/containerd.service.d/http-proxy.conf;
-```
+systemctl enable nfs-server.service
+systemctl restart nfs-server.service
 
+#在安装 NFS 服务器时，已包含常用的命令行工具，无需额外安装
+#显示已经 mount 到本机 NFS 目录的客户端机器
+showmount -e localhost
+#将配置文件中的目录全部重新 export 一次，无需重启服务
+exportfs -rv
+#查看 NFS 的运行状态
+nfsstat
+#查看 rpc 执行信息，可以用于检测 rpc 运行情况
+rpcinfo
 
+2.NFS客户端：
+apt install -y nfs-common
+#显示指定的 NFS 服务器(假设 IP 地址为 172.18.6.69)上 export 出来的目录
+showmount -e 172.18.6.69
 
-kubernetes优化  
-参考文档：  
-大规模场景下 kubernetes 集群的性能优化    https://zhuanlan.zhihu.com/p/111244925  
-Kubernetes：k8s优化大法（江湖失传已久的武林秘籍）    https://www.cnblogs.com/unqiang/p/18360801  
-17个应该了解的Kubernetes优化    https://cloud.tencent.com/developer/article/2402219  
-如何优化Kubernetes的性能和资源利用率优化    https://blog.csdn.net/u010349629/article/details/130638445  
-Kubernetes各组件参数配置优化建议    https://blog.csdn.net/ywq935/article/details/103124541  
-  
-### 4.2.Kubeflow manifests-1.9.1 部署笔记
-  
-  
-  
+# 每个节点创建共享存储文件夹：
+mkdir /nfs;
+mkdir -p /nfs/alertmanager /nfs/grafana /nfs/prometheus
+chmod -R 0755 /nfs
 
-![](../IMAGES/kubeflow-ecosystem-20250415192618.png)
+#假设 NFS 服务器 IP为 172.18.6.69，可以如下设置挂载  
+mount -t nfs 172.18.6.69:/nfs /nfs
+mount -t nfs 10.0.10.153:/nfs /nfs
 
-Kubeflow manifests-1.9.1
-
-
-```text
-有关每个 Kubeflow 组件的更多信息，请参阅以下链接：
-Kubeflow Spark Operator 可用于数据准备和特征工程步骤。
-Kubeflow Notebooks 可用于模型开发和交互式数据科学，以试验您的机器学习工作流程。
-Kubeflow Katib 可用于使用各种 AutoML 算法进行模型优化和超参数调整。
-Kubeflow Trainer 可用于大规模分布式训练或 LLM 微调。
-Kubeflow Model Registry 可用于存储机器学习元数据、模型工件以及准备用于生产服务的模型。
-KServe 可用于模型服务步骤中的在线和批量推理。
-Feast 可用作特征存储，并用于管理离线和在线特征。
-Kubeflow Pipelines 可用于构建、部署和管理机器学习生命周期中的每个步骤。
-
-# Kubeflow manifests-1.9.1
-
-文档的地址：
-https://github.com/kubeflow/manifests/tree/v1.9.1-branch
-
-文件下载的地址：
-https://github.com/kubeflow/manifests/archive/refs/tags/v1.9.1.tar.gz
-注意：一定要选择这个文档对应的安装文件，否则，会安装失败，即便安装成功，也无法打开dex。
-
-https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv5.4.3/kustomize_v5.4.3_linux_amd64.tar.gz
-```
-
-
-1. PV，PVC，
-
-```text
-# 每个节点创建PV的目录
-mkdir -p /data/k8s/authservice-pvc /data/k8s/minio-pvc /data/k8s/mysql-pv-claim /data/k8s/katib-mysql /data/k8s/jupyter-storage; 
-chmod 0755 /data/k8s/ -R;
-chmod 0777 /data/k8s/ -R;
-
-# 需要创建kubeflow-storage.yaml文件，创建PV
-
-root@node1:/opt/manifests-1.9.1# cat kubeflow-storage.yaml 
-kind: StorageClass
+配置持久化卷，添加3个文件：
+kubectl apply -f kube-prometheus-storage-class.yaml
+########################################
 apiVersion: storage.k8s.io/v1
+kind: StorageClass
 metadata:
-  name: local-storage
+  name: prometheus-storage
 provisioner: kubernetes.io/no-provisioner
 volumeBindingMode: WaitForFirstConsumer
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: authservice-pvc
-  namespace: istio-system
-  labels:
-    type: local
-spec:
-  storageClassName: local-storage
-  capacity:
-    storage: 10Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: "/data/k8s/authservice-pvc"
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: minio-pvc
-  namespace: kubeflow
-  labels:
-    type: local
-spec:
-  storageClassName: local-storage
-  capacity:
-    storage: 20Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: "/data/k8s/minio-pvc"
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-      - matchExpressions:
-        - key: kubernetes.io/hostname
-          operator: In
-          values:
-          - node1
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: mysql-pv-claim
-  namespace: kubeflow
-  labels:
-    type: local
-spec:
-  storageClassName: local-storage
-  capacity:
-    storage: 20Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: "/data/k8s/mysql-pv-claim"
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-      - matchExpressions:
-        - key: kubernetes.io/hostname
-          operator: In
-          values:
-          - node1
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  namespace: kubeflow
-  name: katib-mysql
-  labels:
-    type: local
-spec:
-  storageClassName: local-storage
-  capacity:
-    storage: 10Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: "/data/k8s/katib-mysql"
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-      - matchExpressions:
-        - key: kubernetes.io/hostname
-          operator: In
-          values:
-          - node1
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  namespace: kubeflow-user-example-com
-  name: jupyter-storage
-  labels:
-    type: local
-spec:
-  storageClassName: local-storage
-  capacity:
-    storage: 10Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: "/data/k8s/jupyter-storage"
-########################################################
+########################################
 
-# 执行创建
-kubectl apply -f kubeflow-storage.yaml
-
-
-vim apps/katib/upstream/components/mysql/pvc.yaml #1.9.1需要
+kubectl apply -f kube-prometheus-pv.yaml
+########################################
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: prometheus-pv
+spec:
+  capacity:
+    storage: 40Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: prometheus-storage
+  nfs:
+    path: /nfs/prometheus
+    server: 172.18.6.69    # 修改成正确的IP
 ---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: alertmanager-pv
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: prometheus-storage
+  nfs:
+    path: /nfs/alertmanager
+    server: 172.18.6.69    # 修改成正确的IP
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: grafana-pv
+spec:
+  capacity:
+    storage: 8Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: prometheus-storage
+  nfs:
+    path: /nfs/grafana
+    server: 172.18.6.69    # 修改成正确的IP
+########################################
+
+kubectl apply -f kube-prometheus-values.yaml
+########################################
+apiVersion: v1
+prometheus:
+  prometheusSpec:
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: prometheus-storage
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 40Gi
+alertmanager:
+  alertmanagerSpec:
+    storage:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: prometheus-storage
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 2Gi
+grafana:
+  persistence:
+    enabled: true
+    storageClassName: prometheus-storage
+    accessModes: ["ReadWriteOnce"]
+    size: 8Gi
+########################################
+
+# 需要修改的文件：
+vim manifests/alertmanager-service.yaml
+kubectl apply -f manifests/alertmanager-service.yaml 
+########################################
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: alert-router
+    app.kubernetes.io/instance: main
+    app.kubernetes.io/name: alertmanager
+    app.kubernetes.io/part-of: kube-prometheus
+    app.kubernetes.io/version: 0.28.1
+  name: alertmanager-main
+  namespace: monitoring
+spec:
+  ports:
+  - name: web
+    nodePort: 30200    # 添加
+    port: 9093
+    targetPort: web
+  - name: reloader-web
+    port: 8080
+    targetPort: reloader-web
+  selector:
+    app.kubernetes.io/component: alert-router
+    app.kubernetes.io/instance: main
+    app.kubernetes.io/name: alertmanager
+    app.kubernetes.io/part-of: kube-prometheus
+  sessionAffinity: ClientIP
+  type: NodePort     # 添加
+########################################
+
+vim manifests/grafana-service.yaml
+kubectl apply -f manifests/grafana-service.yaml
+########################################
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: grafana
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/part-of: kube-prometheus
+    app.kubernetes.io/version: 12.0.1
+  name: grafana
+  namespace: monitoring
+spec:
+  ports:
+  - name: http
+    nodePort: 30300   # 添加
+    port: 3000
+    targetPort: http
+  selector:
+    app.kubernetes.io/component: grafana
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/part-of: kube-prometheus
+  type: NodePort    # 添加
+########################################
+
+
+vim manifests/prometheus-service.yaml
+kubectl apply -f manifests/prometheus-service.yaml
+########################################
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: prometheus
+    app.kubernetes.io/instance: k8s
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: kube-prometheus
+    app.kubernetes.io/version: 3.4.0
+  name: prometheus-k8s
+  namespace: monitoring
+spec:
+  ports:
+  - name: web
+    nodePort: 31922      # 添加
+    port: 9090
+    targetPort: web
+  - name: reloader-web
+    port: 8080
+    targetPort: reloader-web
+  selector:
+    app.kubernetes.io/component: prometheus
+    app.kubernetes.io/instance: k8s
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: kube-prometheus
+  sessionAffinity: ClientIP
+  type: NodePort        # 添加
+########################################
+
+kubectl -n monitoring get service
+NAME                    TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)                         AGE
+alertmanager-main       NodePort    10.233.48.95    <none>        9093:30200/TCP,8080:30574/TCP   104m
+alertmanager-operated   ClusterIP   None            <none>        9093/TCP,9094/TCP,9094/UDP      97m
+blackbox-exporter       ClusterIP   10.233.28.168   <none>        9115/TCP,19115/TCP              104m
+grafana                 NodePort    10.233.34.41    <none>        3000:30300/TCP                  104m
+kube-state-metrics      ClusterIP   None            <none>        8443/TCP,9443/TCP               104m
+node-exporter           ClusterIP   None            <none>        9100/TCP                        104m
+prometheus-adapter      ClusterIP   10.233.6.253    <none>        443/TCP                         104m
+prometheus-k8s          NodePort    10.233.62.225   <none>        9090:31922/TCP,8080:32293/TCP   104m
+prometheus-operated     ClusterIP   None            <none>        9090/TCP                        97m
+prometheus-operator     ClusterIP   None            <none>        8443/TCP                        104m
+
+
+# 直接在浏览器，打开grafana：
+172.18.6.70：30300/
+admin
+admin
+
+增加其它CPU节点的监控，增加GPU卡的监控，增加模型训练推理的监控。
+增加数据库，对象存储的监控。
+
+
+
+
+
+
+
+4. Krew 
+# 中文文档：
+https://krew.kubernetes.ac.cn/docs/user-guide/setup/install/
+
+https://github.com/kubernetes-sigs/krew/releases/latest/download/krew-linux_amd64.tar.gz
+
+macOS/Linux
+Bash 或 ZSH shell
+# 确保已安装 git。
+# 运行此命令下载并安装 krew
+(
+  set -x; cd "$(mktemp -d)" &&
+  OS="$(uname | tr '[:upper:]' '[:lower:]')" &&
+  ARCH="$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/')" &&
+  KREW="krew-${OS}_${ARCH}" &&
+  curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/${KREW}.tar.gz" &&
+  tar zxvf "${KREW}.tar.gz" &&
+  ./"${KREW}" install krew
+)
+
+# 将 $HOME/.krew/bin 目录添加到你的 PATH 环境变量。为此，更新你的 .bashrc 或 .zshrc 文件并追加以下行
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+
+运行 kubectl krew 检查安装。
+
+krew使用
+1.插件索引更新
+kubectl krew update
+
+2.插件搜索
+kubectl krew search
+kubectl krew search crt
+
+3.安装插件
+kubectl krew install get-all
+kubectl krew install ns tail
+
+4.查看已装插件
+kubectl krew list
+
+5.查看插件详情
+kubectl krew info ns
+
+6.插件更新
+krew upgrade ns
+
+7.使用插件--ns
+kubectl ns weave
+kubectl-ns default
+
+8.使用插件--get-all
+kubectl-get_all
+
+9.使用插件--tail
+kubectl-tail
+kubectl-tail --ns default 
+kubectl-tail --rs kubeapps-8fd98f6f5
+kubectl-tail --rs kubeapps/kubeapps-8fd98f6f5 
+
+查看安装目录
+kubectl krew version
+
+krew卸载
+rm -rf ~/.krew
+
+
+
+
+
+
+5. istio
+istio-1.27.3
+https://istio.io/latest/zh/docs/
+https://istio.io/latest/zh/docs/setup/additional-setup/download-istio-release/
+
+curl -L https://istio.io/downloadIstio | ISTIO_VERSION=1.27.3 TARGET_ARCH=x86_64 sh -
+
+wget -c https://github.com/istio/istio/releases/download/1.27.3/istio-1.27.3-linux-amd64.tar.gz
+
+# 安装文档地址：
+https://istio.io/latest/zh/docs/setup/install/istioctl/   # 这里的说明是，使用 Istioctl 安装
+
+最简单的选择是用下面命令安装 Istio 默认配置档：
+$ istioctl install
+
+此命令在 Kubernetes 集群上安装 default 配置档。 
+default 配置档是建立生产环境的一个良好起点， 这和较大的 demo 配置档不同，后者常用于评估一组广泛的 Istio 特性。
+可以配置各种设置来修改安装。比如，要启动访问日志：
+$ istioctl install --set meshConfig.accessLogFile=/dev/stdout
+
+其他的 Istio 配置档，可以通过在命令行传递配置档名称的方式，安装到集群。 例如，下面命令可以用来安装 demo 配置档。
+$ istioctl install --set profile=demo
+
+在安装 Istio 之前，可以用 manifest generate 子命令生成清单文件。
+例如，使用以下命令为可以使用 kubectl 安装的 default 配置文件生成清单：
+$ istioctl manifest generate > $HOME/generated-manifest.yaml
+
+卸载 Istio
+要从集群中完整卸载 Istio，运行下面命令：
+$ istioctl uninstall --purge
+
+或者，只移除指定的 Istio 控制平面，运行以下命令：
+$ istioctl uninstall <your original installation options>
+
+或
+istioctl manifest generate <your original installation options> | kubectl delete --ignore-not-found=true -f -
+
+控制平面的命名空间（例如：istio-system）默认不会被移除。 如果确认不再需要，用下面命令移除该命名空间：
+$ kubectl delete namespace istio-system
+
+
+
+# 如果镜像下载不了:
+docker.io/istio/pilot:1.27.3
+docker.io/istio/proxyv2:1.27.3
+docker.io/istio/proxyv2:1.27.3
+nerdctl pull m.daocloud.io/docker.io/istio/pilot:1.27.3
+nerdctl pull m.daocloud.io/docker.io/istio/proxyv2:1.27.3
+nerdctl tag m.daocloud.io/docker.io/istio/pilot:1.27.3 docker.io/istio/pilot:1.27.3
+nerdctl tag m.daocloud.io/docker.io/istio/proxyv2:1.27.3 docker.io/istio/proxyv2:1.27.3
+
+
+nerdctl save docker.io/istio/pilot:1.27.3 -o pilot..1.27.3
+nerdctl save docker.io/istio/proxyv2:1.27.3 -o proxyv2..1.27.3
+
+ip="10.0.10.148 10.0.10.155 10.0.10.173 10.0.10.210"; for i in $ip ; do scp pilot..1.27.3 $i:/Data/IMAGES/; ssh $i "nerdctl load -i /Data/IMAGES/pilot..1.27.3" ; done
+ip="10.0.10.148 10.0.10.155 10.0.10.173 10.0.10.210"; for i in $ip ; do scp proxyv2..1.27.3 $i:/Data/IMAGES/; ssh $i "nerdctl load -i /Data/IMAGES/proxyv2..1.27.3" ; done
+
+
+
+
+
+6. Kubeflow
+Kubeflow manifests-1.10.2
+kubeflow manifests-1.10.2
+Kubeflow Platform 1.10.2
+https://github.com/kubeflow/manifests/releases/tag/v1.10.2
+https://github.com/kubeflow/manifests/archive/refs/tags/v1.10.2.tar.gz
+
+/opt/manifests-1.10.2
+grep -E "image: .+:" -R
+
+
+# 先部署：
+wget https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.26/deploy/local-path-storage.yaml
+# 修改 local-path-storage.yaml 里的镜像地址:
+        image: m.daocloud.io/docker.io/rancher/local-path-provisioner:v0.0.26
+        image: m.daocloud.io/docker.io/library/busybox:1.37.0
+kubectl apply -f local-path-storage.yaml
+
+vim common/oidc-client/oidc-authservice/base/pvc.yaml #1.9.1不需要，manifests-1.10.2 中没有这个路径。
+-------------------------------------------------------------------------------------
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: katib-mysql
-  namespace: kubeflow
+  name: authservice-pvc
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: local-storage #添加storageClassName名称
+  storageClassName: local-path   #添加storageClassName名称
   resources:
     requests:
       storage: 10Gi
+-------------------------------------------------------------------------------------
 
-vim apps/kfp-tekton/upstream/v1/third-party/minio/base/minio-pvc.yaml #1.9.1需要
+
+vim apps/kfp-tekton/upstream/v1/third-party/minio/base/minio-pvc.yaml #1.9.1需要。
+vim applications/pipeline/upstream/third-party/minio/base/minio-pvc.yaml  # manifests-1.10.2 位置。
+-------------------------------------------------------------------------------------
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -532,12 +1202,38 @@ metadata:
 spec:
   accessModes:
   - ReadWriteOnce
-  storageClassName: local-storage #添加storageClassName名称
+  storageClassName: local-path #添加storageClassName名称
   resources:
     requests:
       storage: 20Gi
+-------------------------------------------------------------------------------------
+# 如果需要手动执行的话，需要指明 namespace
+kubectl -n kubeflow apply -f applications/pipeline/upstream/third-party/minio/base/minio-pvc.yaml
 
-vim apps/kfp-tekton/upstream/v1/third-party/mysql/base/mysql-pv-claim.yaml #1.9.1需要
+
+vim apps/katib/upstream/components/mysql/pvc.yaml #1.9.1需要。
+vim applications/katib/upstream/components/mysql/pvc.yaml # manifests-1.10.2 位置。
+-------------------------------------------------------------------------------------
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: katib-mysql
+  namespace: kubeflow
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path #添加storageClassName名称
+  resources:
+    requests:
+      storage: 10Gi
+-------------------------------------------------------------------------------------
+# 如果需要手动执行的话，需要指明 namespace
+kubectl -n kubeflow apply -f applications/katib/upstream/components/mysql/pvc.yaml
+
+vim apps/kfp-tekton/upstream/v1/third-party/mysql/base/mysql-pv-claim.yaml #1.9.1需要。
+vim applications/pipeline/upstream/third-party/mysql/base/mysql-pv-claim.yaml # manifests-1.10.2 位置。
+-------------------------------------------------------------------------------------
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -546,1168 +1242,331 @@ metadata:
 spec:
   accessModes:
   - ReadWriteOnce
-  storageClassName: local-storage #添加storageClassName名称
+  storageClassName: local-path #添加storageClassName名称
   resources:
     requests:
       storage: 20Gi
- 
-########################################################
-
-查看所有namespace下的PV,PVC：
-root@node1:~# kubectl get pv,pvc -A
-NAME                               CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM                     STORAGECLASS    VOLUMEATTRIBUTESCLASS   REASON   AGE
-persistentvolume/authservice-pvc   10Gi       RWO            Retain           Bound       kubeflow/katib-mysql      local-storage   <unset>                          25d
-persistentvolume/katib-mysql       10Gi       RWO            Retain           Available                             local-storage   <unset>                          25d
-persistentvolume/minio-pvc         20Gi       RWO            Retain           Bound       kubeflow/minio-pvc        local-storage   <unset>                          25d
-persistentvolume/mysql-pv-claim    20Gi       RWO            Retain           Bound       kubeflow/mysql-pv-claim   local-storage   <unset>                          25d
-
-NAMESPACE   NAME                                   STATUS   VOLUME            CAPACITY   ACCESS MODES   STORAGECLASS    VOLUMEATTRIBUTESCLASS   AGE
-kubeflow    persistentvolumeclaim/katib-mysql      Bound    authservice-pvc   10Gi       RWO            local-storage   <unset>                 25d
-kubeflow    persistentvolumeclaim/minio-pvc        Bound    minio-pvc         20Gi       RWO            local-storage   <unset>                 25d
-kubeflow    persistentvolumeclaim/mysql-pv-claim   Bound    mysql-pv-claim    20Gi       RWO            local-storage   <unset>                 25d
-```
+-------------------------------------------------------------------------------------
+# 如果需要手动执行的话，需要指明 namespace
+kubectl -n kubeflow apply -f applications/pipeline/upstream/third-party/mysql/base/mysql-pv-claim.yaml 
 
 
+# 检查当前的 PVC 状态
+kubectl get pvc -n kubeflow
 
-2.增加containerd的代理
+# 检查可用的存储类
+kubectl get storageclass
 
-```
-root@node1:/etc# cat /etc/containerd/config.toml
-version = 2
-root = "/var/lib/containerd"
-state = "/run/containerd"
-oom_score = 0
+# 如果缺少存储类，需要先创建 (举例):
+kubectl apply -f storage-class.yaml
 
-[grpc]
-  max_recv_message_size = 16777216
-  max_send_message_size = 16777216
+# 检查节点存储状态
+kubectl describe nodes | grep -A 10 -B 5 "Storage"
 
-[debug]
-  address = ""
-  level = "info"
-  format = ""
-  uid = 0
-  gid = 0
-
-[metrics]
-  address = ""
-  grpc_histogram = false
-
-[plugins]
-  [plugins."io.containerd.grpc.v1.cri"]
-    sandbox_image = "k8s.m.daocloud.io/pause:3.10"
-    max_container_log_line_size = 16384
-    enable_unprivileged_ports = false
-    enable_unprivileged_icmp = false
-    enable_selinux = false
-    disable_apparmor = false
-    tolerate_missing_hugetlb_controller = true
-    disable_hugetlb_controller = true
-    image_pull_progress_timeout = "5m"
-    [plugins."io.containerd.grpc.v1.cri".containerd]
-      default_runtime_name = "runc"
-      snapshotter = "overlayfs"
-      discard_unpacked_layers = true
-      [plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
-        [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
-          runtime_type = "io.containerd.runc.v2"
-          runtime_engine = ""
-          runtime_root = ""
-          base_runtime_spec = "/etc/containerd/cri-base.json"
-# 以下为增加的镜像代理
-          [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
-            systemdCgroup = true
-            binaryName = "/usr/local/bin/runc"
-    [plugins."io.containerd.grpc.v1.cri".registry]
-      [plugins."io.containerd.grpc.v1.cri".registry.mirrors]
-        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
-            endpoint = ["https://docker.m.daocloud.io","http://hub-mirror.c.163.com"]
-        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."gcr.io"]
-            endpoint = ["gcr.m.daocloud.io"]
-        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."k8s.gcr.io"]
-            endpoint = ["k8s-gcr.m.daocloud.io"]
-        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."quay.io"]
-            endpoint = ["quay.m.daocloud.io"]
-        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."registry.k8s.io"]
-            endpoint = ["k8s.m.daocloud.io"]
-        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.elastic.co"]
-            endpoint = ["elastic.m.daocloud.io"]
-        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."harbor.sundayhk.com"]
-            endpoint = ["https://harbor.sundayhk.com"]
-      [plugins."io.containerd.grpc.v1.cri".registry.configs]
-        [plugins."io.containerd.grpc.v1.cri".registry.configs."harbor.sundayhk.com"]
-          [plugins."io.containerd.grpc.v1.cri".registry.configs."harbor.sundayhk.com".tls]
-            insecure_skip_verify = true
-          [plugins."io.containerd.grpc.v1.cri".registry.configs."harbor.sundayhk.com".auth]
-            username = "admin"
-            password = "Harbor12345"
-
-```
+# 检查 PV 状态
+kubectl get pv
 
 
+# 最终，正常运行时的 pv 和 pvc 信息:
+-------------------------------------------------------------------------------------
+$ kubectl get pv,pvc -A
+NAME                                                        CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                     STORAGECLASS   VOLUMEATTRIBUTESCLASS   REASON   AGE
+persistentvolume/pvc-3bfa0749-2e7b-4b22-8606-b83f6d465053   20Gi       RWO            Delete           Bound    kubeflow/minio-pvc        local-path     <unset>                          5m14s
+persistentvolume/pvc-5f564f39-0f40-49d0-b382-b084ae2506f9   20Gi       RWO            Delete           Bound    kubeflow/mysql-pv-claim   local-path     <unset>                          2m58s
+persistentvolume/pvc-b0a67d8a-e4ef-4fdd-ae70-fea922140240   10Gi       RWO            Delete           Bound    kubeflow/katib-mysql      local-path     <unset>                          2m27s
 
-3.部署Kubeflow manifests-1.9.1
-
-```
-cd /opt/;
-wget https://github.com/kubeflow/manifests/archive/refs/tags/v1.9.1.tar.gz;
-tar zxf v1.9.1.tar.gz;
-cd /opt/manifests-1.9.1;
-
-# 执行：
-while ! kustomize build example | kubectl apply -f -; do echo "Retrying to apply resources"; sleep 20; done
-
-# 修改成NodePort
-kubectl -n istio-system edit service istio-ingressgateway
-########################################################
-  selector:
-    app: istio-ingressgateway
-    istio: ingressgateway
-  sessionAffinity: None
-  type: NodePort #修改成NodePort
-status:
-  loadBalancer: {}
-########################################################
-
-root@node1:/etc/containerd# kubectl -n istio-system get service
-NAME                    TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)                                      AGE
-cluster-local-gateway   ClusterIP   10.233.37.219   <none>        15020/TCP,80/TCP                             26d
-istio-ingressgateway    NodePort    10.233.22.110   <none>        15021:32733/TCP,80:30221/TCP,443:31208/TCP   26d
-istiod                  ClusterIP   10.233.44.204   <none>        15010/TCP,15012/TCP,443/TCP,15014/TCP        26d
-knative-local-gateway   ClusterIP   10.233.5.35     <none>        80/TCP                                       26d
-
-root@node1:~# kubectl -n istio-system get pod -o wide
-NAME                                    READY   STATUS    RESTARTS      AGE   IP             NODE    NOMINATED NODE   READINESS GATES
-cluster-local-gateway-7f8fd55ff-5bp82   1/1     Running   2 (27h ago)   26d   10.233.64.73   node1   <none>           <none>
-istio-ingressgateway-b8744c4b-nrxlc     1/1     Running   2 (27h ago)   26d   10.233.65.86   node2   <none>           <none>
-istiod-65745f6fbc-cmmdh                 1/1     Running   2 (27h ago)   26d   10.233.64.77   node1   <none>           <none>
-
-
-# 访问node2这个节点的，端口80:30221/TCP
-http://x.x.x.x:30221/_/jupyter/?ns=kubeflow-user-example-com
-user@example.com
-12341234
-
-```
-
-
-
-部署完之后的pod
-
-```
-root@node1:/data# kubectl get pod -A
-NAMESPACE                   NAME                                                     READY   STATUS    RESTARTS       AGE
-auth                        dex-678b97fd68-hfsjj                                     1/1     Running   3 (28h ago)    26d
-cert-manager                cert-manager-77fb85564-8bw4d                             1/1     Running   3 (28h ago)    26d
-cert-manager                cert-manager-cainjector-857964b486-82289                 1/1     Running   2 (28h ago)    26d
-cert-manager                cert-manager-webhook-755d476bb8-f8p59                    1/1     Running   2 (28h ago)    26d
-istio-system                cluster-local-gateway-7f8fd55ff-5bp82                    1/1     Running   2 (28h ago)    26d
-istio-system                istio-ingressgateway-b8744c4b-nrxlc                      1/1     Running   2 (28h ago)    26d
-istio-system                istiod-65745f6fbc-cmmdh                                  1/1     Running   2 (28h ago)    26d
-knative-serving             activator-5495775bdd-q4vn7                               2/2     Running   8 (28h ago)    26d
-knative-serving             autoscaler-54689d6755-lbzzc                              2/2     Running   4 (28h ago)    26d
-knative-serving             controller-6c8dfd7bc7-hrfmq                              2/2     Running   9 (28h ago)    26d
-knative-serving             net-istio-controller-57887bf497-9cr8h                    2/2     Running   4 (28h ago)    26d
-knative-serving             net-istio-webhook-569c478bd8-9cs6g                       2/2     Running   9 (28h ago)    26d
-knative-serving             webhook-5554d58476-xl7bd                                 2/2     Running   5 (28h ago)    26d
-kube-system                 coredns-8675c4df44-klxs7                                 1/1     Running   2 (28h ago)    27d
-kube-system                 coredns-8675c4df44-p2dl6                                 1/1     Running   2 (28h ago)    27d
-kube-system                 dns-autoscaler-74f6cb94c8-xlzjf                          1/1     Running   2 (28h ago)    27d
-kube-system                 kube-apiserver-node1                                     1/1     Running   5 (28h ago)    27d
-kube-system                 kube-apiserver-node2                                     1/1     Running   5 (28h ago)    27d
-kube-system                 kube-apiserver-node3                                     1/1     Running   6 (28h ago)    22d
-kube-system                 kube-controller-manager-node1                            1/1     Running   7 (28h ago)    27d
-kube-system                 kube-controller-manager-node2                            1/1     Running   6 (28h ago)    27d
-kube-system                 kube-controller-manager-node3                            1/1     Running   7 (28h ago)    22d
-kube-system                 kube-flannel-57bkt                                       1/1     Running   2 (28h ago)    27d
-kube-system                 kube-flannel-rccvw                                       1/1     Running   2 (28h ago)    27d
-kube-system                 kube-flannel-txkjd                                       1/1     Running   4 (28h ago)    22d
-kube-system                 kube-proxy-9lkjr                                         1/1     Running   2 (28h ago)    27d
-kube-system                 kube-proxy-j5fx8                                         1/1     Running   2 (28h ago)    22d
-kube-system                 kube-proxy-zndxp                                         1/1     Running   2 (28h ago)    27d
-kube-system                 kube-scheduler-node1                                     1/1     Running   6 (28h ago)    27d
-kube-system                 kube-scheduler-node2                                     1/1     Running   5 (28h ago)    27d
-kube-system                 kube-scheduler-node3                                     1/1     Running   5 (28h ago)    22d
-kube-system                 nodelocaldns-2dl75                                       1/1     Running   2 (28h ago)    27d
-kube-system                 nodelocaldns-59f8m                                       1/1     Running   2 (28h ago)    27d
-kube-system                 nodelocaldns-lshxx                                       1/1     Running   3 (28h ago)    22d
-kubeflow-user-example-com   bbc-0-0                                                  0/2     Pending   0              5m2s
-kubeflow-user-example-com   ml-pipeline-ui-artifact-6b44b849d7-8qj29                 2/2     Running   4 (28h ago)    26d
-kubeflow-user-example-com   ml-pipeline-visualizationserver-5fcb5568f-ntzf2          2/2     Running   4 (28h ago)    26d
-kubeflow                    admission-webhook-deployment-5644dcc957-zdcbk            1/1     Running   2 (28h ago)    26d
-kubeflow                    cache-server-59dfb6fcfc-7gtrz                            2/2     Running   0              125m
-kubeflow                    centraldashboard-74fc94fcf4-lls9q                        2/2     Running   4 (28h ago)    26d
-kubeflow                    jupyter-web-app-deployment-d68bd54dc-x6kkr               2/2     Running   0              54m
-kubeflow                    katib-controller-7d6984668d-7fgxt                        1/1     Running   2 (28h ago)    26d
-kubeflow                    katib-db-manager-676776f9c-72wpj                         1/1     Running   68 (28h ago)   26d
-kubeflow                    katib-mysql-5c9cd9b95f-wc4kp                             1/1     Running   2 (28h ago)    25d
-kubeflow                    katib-ui-6c6fc87849-mvkks                                2/2     Running   4 (28h ago)    26d
-kubeflow                    kserve-controller-manager-67f4559f9d-lfv2p               2/2     Running   4 (28h ago)    20d
-kubeflow                    kserve-models-web-app-67f4b9dcfd-45rvz                   2/2     Running   0              125m
-kubeflow                    kubeflow-pipelines-profile-controller-7b7b8f44f7-wp5zh   1/1     Running   2 (28h ago)    26d
-kubeflow                    metacontroller-0                                         1/1     Running   2 (28h ago)    26d
-kubeflow                    metadata-envoy-deployment-74dbc5bdcc-zdt9m               1/1     Running   2 (28h ago)    26d
-kubeflow                    metadata-grpc-deployment-8496ffb98b-tk6bh                2/2     Running   17 (28h ago)   25d
-kubeflow                    metadata-writer-7d7dfc5b8d-2v5tq                         2/2     Running   11 (28h ago)   25d
-kubeflow                    minio-7c77bc59b8-s6tfp                                   2/2     Running   4 (28h ago)    25d
-kubeflow                    ml-pipeline-bf9f88745-7dqlp                              2/2     Running   48 (28h ago)   26d
-kubeflow                    ml-pipeline-persistenceagent-f97777b7f-5lvd7             2/2     Running   4 (28h ago)    26d
-kubeflow                    ml-pipeline-scheduledworkflow-6bbc87d49-7n7x5            2/2     Running   4 (28h ago)    26d
-kubeflow                    ml-pipeline-ui-6cf7f5d654-x26mk                          2/2     Running   12 (28h ago)   26d
-kubeflow                    ml-pipeline-viewer-crd-8685d84fb6-zpmgt                  2/2     Running   1 (124m ago)   125m
-kubeflow                    ml-pipeline-visualizationserver-75b9c88599-lcc4r         2/2     Running   4 (28h ago)    26d
-kubeflow                    mysql-758cd66576-ff8qd                                   2/2     Running   4 (28h ago)    25d
-kubeflow                    notebook-controller-deployment-6545dbccf4-888jd          2/2     Running   11 (28h ago)   26d
-kubeflow                    profiles-deployment-5f46f7c9bb-8c9mq                     3/3     Running   12 (28h ago)   26d
-kubeflow                    pvcviewer-controller-manager-55f545dfc4-dqhsj            3/3     Running   7 (28h ago)    26d
-kubeflow                    tensorboard-controller-deployment-546b5886c5-vbhpj       3/3     Running   9 (28h ago)    26d
-kubeflow                    tensorboards-web-app-deployment-5bd559766d-mc79f         2/2     Running   4 (28h ago)    26d
-kubeflow                    training-operator-7f8bfd56f-zn4dj                        1/1     Running   2 (28h ago)    26d
-kubeflow                    volumes-web-app-deployment-5b558895d6-nplfl              2/2     Running   4 (28h ago)    26d
-kubeflow                    workflow-controller-784cfd9c97-84jkn                     2/2     Running   10 (28h ago)   26d
-oauth2-proxy                oauth2-proxy-65fbcb849-8rnn9                             1/1     Running   2 (28h ago)    26d
-oauth2-proxy                oauth2-proxy-65fbcb849-h458f                             1/1     Running   2 (28h ago)    26d
-```
+NAMESPACE   NAME                                   STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+kubeflow    persistentvolumeclaim/katib-mysql      Bound    pvc-b0a67d8a-e4ef-4fdd-ae70-fea922140240   10Gi       RWO            local-path     <unset>                 2m37s
+kubeflow    persistentvolumeclaim/minio-pvc        Bound    pvc-3bfa0749-2e7b-4b22-8606-b83f6d465053   20Gi       RWO            local-path     <unset>                 5m19s
+kubeflow    persistentvolumeclaim/mysql-pv-claim   Bound    pvc-5f564f39-0f40-49d0-b382-b084ae2506f9   20Gi       RWO            local-path     <unset>                 3m3s
+-------------------------------------------------------------------------------------
 
 
 
 
 
-4.Kubeflow manifests-1.9.1 DashBoard
+# 需要手动下载 kustomize 并放到/usr/bin/目录下:
+https://github.com/kubernetes-sigs/kustomize/archive/refs/tags/kustomize/v5.4.3.tar.gz
+https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv5.4.3/kustomize_v5.4.3_linux_amd64.tar.gz
 
 
-5.Kubeflow manifests-1.9.1功能性问题
+# 在镜像地址前添加代理地址:
+cd /opt/manifests-1.10.2;
+find ./ -type f |xargs -i sed -i "s#image: gcr.io#image: m.daocloud.io/gcr.io#g" {};
+find ./ -type f |xargs -i sed -i "s#image: ghcr.io#image: m.daocloud.io/ghcr.io#g" {};
+find ./ -type f |xargs -i sed -i "s#image: quay.io#image: m.daocloud.io/quay.io#g" {};
+find ./ -type f |xargs -i sed -i "s#image: registry.k8s.io#image: m.daocloud.io/registry.k8s.io#g" {};
+find ./ -type f |xargs -i sed -i "s#image: ghcr.io#image: m.daocloud.io/ghcr.io#g" {};
 
-```
-1. 建立Volumes和创建notebook的时候会出错。
+find ./ -type f |xargs -i sed -i "s#image: spark#image: hub.rat.dev/spark#g" {};
+find ./ -type f |xargs -i sed -i "s#image: kserve#image: hub.rat.dev/kserve#g" {};
+find ./ -type f |xargs -i sed -i "s#image: kubeflownotebookswg#image: hub.rat.dev/kubeflownotebookswg#g" {};
+find ./ -type f |xargs -i sed -i "s#image: mysql#image:hub.rat.dev/mysql#g" {};
+find ./ -type f |xargs -i sed -i "s#image: postgres#image:hub.rat.dev/postgres#g" {};
+find ./ -type f |xargs -i sed -i "s#image: kindest#image:hub.rat.dev/kindest#g" {};
+find ./ -type f |xargs -i sed -i "s#image: prom#image:hub.rat.dev/prom#g" {};
+
+
+while ! kustomize build example | kubectl apply -f -; do echo "Retrying to apply resources"; sleep 10; done
+while ! kustomize build example | kubectl apply --server-side --force-conflicts -f -; do echo "Retrying to apply resources"; sleep 20; done  # 本次部署使用的命令
+
+
+# 可能用到的命令:
+kubectl get pv,pvc -A
+
+
+
+# 查看非 Running 状态的 pod:
+kubectl get pod -A |grep -E -v 'Runn|NAME'
+kubectl get pod -A | awk '!/Runn|NAME/ {print $1, $2}' | xargs -n2 sh -c 'kubectl describe pod -n "$1" "$2"' _|grep "pulling image"   # 查看还有那些镜像没有完成下载
+
+# 删掉非 Running 状态的 pod:
+kubectl get pod -A | grep -E -v 'Runn|NAME' | awk '{print $1, $2}' | while read namespace pod; do
+    echo "Deleting pod $pod in namespace $namespace"
+    kubectl delete pod -n "$namespace" "$pod"
+done
+
+kubectl get pod -A | awk '!/Runn|NAME/ {print $1, $2}' | xargs -n2 sh -c 'kubectl delete pod -n "$1" "$2"' _
+
+
+# 有些镜像的版本号为 :dummy ，要修改成2.5.0
+kubectl -n kubeflow describe deployments.apps ml-pipeline-api-server |grep -i image
+kubectl -n kubeflow get deployment cache-server -o yaml | grep "name:"
+kubectl -n kubeflow get deployment ml-pipeline-visualizationserver -o jsonpath='{.spec.template.spec.containers[*].name}'
+
+# 查询命令:
+kubectl -n kubeflow get deployment cache-server -o jsonpath='{.spec.template.spec.containers[*].name}'
+kubectl -n kubeflow get deployment metadata-writer -o jsonpath='{.spec.template.spec.containers[*].name}'
+kubectl -n kubeflow get deployment ml-pipeline -o jsonpath='{.spec.template.spec.containers[*].name}'
+kubectl -n kubeflow get deployment ml-pipeline-persistenceagent -o jsonpath='{.spec.template.spec.containers[*].name}'
+kubectl -n kubeflow get deployment ml-pipeline-scheduledworkflow -o jsonpath='{.spec.template.spec.containers[*].name}'
+kubectl -n kubeflow get deployment ml-pipeline-ui -o jsonpath='{.spec.template.spec.containers[*].name}'
+kubectl -n kubeflow get deployment ml-pipeline-viewer-crd -o jsonpath='{.spec.template.spec.containers[*].name}'
+kubectl -n kubeflow get deployment ml-pipeline-visualizationserver -o jsonpath='{.spec.template.spec.containers[*].name}'
+kubectl -n kubeflow get deployment metadata-envoy-deployment -o jsonpath='{.spec.template.spec.containers[*].name}'
+
+# 执行替换的命令:
+kubectl -n kubeflow set image deployment/cache-server server=m.daocloud.io/ghcr.io/kubeflow/kfp-cache-server:2.5.0
+kubectl -n kubeflow set image deployment/metadata-writer main=m.daocloud.io/ghcr.io/kubeflow/kfp-metadata-writer:2.5.0
+kubectl -n kubeflow set image deployment/ml-pipeline ml-pipeline-api-server=m.daocloud.io/ghcr.io/kubeflow/kfp-api-server:2.5.0
+kubectl -n kubeflow set image deployment/ml-pipeline-persistenceagent ml-pipeline-persistenceagent=m.daocloud.io/ghcr.io/kubeflow/kfp-persistence-agent:2.5.0
+kubectl -n kubeflow set image deployment/ml-pipeline-scheduledworkflow ml-pipeline-scheduledworkflow=m.daocloud.io/ghcr.io/kubeflow/kfp-scheduled-workflow-controller:2.5.0
+kubectl -n kubeflow set image deployment/ml-pipeline-ui ml-pipeline-ui=m.daocloud.io/ghcr.io/kubeflow/kfp-frontend:2.5.0
+kubectl -n kubeflow set image deployment/ml-pipeline-viewer-crd ml-pipeline-viewer-crd=m.daocloud.io/ghcr.io/kubeflow/kfp-viewer-crd-controller:2.5.0
+kubectl -n kubeflow set image deployment/ml-pipeline-visualizationserver ml-pipeline-visualizationserver=m.daocloud.io/ghcr.io/kubeflow/kfp-visualization-server:2.5.0
+kubectl -n kubeflow set image deployment/metadata-envoy-deployment container=m.daocloud.io/ghcr.io/kubeflow/kfp-metadata-envoy:2.5.0
+
+m.daocloud.io/ghcr.io/kubeflow/kfp-metadata-envoy:dummy
+
+# 拷贝容器镜像:
+ip="10.0.10.148 10.0.10.155 10.0.10.173 10.0.10.210"; for i in $ip ; do scp proxyv2..1.27.3 $i:/Data/IMAGES/; ssh $i "nerdctl load -i /Data/IMAGES/proxyv2..1.27.3" ; done
+
+# 删除pvc
+kubectl delete pvc katib-mysql minio-pvc mysql-pv-claim -n kubeflow
+
+
+# Port-Forward
+kubectl port-forward svc/istio-ingressgateway -n istio-system 8080:80   # 不执行这一条，执行下面一条，修改成 nodeport
+
+# 查看所有 NodePort 类型的 Service
+kubectl -n istio-system patch svc/istio-ingressgateway -p '{"spec":{"type":"NodePort"}}'
+kubectl -n istio-system get svc
+
+# 登录的官方文档说明：
+After running the command, you can access the Kubeflow Central Dashboard by doing the following:
+1. Open your browser and visit http://localhost:8080. You should see the Dex login screen.
+2. Log in with the default user's credentials. The default email address is user@example.com, and the default password is 12341234. '
+
+# 示当前配置的容器运行时端点信息
+crictl config --list
+
+
+
+
+Kubeflow manifests-1.10.2 检查:
+
+1. 检查是否有运行错误的 pod 。
+kubectl get pod -A|grep -v Runn
+
+2. 检查 containerd 服务，是否有报错信息。
+journalctl -u containerd.service -f
+
+
+
+
+
+
+Kubeflow manifests-1.10.2 功能性问题:
+
+1. 建立 Volumes 和创建 notebook 的时候会出错。
+--------------------------------------------------------------------------------------------
 [403] Could not find CSRF co okie XSRF-TOKEN in therequest.http://121.40.245.182:7116/volumes/api/namespaces/kubeflow-user-exampleCom/pvCs
+......
+[200] undefined http://121.40.245.182:7116/volumes/api/namespaces/pvcs
 ......
 Could not find CSRF cookie XSRF-TOKEN
 ......
-No default Storage Class is set. Can't create new Disks for the new Notebook. Please use an Existing Disk.
+No default Storage Class is set. Can't create new Disks for the new Notebook. Please use an Existing Disk.   '   #  点击 New notebook 会出现这个提示:
 ......
+[403] Could not find CSRF cookie XSRF-TOKEN in the request. http://121.40.245.182:7116/jupyter/api/namespaces/kubeflow-user-example-com/notebooks
 
-在kubeflow ui界面创建notebook的时候，出现Could not find CSRF cookie XSRF-TOKEN错误
-查找相关日志 kubectl logs <name> <name-spaces>
-错误信息Could not find CSRF cookie XSRF-TOKEN in the request.
-原因分析通过访问 Kubeflow UI是通过 http（而不是 https），因此需要在 Jupyter Web 应用服务中将环境变量设置APP_SECURE_COOKIES=false。
-
-解决方法：
-kubectl edit deployments.apps -n kubeflow jupyter-web-app-deployment，修改如下部分。
-########################################################
-      containers:
-      - env:
-        - name: APP_PREFIX
-          value: /jupyter
-        - name: UI
-          value: default
-        - name: USERID_HEADER
-          value: kubeflow-userid
-        - name: USERID_PREFIX
-        - name: APP_SECURE_COOKIES
-          value: "false" # 从"true"改为"false"
-        image: docker.io/kubeflownotebookswg/jupyter-web-app:v1.9.2
-        imagePullPolicy: IfNotPresent
-        name: jupyter-web-app
-########################################################
-kubectl edit deployments.apps -n kubeflow volumes-web-app-deployment，修改如下部分。
-########################################################
-        - name: APP_PREFIX
-          value: /volumes
-        - name: USERID_HEADER
-          value: kubeflow-userid
-        - name: USERID_PREFIX
-        - name: APP_SECURE_COOKIES
-          value: "false" # 从"true"改为"false"
-        - name: VOLUME_VIEWER_IMAGE
-########################################################
-kubectl edit deployments.apps -n kubeflow tensorboards-web-app-deployment，修改如下部分。
-########################################################
-        kustomize.component: tensorboards-web-app
-    spec:
-      containers:
-      - env:
-        - name: APP_PREFIX
-          value: /tensorboards
-        - name: USERID_HEADER
-          value: kubeflow-userid
-        - name: USERID_PREFIX
-        - name: APP_SECURE_COOKIES
-          value: "false" # 从"true"改为"false"
-        image: docker.io/kubeflownotebookswg/tensorboards-web-app:v1.9.2
-        imagePullPolicy: IfNotPresent
-        name: tensorboards-web-app
-########################################################
-
-root@node1:/opt/manifests-1.9.1# kubectl -n kubeflow-user-example-com get pod
-NAME                                              READY   STATUS    RESTARTS      AGE
-bbc-0-0                                           2/2     Running   0             9h
-ff-0-58bbf986c-w8kwd                              2/2     Running   0             8h
-ml-pipeline-ui-artifact-6b44b849d7-8qj29          2/2     Running   4 (43h ago)   26d
-ml-pipeline-visualizationserver-5fcb5568f-ntzf2   2/2     Running   4 (43h ago)   26d
-pvcviewer-cc-69989f9d74-tll72                     2/2     Running   0             9h
-root@node1:/opt/manifests-1.9.1# kubectl get pv,pvc -A
-NAME                               CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                                    STORAGECLASS    VOLUMEATTRIBUTESCLASS   REASON   AGE
-persistentvolume/authservice-pvc   10Gi       RWO            Retain           Bound    kubeflow/katib-mysql                     local-storage   <unset>                          26d
-persistentvolume/jupyter-storage   10Gi       RWO            Retain           Bound    kubeflow-user-example-com/cc             local-storage   <unset>                          9h
-persistentvolume/katib-mysql       10Gi       RWO            Retain           Bound    kubeflow-user-example-com/bbc-0-volume   local-storage   <unset>                          26d
-persistentvolume/minio-pvc         20Gi       RWO            Retain           Bound    kubeflow/minio-pvc                       local-storage   <unset>                          26d
-persistentvolume/mysql-pv-claim    20Gi       RWO            Retain           Bound    kubeflow/mysql-pv-claim                  local-storage   <unset>                          26d
-
-NAMESPACE                   NAME                                   STATUS   VOLUME            CAPACITY   ACCESS MODES   STORAGECLASS    VOLUMEATTRIBUTESCLASS   AGE
-kubeflow-user-example-com   persistentvolumeclaim/bbc-0-volume     Bound    katib-mysql       10Gi       RWO            local-storage   <unset>                 9h
-kubeflow-user-example-com   persistentvolumeclaim/cc               Bound    jupyter-storage   10Gi       RWO            local-storage   <unset>                 9h
-kubeflow                    persistentvolumeclaim/katib-mysql      Bound    authservice-pvc   10Gi       RWO            local-storage   <unset>                 26d
-kubeflow                    persistentvolumeclaim/minio-pvc        Bound    minio-pvc         20Gi       RWO            local-storage   <unset>                 26d
-kubeflow                    persistentvolumeclaim/mysql-pv-claim   Bound    mysql-pv-claim    20Gi       RWO            local-storage   <unset>                 26d
+[200] undefined http://121.40.245.182:7116/volumes/api/namespaces/pvcs
+--------------------------------------------------------------------------------------------
 
 
-2. 创建Katib Experiments 报错。
+# 解决方法:
+kubectl get storageclass
+kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+
+
+# 镜像无法下载:
+filebrowser/filebrowser:v2.25.0
+nerdctl pull m.daocloud.io/docker.io/filebrowser/filebrowser:v2.25.0
+nerdctl tag m.daocloud.io/docker.io/filebrowser/filebrowser:v2.25.0 filebrowser/filebrowser:v2.25.0
+nerdctl save filebrowser/filebrowser:v2.25.0 -o filebrowser..v2.25.0
+
+nerdctl pull ghcr.io/kubeflow/kubeflow/notebook-servers/jupyter-scipy:v1.10.0
+nerdctl save ghcr.io/kubeflow/kubeflow/notebook-servers/jupyter-scipy:v1.10.0 -o jupyter-scipy..v1.10.0
+
+
+ip="10.0.10.148 10.0.10.155 10.0.10.173 10.0.10.210"; for i in $ip ; do scp filebrowser..v2.25.0 $i:/Data/IMAGES/; ssh $i "nerdctl load -i /Data/IMAGES/filebrowser..v2.25.0" ; done
+ip="10.0.10.148 10.0.10.155 10.0.10.173 10.0.10.210"; for i in $ip ; do scp jupyter-scipy..v1.10.0 $i:/Data/IMAGES/; ssh $i "nerdctl load -i /Data/IMAGES/jupyter-scipy..v1.10.0" ; done
+
+
+# 如果需要的话，删除并重新创建 Released 状态的 PV
+kubectl delete pv jupyter-storage
+kubectl delete pv katib-mysql
+
+# 如果需要的话，或者重新绑定（如果数据不重要）
+kubectl patch pv jupyter-storage -p '{"spec":{"claimRef": null}}'
+kubectl patch pv katib-mysql -p '{"spec":{"claimRef": null}}'
+
+
+创建 notebook 的时候会出错。
+-------------------------------------------------------------------------
+Pending: no persistent volumes available for this claim and no storage class is set
+
+Unschedulable: 0/5 nodes are available: pod has unbound immediate PersistentVolumeClaims. preemption: 0/5 nodes are available: 5 Preemption is not helpful for scheduling.
+
+No default Storage Class is set. Can't create new Disks for the new Notebook. Please use an Existing Disk.   '
+
+-------------------------------------------------------------------------
+
+# 找到是哪个 deployment 部署的这个 pod 。 搜索 kubeflow 这个 namespace 下的所有 pod 的日志，在复杂系统中，初步过滤问题，很重要:
+kubectl -n kubeflow get pods -o name | xargs -I {} sh -c 'echo "=== {} ==="; kubectl -n kubeflow logs {} 2>/dev/null | grep -i "j222-0" || true'
+
+nerdctl pull tensorflow/tensorflow:2.5.1
+nerdctl pull m.daocloud.io/docker.io/tensorflow/tensorflow:2.5.1
+nerdctl tag m.daocloud.io/docker.io/tensorflow/tensorflow:2.5.1 tensorflow/tensorflow:2.5.1
+nerdctl save tensorflow/tensorflow:2.5.1 -o tensorflow..2.5.1
+ip="10.0.10.148 10.0.10.155 10.0.10.173 10.0.10.210"; for i in $ip ; do scp tensorflow..2.5.1 $i:/Data/IMAGES/; ssh $i "nerdctl load -i /Data/IMAGES/tensorflow..2.5.1" ; done
+
+nerdctl pull m.daocloud.io/docker.io/rancher/local-path-provisioner:v0.0.26
+nerdctl tag m.daocloud.io/docker.io/rancher/local-path-provisioner:v0.0.26 rancher/local-path-provisioner:v0.0.26
+nerdctl save rancher/local-path-provisioner:v0.0.26 -o local-path-provisioner..v0.0.26
+ip="10.0.10.148 10.0.10.155 10.0.10.173 10.0.10.210"; for i in $ip ; do scp local-path-provisioner..v0.0.26 $i:/Data/IMAGES/; ssh $i "nerdctl load -i /Data/IMAGES/local-path-provisioner..v0.0.26" ; done
+
+docker pull busybox:1.37.0
+
+
+
+2. 创建 Katib Experiments 报错。
 [500] admission webhook "validator.experiment.katib.kubeflow.org" denied the request: spec.trialTemplate.trialParameters must be specified
 ......
 
 #查看katib-ui日志，发现以下报错。
-root@node1:/opt/manifests-1.9.1# kubectl -n kubeflow logs -f katib-ui-6c6fc87849-mvkks 
-2025/04/07 06:42:46 Serving the frontend dir /app/build
-2025/04/07 06:42:46 Serving at 0.0.0.0:8080
-2025/04/08 10:18:23 Sending file /app/build/static/index.html for url: /katib/
-2025/04/08 16:53:14 Sending file /app/build/static/index.html for url: /katib/
-2025/04/08 16:53:24 CreateRuntimeObject from parameters failed: admission webhook "validator.experiment.katib.kubeflow.org" denied the request: spec.trialTemplate.trialParameters must be specified
-2025/04/08 17:12:38 Sending file /app/build/static/index.html for url: /katib/
-2025/04/09 02:39:52 Sending file /app/build/static/index.html for url: /katib/
-2025/04/09 02:40:00 CreateRuntimeObject from parameters failed: admission webhook "validator.experiment.katib.kubeflow.org" denied the request: spec.trialTemplate.trialParameters must be specified
-2025/04/09 02:41:16 CreateRuntimeObject from parameters failed: admission webhook "validator.experiment.katib.kubeflow.org" denied the request: spec.trialTemplate.trialParameters must be specified
-2025/04/09 02:46:33 CreateRuntimeObject from parameters failed: admission webhook "validator.experiment.katib.kubeflow.org" denied the request: spec.trialTemplate.trialParameters must be specified
-2025/04/09 02:46:36 CreateRuntimeObject from parameters failed: admission webhook "validator.experiment.katib.kubeflow.org" denied the request: spec.trialTemplate.trialParameters must be specified
+kubectl -n kubeflow logs -f katib-ui-949786bfd-zsg2t
+-------------------------------------------------------------------------
+2025/11/01 16:22:58 Serving the frontend dir /app/build
+2025/11/01 16:22:58 Serving at 0.0.0.0:8080
+2025/11/02 18:00:33 Sending file /app/build/static/index.html for url: /katib/
+2025/11/02 18:01:23 Sending file /app/build/static/index.html for url: /katib/
+2025/11/05 03:09:24 Sending file /app/build/static/index.html for url: /katib/
+2025/11/05 03:09:39 CreateRuntimeObject from parameters failed: admission webhook "validator.experiment.katib.kubeflow.org" denied the request: spec.trialTemplate.trialParameters: Required value: must be specified
+
+
+
+2025/11/05 03:10:26 CreateRuntimeObject from parameters failed: admission webhook "validator.experiment.katib.kubeflow.org" denied the request: spec.trialTemplate.trialParameters: Required value: must be specified
+2025/11/05 03:12:28 CreateRuntimeObject from parameters failed: admission webhook "validator.experiment.katib.kubeflow.org" denied the request: [spec.trialTemplate.trialParameters[0]: Invalid value: "": name and reference must be specified and name must not contain '{' or '}', spec.trialTemplate.trialParameters[1]: Invalid value: "": name and reference must be specified and name must not contain '{' or '}', spec.trialTemplate: Invalid value: "": parameters: [${trialParameters.learningRate} ${trialParameters.momentum}] in spec.trialTemplate not found in spec.trialParameters: [{learningRate  } {momentum  }]]
+-------------------------------------------------------------------------
+
+nerdctl pull m.daocloud.io/docker.io/kubeflowkatib/tf-mnist-with-summaries:latest
+
+# 编写正确的 tfjob-example.yaml 
+tfjob-example.yaml
+https://github.com/cloudnatived/mlops/blob/main/KUBEFLOW/tfjob-example.yaml
+
+# 查看 pod 中的多个容器的名称:
+kubectl -n kubeflow-user-example-com describe pod tfjob-example-xncvxxvs-worker-0 |grep -A 10 "Containers:"
+
+# 查看 pod 中的某个容器的日志，在分析有 sidecar 容器的 pod 时很重要:
+kubectl -n kubeflow-user-example-com logs -f tfjob-example-xncvxxvs-worker-0 -c istio-validation
+
+# 在katib-controller- 容器和 katib-ui- 容器中有 tf-job 的信息，待查。
+
+
 
 
 3. Pipelines界面的提示。
+-------------------------------------------------------------------------
 Error: failed to retrieve list of pipelines. Click Details for more information.
 ......
 Cannot retrieve pipeline details. Click Details for more information.
 ......
+An error occurred
+{"error":"Failed to list pipelines in namespace kubeflow-user-example-com. Check error stack: Failed to list pipelines with context \u0026{0xc000a1a8c0}, options \u0026{10 0xc00123ee00}: InternalServerError: Failed to start transaction to list pipelines: Error 1049 (42000): Unknown database 'mlpipeline'","code":13,"message":"Failed to list pipelines in namespace kubeflow-user-example-com. Check error stack: Failed to list pipelines with context \u0026{0xc000a1a8c0}, options \u0026{10 0xc00123ee00}: InternalServerError: Failed to start transaction to list pipelines: Error 1049 (42000): Unknown database 'mlpipeline'","details":[{"@type":"type.googleapis.com/google.rpc.Status","code":13,"message":"Internal Server Error"}]}
+-------------------------------------------------------------------------
 
+分析结果:
+MySQL 数据库 mlpipeline不存在
 
-```
+# 获取 MySQL root 密码
+kubectl get secret -n kubeflow mysql-secret -o jsonpath='{.data.password}' | base64 -d && echo
 
+# 连接到 MySQL Pod
+kubectl exec -it -n kubeflow deployment/mysql -- bash
 
+# 手动在 MySQL 命令行中创建数据库：
+CREATE DATABASE IF NOT EXISTS mlpipeline;
+SHOW DATABASES;
+EXIT;
 
+# 或者使用一行命令创建数据库:
+kubectl exec -n kubeflow deployment/mysql -- mysql -u root -p$MYSQL_ROOT_PASSWORD -e "CREATE DATABASE IF NOT EXISTS mlpipeline; SHOW DATABASES;"
+kubectl exec -n kubeflow deployment/mysql -- mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS mlpipeline; SHOW DATABASES;"
 
+# 重启 Pipelines 组件以重新初始化
+# 重启 Pipelines 相关组件
+kubectl rollout restart deployment -n kubeflow \
+  ml-pipeline \
+  ml-pipeline-persistenceagent \
+  ml-pipeline-scheduledworkflow
 
-### 4.3.Kubeflow Trainer （Training Operator）
+# 等待重启完成
+kubectl rollout status deployment/ml-pipeline -n kubeflow
 
-Kubeflow的Trainer（之前的项目名为Training Operator）组件介绍、安装、应用
 
-Kubeflow Trainer 是什么？ Kubeflow Trainer 是一个 Kubernetes 原生项目，旨在对大型语言模型 (LLM) 进行微调，并支持跨 PyTorch、JAX、TensorFlow 和 XGBoost 等各种框架进行可扩展的分布式机器学习 (ML) 模型训练。 
-可以将其他机器学习库（例如 HuggingFace、DeepSpeed 或 Megatron-LM）与 Kubeflow Trainer 集成，以便在 Kubernetes 上编排它们的机器学习训练。 Kubeflow Trainer 允许您使用 Kubeflow Python SDK 轻松开发 LLM，并使用 Kubernetes 自定义资源 API 构建 Kubernetes 原生训练运行时。
+1. 检查 Pipelines 核心组件状态
+# 检查 Pipelines 相关 Pod 状态
+kubectl get pods -n kubeflow | grep -E "(ml-pipeline|pipeline|cache|viewer)"
 
-这些服务于各种深度学习训练（TensorFlow、PyTorch、MXNet 等）的 operators **主要的工作包括**：
+# 检查关键服务状态
+kubectl get deployments -n kubeflow | grep -E "(ml-pipeline|pipeline)"
 
-1. 在 Kubernetes 集群上创建 Pod 以拉起各个训练进程
-2. 配置用作服务发现的信息（如 `TF_CONFIG`）以及创建相关 Kubernetes 资源（如 Service）
-3. 监控并更新整个任务的状态
+2. 查看详细错误日志
+# 查看 Pipeline Server 日志
+kubectl logs -n kubeflow deployment/ml-pipeline -c ml-pipeline-api-server
 
-Trainer里面主要是一些CRD和相关的controller。其中包括了tfjob，pytorchjob，mpijob，mxjob，paddlepaddlejob等等。kubeflow有专门的文档来家介绍各种job的使用：tfjob，pytorchjob。
+# 查看前端日志
+kubectl logs -n kubeflow deployment/ml-pipeline-ui
 
-tfjob的文档之所以称之为tfjob，是因为契合支持tensorflow的分布式训练。tensorflow的分布式训练是参数服务器架构且使用2222端口通信，因此tfjob中的pod的角色类型就是PS和Worker，其中PS的2222端口默认开放。eg.以 tf_job_mnist.yaml 为例，运行起来后，执行kubectl get all 输出如下，每个PS和Worker都有一个headless service，和pod同名，开启2222端口用于通讯。pod无需关心通信逻辑，因为通信逻辑是用户运行的tensorflow的分布式代码决定的。
+# 查看 Persistent Agent 日志（如果有）
+kubectl logs -n kubeflow deployment/ml-pipeline-persistenceagent
 
+# 查看 Scheduled Workflow 日志
+kubectl logs -n kubeflow deployment/ml-pipeline-scheduledworkflow
 
-```
-文档地址：https://www.kubeflow.org/docs/components/trainer/operator-guides/installation/
-GITHUB地址:https://github.com/kubeflow/trainer
 
-
-root@node1:/opt/manifests-1.9.1# kubectl apply --server-side -k "https://github.com/kubeflow/trainer.git/manifests/overlays/manager?ref=master"
-namespace/kubeflow-system serverside-applied
-customresourcedefinition.apiextensions.k8s.io/clustertrainingruntimes.trainer.kubeflow.org serverside-applied
-customresourcedefinition.apiextensions.k8s.io/jobsets.jobset.x-k8s.io serverside-applied
-customresourcedefinition.apiextensions.k8s.io/trainingruntimes.trainer.kubeflow.org serverside-applied
-customresourcedefinition.apiextensions.k8s.io/trainjobs.trainer.kubeflow.org serverside-applied
-serviceaccount/jobset-controller-manager serverside-applied
-serviceaccount/kubeflow-trainer-controller-manager serverside-applied
-role.rbac.authorization.k8s.io/jobset-leader-election-role serverside-applied
-clusterrole.rbac.authorization.k8s.io/jobset-manager-role serverside-applied
-clusterrole.rbac.authorization.k8s.io/jobset-metrics-reader serverside-applied
-clusterrole.rbac.authorization.k8s.io/jobset-proxy-role serverside-applied
-clusterrole.rbac.authorization.k8s.io/kubeflow-trainer-controller-manager serverside-applied
-rolebinding.rbac.authorization.k8s.io/jobset-leader-election-rolebinding serverside-applied
-clusterrolebinding.rbac.authorization.k8s.io/jobset-manager-rolebinding serverside-applied
-clusterrolebinding.rbac.authorization.k8s.io/jobset-metrics-reader-rolebinding serverside-applied
-clusterrolebinding.rbac.authorization.k8s.io/jobset-proxy-rolebinding serverside-applied
-clusterrolebinding.rbac.authorization.k8s.io/kubeflow-trainer-controller-manager serverside-applied
-configmap/jobset-manager-config serverside-applied
-secret/jobset-webhook-server-cert serverside-applied
-secret/kubeflow-trainer-webhook-cert serverside-applied
-service/jobset-controller-manager-metrics-service serverside-applied
-service/jobset-webhook-service serverside-applied
-service/kubeflow-trainer-controller-manager serverside-applied
-deployment.apps/jobset-controller-manager serverside-applied
-deployment.apps/kubeflow-trainer-controller-manager serverside-applied
-mutatingwebhookconfiguration.admissionregistration.k8s.io/jobset-mutating-webhook-configuration serverside-applied
-validatingwebhookconfiguration.admissionregistration.k8s.io/jobset-validating-webhook-configuration serverside-applied
-validatingwebhookconfiguration.admissionregistration.k8s.io/validator.trainer.kubeflow.org serverside-applied
-
-# 检查pod。
-root@node1:~# kubectl get pod -n kubeflow-system 
-NAME                                                   READY   STATUS    RESTARTS   AGE
-jobset-controller-manager-78c56848fc-9tl2g             1/1     Running   0          15h
-kubeflow-trainer-controller-manager-5888cf8498-8ng22   1/1     Running   0          15h
-
-# 这里有很多trainer的examples。
-https://github.com/kubeflow/trainer/tree/release-1.9/examples
-
-# tf_job operation的实例之一：
-https://github.com/kubeflow/trainer/tree/release-1.9/examples/tensorflow/dist-mnist
-
-dist_mnist.py
-####################################
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
-import json
-import math
-import os
-import sys
-import tempfile
-import time
-
-import tensorflow as tf
-from tensorflow.examples.tutorials.mnist import input_data
-
-flags = tf.app.flags
-flags.DEFINE_string("data_dir", "/tmp/mnist-data",
-                    "Directory for storing mnist data")
-flags.DEFINE_boolean("download_only", False,
-                     "Only perform downloading of data; Do not proceed to "
-                     "session preparation, model definition or training")
-flags.DEFINE_integer("task_index", None,
-                     "Worker task index, should be >= 0. task_index=0 is "
-                     "the master worker task the performs the variable "
-                     "initialization ")
-flags.DEFINE_integer("num_gpus", 1, "Total number of gpus for each machine."
-                     "If you don't use GPU, please set it to '0'")
-flags.DEFINE_integer("replicas_to_aggregate", None,
-                     "Number of replicas to aggregate before parameter update"
-                     "is applied (For sync_replicas mode only; default: "
-                     "num_workers)")
-flags.DEFINE_integer("hidden_units", 100,
-                     "Number of units in the hidden layer of the NN")
-flags.DEFINE_integer("train_steps", 20000,
-                     "Number of (global) training steps to perform")
-flags.DEFINE_integer("batch_size", 100, "Training batch size")
-flags.DEFINE_float("learning_rate", 0.01, "Learning rate")
-flags.DEFINE_boolean(
-    "sync_replicas", False,
-    "Use the sync_replicas (synchronized replicas) mode, "
-    "wherein the parameter updates from workers are aggregated "
-    "before applied to avoid stale gradients")
-flags.DEFINE_boolean(
-    "existing_servers", False, "Whether servers already exists. If True, "
-    "will use the worker hosts via their GRPC URLs (one client process "
-    "per worker host). Otherwise, will create an in-process TensorFlow "
-    "server.")
-flags.DEFINE_string("ps_hosts", "localhost:2222",
-                    "Comma-separated list of hostname:port pairs")
-flags.DEFINE_string("worker_hosts", "localhost:2223,localhost:2224",
-                    "Comma-separated list of hostname:port pairs")
-flags.DEFINE_string("job_name", None, "job name: worker or ps")
-
-FLAGS = flags.FLAGS
-
-IMAGE_PIXELS = 28
-
-# Example:
-#   cluster = {'ps': ['host1:2222', 'host2:2222'],
-#              'worker': ['host3:2222', 'host4:2222', 'host5:2222']}
-#   os.environ['TF_CONFIG'] = json.dumps(
-#       {'cluster': cluster,
-#        'task': {'type': 'worker', 'index': 1}})
-
-def main(unused_argv):
-  # Parse environment variable TF_CONFIG to get job_name and task_index
-
-  # If not explicitly specified in the constructor and the TF_CONFIG
-  # environment variable is present, load cluster_spec from TF_CONFIG.
-  tf_config = json.loads(os.environ.get('TF_CONFIG') or '{}')
-  task_config = tf_config.get('task', {})
-  task_type = task_config.get('type')
-  task_index = task_config.get('index')
-
-  FLAGS.job_name = task_type
-  FLAGS.task_index = task_index
-
-  mnist = input_data.read_data_sets(FLAGS.data_dir, one_hot=True)
-  if FLAGS.download_only:
-    sys.exit(0)
-
-  if FLAGS.job_name is None or FLAGS.job_name == "":
-    raise ValueError("Must specify an explicit `job_name`")
-  if FLAGS.task_index is None or FLAGS.task_index == "":
-    raise ValueError("Must specify an explicit `task_index`")
-
-  print("job name = %s" % FLAGS.job_name)
-  print("task index = %d" % FLAGS.task_index)
-
-  cluster_config = tf_config.get('cluster', {})
-  ps_hosts = cluster_config.get('ps')
-  worker_hosts = cluster_config.get('worker')
-
-  ps_hosts_str = ','.join(ps_hosts)
-  worker_hosts_str = ','.join(worker_hosts)
-
-  FLAGS.ps_hosts = ps_hosts_str
-  FLAGS.worker_hosts = worker_hosts_str
-
-  # Construct the cluster and start the server
-  ps_spec = FLAGS.ps_hosts.split(",")
-  worker_spec = FLAGS.worker_hosts.split(",")
-
-  # Get the number of workers.
-  num_workers = len(worker_spec)
-
-  cluster = tf.train.ClusterSpec({"ps": ps_spec, "worker": worker_spec})
-
-  if not FLAGS.existing_servers:
-    # Not using existing servers. Create an in-process server.
-    server = tf.train.Server(
-        cluster, job_name=FLAGS.job_name, task_index=FLAGS.task_index)
-    if FLAGS.job_name == "ps":
-      server.join()
-
-  is_chief = (FLAGS.task_index == 0)
-  if FLAGS.num_gpus > 0:
-    # Avoid gpu allocation conflict: now allocate task_num -> #gpu
-    # for each worker in the corresponding machine
-    gpu = (FLAGS.task_index % FLAGS.num_gpus)
-    worker_device = "/job:worker/task:%d/gpu:%d" % (FLAGS.task_index, gpu)
-  elif FLAGS.num_gpus == 0:
-    # Just allocate the CPU to worker server
-    cpu = 0
-    worker_device = "/job:worker/task:%d/cpu:%d" % (FLAGS.task_index, cpu)
-  # The device setter will automatically place Variables ops on separate
-  # parameter servers (ps). The non-Variable ops will be placed on the workers.
-  # The ps use CPU and workers use corresponding GPU
-  with tf.device(
-      tf.train.replica_device_setter(
-          worker_device=worker_device,
-          ps_device="/job:ps/cpu:0",
-          cluster=cluster)):
-    global_step = tf.Variable(0, name="global_step", trainable=False)
-
-    # Variables of the hidden layer
-    hid_w = tf.Variable(
-        tf.truncated_normal(
-            [IMAGE_PIXELS * IMAGE_PIXELS, FLAGS.hidden_units],
-            stddev=1.0 / IMAGE_PIXELS),
-        name="hid_w")
-    hid_b = tf.Variable(tf.zeros([FLAGS.hidden_units]), name="hid_b")
-
-    # Variables of the softmax layer
-    sm_w = tf.Variable(
-        tf.truncated_normal(
-            [FLAGS.hidden_units, 10],
-            stddev=1.0 / math.sqrt(FLAGS.hidden_units)),
-        name="sm_w")
-    sm_b = tf.Variable(tf.zeros([10]), name="sm_b")
-
-    # Ops: located on the worker specified with FLAGS.task_index
-    x = tf.placeholder(tf.float32, [None, IMAGE_PIXELS * IMAGE_PIXELS])
-    y_ = tf.placeholder(tf.float32, [None, 10])
-
-    hid_lin = tf.nn.xw_plus_b(x, hid_w, hid_b)
-    hid = tf.nn.relu(hid_lin)
-
-    y = tf.nn.softmax(tf.nn.xw_plus_b(hid, sm_w, sm_b))
-    cross_entropy = -tf.reduce_sum(y_ * tf.log(tf.clip_by_value(y, 1e-10, 1.0)))
-
-    opt = tf.train.AdamOptimizer(FLAGS.learning_rate)
-
-    if FLAGS.sync_replicas:
-      if FLAGS.replicas_to_aggregate is None:
-        replicas_to_aggregate = num_workers
-      else:
-        replicas_to_aggregate = FLAGS.replicas_to_aggregate
-
-      opt = tf.train.SyncReplicasOptimizer(
-          opt,
-          replicas_to_aggregate=replicas_to_aggregate,
-          total_num_replicas=num_workers,
-          name="mnist_sync_replicas")
-
-    train_step = opt.minimize(cross_entropy, global_step=global_step)
-
-    if FLAGS.sync_replicas:
-      local_init_op = opt.local_step_init_op
-      if is_chief:
-        local_init_op = opt.chief_init_op
-
-      ready_for_local_init_op = opt.ready_for_local_init_op
-
-      # Initial token and chief queue runners required by the sync_replicas mode
-      chief_queue_runner = opt.get_chief_queue_runner()
-      sync_init_op = opt.get_init_tokens_op()
-
-    init_op = tf.global_variables_initializer()
-    train_dir = tempfile.mkdtemp()
-
-    if FLAGS.sync_replicas:
-      sv = tf.train.Supervisor(
-          is_chief=is_chief,
-          logdir=train_dir,
-          init_op=init_op,
-          local_init_op=local_init_op,
-          ready_for_local_init_op=ready_for_local_init_op,
-          recovery_wait_secs=1,
-          global_step=global_step)
-    else:
-      sv = tf.train.Supervisor(
-          is_chief=is_chief,
-          logdir=train_dir,
-          init_op=init_op,
-          recovery_wait_secs=1,
-          global_step=global_step)
-
-    sess_config = tf.ConfigProto(
-        allow_soft_placement=True,
-        log_device_placement=False,
-        device_filters=["/job:ps",
-                        "/job:worker/task:%d" % FLAGS.task_index])
-
-    # The chief worker (task_index==0) session will prepare the session,
-    # while the remaining workers will wait for the preparation to complete.
-    if is_chief:
-      print("Worker %d: Initializing session..." % FLAGS.task_index)
-    else:
-      print("Worker %d: Waiting for session to be initialized..." %
-            FLAGS.task_index)
-
-    if FLAGS.existing_servers:
-      server_grpc_url = "grpc://" + worker_spec[FLAGS.task_index]
-      print("Using existing server at: %s" % server_grpc_url)
-
-      sess = sv.prepare_or_wait_for_session(server_grpc_url, config=sess_config)
-    else:
-      sess = sv.prepare_or_wait_for_session(server.target, config=sess_config)
-
-    print("Worker %d: Session initialization complete." % FLAGS.task_index)
-
-    if FLAGS.sync_replicas and is_chief:
-      # Chief worker will start the chief queue runner and call the init op.
-      sess.run(sync_init_op)
-      sv.start_queue_runners(sess, [chief_queue_runner])
-
-    # Perform training
-    time_begin = time.time()
-    print("Training begins @ %f" % time_begin)
-
-    local_step = 0
-    while True:
-      # Training feed
-      batch_xs, batch_ys = mnist.train.next_batch(FLAGS.batch_size)
-      train_feed = {x: batch_xs, y_: batch_ys}
-
-      _, step = sess.run([train_step, global_step], feed_dict=train_feed)
-      local_step += 1
-
-      now = time.time()
-      print("%f: Worker %d: training step %d done (global step: %d)" %
-            (now, FLAGS.task_index, local_step, step))
-
-      if step >= FLAGS.train_steps:
-        break
-
-    time_end = time.time()
-    print("Training ends @ %f" % time_end)
-    training_time = time_end - time_begin
-    print("Training elapsed time: %f s" % training_time)
-
-    # Validation feed
-    val_feed = {x: mnist.validation.images, y_: mnist.validation.labels}
-    val_xent = sess.run(cross_entropy, feed_dict=val_feed)
-    print("After %d training step(s), validation cross entropy = %g" %
-          (FLAGS.train_steps, val_xent))
-
-
-if __name__ == "__main__":
-  tf.app.run()
-####################################
-
-Dockerfile
-####################################
-FROM tensorflow/tensorflow:1.5.0
-
-ADD examples/tensorflow/dist-mnist/ /var/tf_dist_mnist
-ENTRYPOINT ["python", "/var/tf_dist_mnist/dist_mnist.py"]
-####################################
-
-tf_job_mnist.yaml
-####################################
-apiVersion: "kubeflow.org/v1"
-kind: "TFJob"
-metadata:
-  name: "dist-mnist-for-e2e-test"
-spec:
-  tfReplicaSpecs:
-    PS:
-      replicas: 2
-      restartPolicy: Never
-      template:
-        spec:
-          containers:
-            - name: tensorflow
-              image: kubeflow/tf-dist-mnist-test:latest
-    Worker:
-      replicas: 4
-      restartPolicy: Never
-      template:
-        spec:
-          containers:
-            - name: tensorflow
-              image: kubeflow/tf-dist-mnist-test:latest
-####################################
-
-# 创建自有镜像。
-docker build -f Dockerfile -t kubeflow/tf-dist-mnist-test:1.0 ./
-docker save -o tf-dist-mnist-test..1.0 kubeflow/tf-dist-mnist-test:1.0
-docker build -t Dockerfile -t deepspeed20250414:2.0 ./
-
-
-
-# 提交tf-jobs
-kubectl apply -f tf-dist-mnist.yaml
-
-# 查看pod状态。
-root@node1:~/BBC-T# kubectl -n kubeflow-system get pod
-NAME                                                   READY   STATUS    RESTARTS   AGE
-jobset-controller-manager-78c56848fc-9tl2g             1/1     Running   0          26h
-kubeflow-trainer-controller-manager-5888cf8498-8ng22   1/1     Running   0          26h
-tf-dist-mnist-for-e2e-test-ps-0                        1/1     Running   0          3m31s
-tf-dist-mnist-for-e2e-test-ps-1                        1/1     Running   0          3m31s
-tf-dist-mnist-for-e2e-test-worker-0                    1/1     Running   0          3m30s
-tf-dist-mnist-for-e2e-test-worker-1                    1/1     Running   0          3m30s
-tf-dist-mnist-for-e2e-test-worker-2                    1/1     Running   0          3m30s
-tf-dist-mnist-for-e2e-test-worker-3                    1/1     Running   0          3m30s
-
-
-```
-
-
-
-```
-# 完成部署之后，部署Kubeflow Training Runtimes
-kubectl apply --server-side -k "https://github.com/kubeflow/trainer.git/manifests/overlays/runtimes?ref=master"
-
-root@node1:~# kubectl apply --server-side -k "https://github.com/kubeflow/trainer.git/manifests/overlays/runtimes?ref=master"
-clustertrainingruntime.trainer.kubeflow.org/deepspeed-distributed serverside-applied
-clustertrainingruntime.trainer.kubeflow.org/mlx-distributed serverside-applied
-clustertrainingruntime.trainer.kubeflow.org/mpi-distributed serverside-applied
-clustertrainingruntime.trainer.kubeflow.org/torch-distributed serverside-applied
-
-# 查看
-root@node1:~# kubectl get clustertrainingruntime.trainer.kubeflow.org
-NAME                    AGE
-deepspeed-distributed   53m
-mlx-distributed         53m
-mpi-distributed         53m
-torch-distributed       53m
-
-# 查看 torch-distributed 详情
-root@node1:~# kubectl describe clustertrainingruntimes.trainer.kubeflow.org torch-distributed
-Name:         torch-distributed
-Namespace:    
-Labels:       <none>
-Annotations:  <none>
-API Version:  trainer.kubeflow.org/v1alpha1
-Kind:         ClusterTrainingRuntime
-Metadata:
-  Creation Timestamp:  2025-04-13T02:52:15Z
-  Generation:          1
-  Resource Version:    16413802
-  UID:                 d1e82daa-d8d0-4932-b79c-81026ca5dacb
-Spec:
-  Ml Policy:
-    Num Nodes:  1
-    Torch:
-      Num Proc Per Node:  auto
-  Template:
-    Spec:
-      Replicated Jobs:
-        Name:      node
-        Replicas:  1
-        Template:
-          Metadata:
-            Labels:
-              trainer.kubeflow.org/trainjob-ancestor-step:  trainer
-          Spec:
-            Template:
-              Spec:
-                Containers:
-                  Command:
-                    /bin/bash
-                    -c
-                    echo "Torch Distributed Runtime"
-
-echo "--------------------------------------"
-echo "Torch Default Runtime Env"
-env | grep PET_
-
-pip list
-
-                  Image:  pytorch/pytorch:2.5.0-cuda12.4-cudnn9-runtime
-                  Name:   node
-Events:                   <none>
-#
-
-
-```
-
-
-
-### 4.4.基于Kubernetes和DeepSpeed进行分布式训练
-
-基于Kubernetes和DeepSpeed进行分布式训练的实例
-
-
-
-一、准备
-1.Kubernetes集群搭建：
-在两台Node节点上安装Kubernetes，并确保它们组成一个高可用性的集群。你可以使用kubeadmin、minikube或其他Kubernetes安装工具来完成这一步。
-确保Kubernetes集群的网络配置正确，以便Pod之间可以相互通信。
-2.安装和配置DeepSpeed：
-在每个Node节点的容器中安装DeepSpeed。你可以通过pip进行安装：pip install deepspeed。
-根据你的模型和训练需求，配置一个DeepSpeed的配置文件（例如ds_config.json）。这个配置文件将指定各种分布式训练参数，如zero优化器的阶段（zero-1、zero-2、zero-3）、梯度累积、batch大小等。
-3.准备数据集和存储：
-将训练所需的数据集上传到Kubernetes集群可访问的持久化存储中，如NFS、CephFS或云存储服务。
-确保Kubernetes集群中的Pod可以访问这个存储，并且具有足够的读写权限。
-
-二、部署和配置训练任务
-1.编写Dockerfile和构建镜像：
-创建一个Dockerfile，其中应包含你的训练代码、依赖库、模型和DeepSpeed环境。
-使用Docker命令构建镜像：docker build -t your-image-name .，并将镜像推送到Docker仓库。
-2.编写Kubernetes部署文件：
-创建一个Kubernetes部署文件（如deployment.yaml），指定要运行的Docker镜像、资源请求和限制、环境变量、Pod间通信等配置。
-在部署文件中，你可以通过设置环境变量来传递DeepSpeed配置文件路径和其他训练参数给你的训练代码。
-3.部署训练任务：
-使用kubectl命令部署你的训练任务：kubectl apply -f deployment.yaml。
-你可以通过kubectl来查看和管理Pod的状态：kubectl get pods，kubectl logs <pod-name>等。
-
-三、编写和运行训练代码
-1.初始化DeepSpeed：
-在你的训练代码中，导入DeepSpeed库，并使用deepspeed.initialize()函数来初始化DeepSpeed引擎。传入模型、优化器、学习率调度器等参数。
-DeepSpeed会自动对模型参数进行分区，并管理分布式训练过程中的通信和同步。
-2.加载数据集和模型：
-使用PyTorch的数据加载器（如DataLoader）或自定义数据加载器来加载训练数据集。
-定义和初始化你的模型，确保它与DeepSpeed兼容。
-3.编写训练循环：
-在训练循环中，调用模型的forward方法进行前向传播，计算损失，并调用backward方法进行反向传播。
-使用DeepSpeed引擎的step()方法来更新模型参数，而不是直接使用优化器的step()方法。
-根据需要保存和加载模型状态，以便在训练中断后能够恢复训练。
-
-四、监控和调优
-
-![](IMAGE-1\mlops-5ff7aed57a2863ddd7c48de8f01ef36e.png)
-
-1.监控训练过程：
-使用Kubernetes的监控工具（如Prometheus和Grafana）来实时监控训练过程的资源使用情况、训练速度、损失和准确率等指标。
-根据监控数据进行性能分析和调优。
-2.日志收集和分析：
-配置日志收集系统（如ELK Stack或Fluentd）来收集和分析训练过程中的日志信息。这有助于及时发现问题、定位错误并进行调试。
-根据日志分析的结果调整训练参数和配置，以优化训练效果和资源利用率。
-3.调整配置和优化性能：
-根据监控和日志分析的结果，调整DeepSpeed配置文件中的参数（如zero优化阶段、梯度累积步数等）以及Kubernetes部署文件中的资源请求和限制等配置来优化训练性能和资源利用率。
-
-
-
-五、代码实现 
-
-Dockerfile
-
-```
-Dockerfile
-####################################################
-# Dockerfile  
-FROM pytorch/pytorch:latest  
-  
-# 安装DeepSpeed  
-RUN pip install deepspeed  
-  
-# 将训练代码复制到镜像中  
-COPY train.py .  
-COPY ds_config.json .  
-  
-# 设置工作目录  
-WORKDIR /app  
-  
-# 运行训练脚本  
-CMD ["python", "train.py"]
-####################################################
-
-docker build -f Dockerfile -t deepspeed20250414:2.0 ./
-
-
-```
-
-DeepSpeed 配置文件 (ds_config.json)
-
-```
-{  
- "train_batch_size": 32,  
- "gradient_accumulation_steps": 1,  
- "optimizer": {  
-  "type": "Adam",  
-  "params": {  
-      "lr": 0.001,  
-      "betas": [0.9, 0.999],  
-      "eps": 1e-8,  
-      "weight_decay": 0  
-  }  
- },  
- "fp16": {  
-  "enabled": true  
- },  
- "zero_optimization": {  
-  "stage": 2,  
-  "allgather_partitions": true,  
-  "allgather_bucket_size": 2e8,  
-  "overlap_comm": true,  
-  "reduce_scatter": true,  
-  "reduce_bucket_size": 2e8,  
-  "contiguous_gradients": true,  
-  "cpu_offload": false  
- }  
-}
-```
-
-
-
-PyTorch 训练脚本 (train.py)
-
-```
-import torch
-import torch.nn as nn  
-import torch.optim as optim  
-import deepspeed
-from torch.utils.data import DataLoader, TensorDataset
-
-# 假设你已经有了一个简单的模型和数据集  
-class SimpleModel(nn.Module):
-    def __init__(self):
-        super(SimpleModel, self).__init__()
-        self.linear = nn.Linear(10, 2)
-
-    def forward(self, x):
-        return self.linear(x)
-
-# 模拟数据集  
-x = torch.randn(100, 10)
-y = torch.randint(0, 2, (100,))
-dataset = TensorDataset(x, y)
-dataloader = DataLoader(dataset, batch_size=32)
-
-# 初始化模型和优化器  
-model = SimpleModel()
-optimizer = optim.Adam(model.parameters(), lr=0.001)
-
-# 加载DeepSpeed配置并初始化  
-model_engine, optimizer, _, _ = deepspeed.initialize(args=deepspeed.args(),
-                                                     model=model,
-                                                     model_parameters=model.parameters(),
-                                                     config="ds_config.json",
-                                                     optimizer=optimizer)
-
-# 训练循环  
-model_engine.train()
-for epoch in range(10):  # 假设训练10个epoch  
-    for batch in dataloader:
-        data, targets = batch
-        outputs = model_engine(data)
-        loss = nn.CrossEntropyLoss()(outputs, targets)
-        model_engine.backward(loss)
-        model_engine.step()
-```
-
-
-
-**Kubernetes 部署文件 (deployment.yaml)**
-
-```
-deployment.yaml
-##############################################################
-apiVersion: apps/v1  
-kind: Deployment  
-metadata:  
-  name: deepspeed-training  
-spec:  
-  replicas: 2 # 根据你的节点数量调整
-  selector:  
-    matchLabels:  
-      app: deepspeed-training  
-  template:  
-    metadata:  
-      labels:  
-        app: deepspeed-training
-    spec:  
-      containers:  
-      - name: trainer  
-        #image: your-docker-image # 替换为Docker镜像名称
-        image: deepspeed20250414:2.0
-        env:  
-          - name: MASTER_ADDR  
-            value: "localhost" # 在Kubernetes中，这通常是通过服务发现来设置的
-          - name: MASTER_PORT  
-            value: "6000" # 选择一个合适的端口
-          - name: LOCAL_RANK  
-            valueFrom:  
-              fieldRef:  
-                fieldPath: metadata.annotations['kubernetes.io/pod-name'] # 用于设置local_rank，可能需要更复杂的逻辑来确保唯一性
-          - name: WORLD_SIZE  
-            value: "2" # 副本数设置
-        resources:
-          limits:  
-            nvidia.com/gpu: 1 # 每个Pod请求的GPU数量
-##############################################################
-```
-  
-  
-  
-注意事项：  
-1.环境变量：在Kubernetes部署中，MASTER_ADDR 和 MASTER_PORT 需要正确设置以确保Pod之间可以通信。在真实的Kubernetes环境中，你可能需要使用服务（Service）来发现其他Pods。  
-2.World Size 和 Local Rank：在分布式训练中，WORLD_SIZE 表示总的进程数，而 LOCAL_RANK 表示当前进程的唯一标识符。在Kubernetes中，你可能需要使用更复杂的逻辑来设置这些值，例如通过StatefulSet或Downward API。  
-3.GPU资源：在deployment.yaml中，我们请求了每个Pod一个GPU。确保你的Kubernetes集群有足够的GPU资源。  
-4.代码和配置调整：根据你的具体模型和训练需求，你可能需要调整训练脚本和DeepSpeed配置。  
-示例提供了一个基本的框架，但是，在生产环境中部署分布式训练任务通常需要更多的配置和优化。    
-  
-Kubeflow的借助TFJob简化了作业的配置。Volcano通过简单的增加一行配置就可以让用户启动组调度、Task-topology等功能来解决死锁、亲和性等问题，在大规模分布式训练情况下，可以有效的缩短整体训练时间。  
-Kubeflow 和 Volcano两个开源项目的结合充分简化和加速了Kubernetes上AI计算进程。当前已经成为越来越多用户的最佳选择，应用于生产环境。  
-  
-  
-参考资料：  
-基于Kubernetes和DeepSpeed进行分布式训练的实战教程    https://blog.csdn.net/myTomorrow_better/article/details/139515425  
-Kubeflow+Volcano：使用K8s轻松完成AI计算    https://zhuanlan.zhihu.com/p/657157700  
-
-
-#### milvus
-
-
-```
-milvus文档：
-https://github.com/milvus-io/milvus/tree/master/scripts
-https://github.com/milvus-io/milvus/blob/master/scripts/standalone_embed.sh
-参考资料：
-https://blog.csdn.net/lsb2002/article/details/132222947    为AI而生的数据库：Milvus详解及实战
-https://zhuanlan.zhihu.com/p/634255317   Milvus 完整指南：开源向量数据库，AI 应用开发的基础设施（逐行解释代码，小白适用）
-https://www.milvus-io.com/getstarted/standalone/install_standalone-helm   用 Kubernetes 安装独立运行的 Milvus
-
-wget https://github.com/milvus-io/milvus/releases/download/v2.2.13/milvus-standalone-docker-compose.yml -O docker-compose.yml
-
-docker-compose up -d
-docker-compose ps
-
-export http_proxy=http://192.168.1.2:7890;
-export https_proxy=https://192.168.1.2:7890;
-
-docker镜像：
-docker pull minio/minio:RELEASE.2023-03-20T20-16-18Z
-docker pull milvusdb/milvus:v2.2.11
-
-docker pull dhub.kubesre.xyz/milvusdb/milvus:v2.2.11
-docker pull dhub.kubesre.xyz/minio/minio:RELEASE.2023-03-20T20-16-18Z
-
-docker tag dhub.kubesre.xyz/milvusdb/milvus:v2.2.11 milvusdb/milvus:v2.2.11
-docker tag dhub.kubesre.xyz/minio/minio:RELEASE.2023-03-20T20-16-18Z minio/minio:RELEASE.2023-03-20T20-16-18Z
-
-WARN[0000] /Data/BBC/Milvus/docker-compose.yml: `version` is obsolete
-NAME                IMAGE                                      COMMAND                  SERVICE      CREATED         STATUS                   PORTS
-milvus-etcd         quay.io/coreos/etcd:v3.5.5                 "etcd -advertise-cli…"   etcd         5 minutes ago   Up 5 minutes             2379-2380/tcp
-milvus-minio        minio/minio:RELEASE.2023-03-20T20-16-18Z   "/usr/bin/docker-ent…"   minio        5 minutes ago   Up 5 minutes (healthy)   9000/tcp
-milvus-standalone   milvusdb/milvus:v2.2.11                    "/tini -- milvus run…"   standalone   5 minutes ago   Up 5 minutes             0.0.0.0:9091->9091/tcp, 0.0.0.0:19530->19530/tcp
-
-# 启动和查看milvus
-docker-compose up -d
-docker-compose ps
-
-docker pull docker.chenby.cn/zilliz/attu
-docker pull dhub.kubesre.xyz/zilliz/attu:v2.2.6
-
-docker tag dhub.kubesre.xyz/zilliz/attu:v2.2.6 zilliz/attu:v2.2.6
-docker pull dhub.kubesre.xyz/zilliz/attu:v2.4.4
-
-mkdir -p /etc/docker
-tee /etc/docker/daemon.json <<EOF
-{
-    "registry-mirrors": [
-        "https://docker.anyhub.us.kg",
-        "https://dockerhub.icu",
-        "https://docker.awsl9527.cn"
-    ]
-}
-EOF
-systemctl daemon-reload
-systemctl restart docker
-
-
-http://192.168.1.103:8000/
-zilliz:zilliz
-
-```
-
-```
-wget https://raw.githubusercontent.com/milvus-io/pymilvus/v2.2.8/examples/hello_milvus.py
-python3 hello_milvus.py
-
-```
-
-
-手动安装 containerd 
-```
-https://blog.csdn.net/qq_44625641/article/details/139346116    nerdctl命令在进行端口映射时报错
-
-# apt 安装:
-apt install containerd
-#  生成默认配置
-containerd config default > /etc/containerd/config.toml
-
-# 下载 nerdctl ，nerdctl 与 docker 使用方式几乎完全一致。
-wget https://github.com/containerd/nerdctl/releases/download/v1.7.6/nerdctl-full-1.7.6-linux-amd64.tar.gz
-tar -xvf nerdctl-full-1.7.6-linux-amd64.tar.gz -C /usr/local/bin/
-
-# 验证安装：
-nerdctl version
-nerdctl ps -a
-nerdctl images
-
-#  生成默认配置
-containerd config default > /etc/containerd/config.toml
-
-# 创建目录
-sudo mkdir -p /opt/cni/bin
-# 下载 CNI 插件 amd
-cd /opt/cni/bin
-wget https://github.com/containernetworking/plugins/releases/download/v1.1.1/cni-plugins-linux-amd64-v1.1.1.tgz
-tar zxf cni-plugins-linux-amd64-v1.1.1.tgz
-
-cat > /etc/cni/net.d/10-bridge.conf <<EOF
-{
-    "cniVersion": "0.4.0",
-    "name": "bridge",
-    "type": "bridge",
-    "bridge": "cni0",
-    "isGateway": true,
-    "ipMasq": true,
-    "ipam": {
-        "type": "host-local",
-        "ranges": [
-            [{"subnet": "10.22.0.0/16"}]
-        ],
-        "routes": [
-            {"dst": "0.0.0.0/0"}
-        ]
-    }
-}
-EOF
-
-```
 
 
 
