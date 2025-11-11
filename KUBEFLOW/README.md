@@ -722,7 +722,6 @@ Metrics Server与其他工具的对比
 kube-prometheus-0.15.0
 kube-prometheus-0.16.0
 
-```
 主要参考文档：
 https://www.cnblogs.com/niuben/p/18888238   主要是看的这个文档里的NFS。
 https://cloud.tencent.com/developer/article/1780158
@@ -1570,6 +1569,7 @@ kubectl logs -n kubeflow deployment/ml-pipeline-scheduledworkflow
 
 
 ```
+
 
 
 
