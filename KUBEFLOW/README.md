@@ -2,17 +2,22 @@
 
 
 
-1. kubespray, kubespray-2.29.0
+1. kubespray, kubespray-2.29.0, ingress-nginx, rancher
 2. Kubernetes Metrics Server, 
 3. kube-prometheus, 
 4. krew, 
 5. istio, 
 6. kubeflow, kubeflow manifests-1.10.2
+7. kuberay
+
+
 
 
 ```
 
+
 1. kubespray
+1.1 kubespray
 kubespray-2.29.0
 
 # 参考资料：
@@ -583,6 +588,63 @@ ansible-playbook -i inventory/bbc/hosts.yaml \
   cluster.yml
 
 
+1.2 ingress-nginx
+ingress-nginx controller-v1.14.0
+https://github.com/kubernetes/ingress-nginx/releases/tag/controller-v1.14.0
+https://github.com/kubernetes/ingress-nginx/archive/refs/tags/controller-v1.14.0.tar.gz
+https://kubernetes.github.io/ingress-nginx/deploy/
+
+# 部署:
+# kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.14.0/deploy/static/provider/cloud/deploy.yaml   # 官方命令
+wget https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.14.0/deploy/static/provider/cloud/deploy.yaml                 # 实际操作步骤 
+sed -i "s#image: #image: m.daocloud.io/#g" deploy.yaml
+kubectl apply -f deploy.yaml
+
+nerdctl pull m.daocloud.io/registry.k8s.io/ingress-nginx/controller:v1.14.0@sha256:e4127065d0317bd11dc64c4dd38dcf7fb1c3d72e468110b4086e636dbaac943d
+nerdctl save m.daocloud.io/registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.6.4@sha256:bcfc926ed57831edf102d62c5c0e259572591df4796ef1420b87f9cf6092497f -o controller..v1.14.0@sha256:e4127065d0317bd11dc64c4dd38dcf7fb1c3d72e468110b4086e636dbaac943d
+nerdctl save m.daocloud.io/registry.k8s.io/ingress-nginx/controller:v1.14.0@sha256:e4127065d0317bd11dc64c4dd38dcf7fb1c3d72e468110b4086e636dbaac943d -o controller..v1.14.0@sha256:e4127065d0317bd11dc64c4dd38dcf7fb1c3d72e468110b4086e636dbaac943d
+nerdctl pull m.daocloud.io/registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.6.4@sha256:bcfc926ed57831edf102d62c5c0e259572591df4796ef1420b87f9cf6092497f
+nerdctl save m.daocloud.io/registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.6.4@sha256:bcfc926ed57831edf102d62c5c0e259572591df4796ef1420b87f9cf6092497f -o kube-webhook-certgen..v1.6.4@sha256:bcfc926ed57831edf102d62c5c0e259572591df4796ef1420b87f9cf6092497f
+
+# 验证:
+kubectl get pods -n ingress-nginx
+kubectl get svc -n ingress-nginx
+
+使用 kubectl patch 修改为 NodePort
+kubectl patch svc ingress-nginx-controller -n ingress-nginx -p '{"spec": {"type": "NodePort"}}'
+kubectl get svc -n ingress-nginx ingress-nginx-controller
+curl -H "Host: your-host.com" http://<NODE_IP>:31234      # 示范
+curl -H "Host: your-host.comm" http://10.0.10.153:32415  
+telnet 10.0.10.153 32415
+
+kubectl patch svc ingress-nginx-controller -n ingress-nginx -p '{"spec": {"type": "LoadBalancer"}}'     # 恢复为 LoadBalancer（如需）
+
+
+
+1.3 rancher
+
+docker pull registry.cn-hangzhou.aliyuncs.com/rancher/rancher:v2.8.4
+docker pull rancher/rancher:v2.13-dc792f277d13955ed1de3081adc617af0bd28f2c-head
+docker pull hub.rat.dev/rancher/rancher:v2.13-dc792f277d13955ed1de3081adc617af0bd28f2c-head    # 可执行
+
+docker run -d --restart=unless-stopped \
+  -p 80:80 -p 443:443 \
+  --privileged \
+  -e CATTLE_SYSTEM_DEFAULT_REGISTRY=registry.cn-hangzhou.aliyuncs.com \
+  --name rancher \
+  registry.cn-hangzhou.aliyuncs.com/rancher/rancher:v2.8.4
+
+docker run -d --restart=unless-stopped \
+  -p 80:80 -p 443:443 \
+  --privileged \
+  --name rancher \
+  hub.rat.dev/rancher/rancher:v2.13-dc792f277d13955ed1de3081adc617af0bd28f2c-head
+
+https://ranchermanager.docs.rancher.com/zh/getting-started/quick-start-guides/deploy-workloads/workload-ingress
+
+
+
+
 
 
 
@@ -618,7 +680,7 @@ registry.k8s.io/metrics-server/metrics-server:v0.8.0
 m.daocloud.io/registry.k8s.io/metrics-server/metrics-server:v0.8.0
 
 
-1. 基础状态检查命令
+2.1 基础状态检查命令
 检查Metrics Server部署状态
 # 检查Metrics Server Pod状态
 kubectl get pods -n kube-system -l k8s-app=metrics-server
@@ -639,7 +701,7 @@ kubectl get --raw /apis/metrics.k8s.io/v1beta1 | jq .
 kubectl get apiservices | grep metrics
 kubectl get --raw /apis/metrics.k8s.io/v1beta1/nodes
 
-2. 资源指标查询命令
+2.2 资源指标查询命令
 查看节点资源指标
 # 查看所有节点的资源使用情况
 kubectl top nodes
@@ -662,7 +724,7 @@ kubectl top pod <pod-name> -n <namespace>
 # 包含标签信息
 kubectl top pods -l app=my-app
 
-3. 诊断和故障排除命令
+2.3 诊断和故障排除命令
 检查Metrics Server日志
 # 查看Metrics Server Pod日志
 kubectl logs -n kube-system -l k8s-app=metrics-server
@@ -684,7 +746,7 @@ kubectl get endpoints -n kube-system metrics-server
 # 检查服务证书
 kubectl get --raw /api/v1/namespaces/kube-system/services/https:metrics-server:/proxy/healthz  # 执行后报错：Error from server (ServiceUnavailable): no endpoints available for service "https:metrics-server:"
 
-4. 高级测试命令
+2.4 高级测试命令
 直接访问Metrics API
 # 获取所有节点的metrics数据
 kubectl get --raw /apis/metrics.k8s.io/v1beta1/nodes | jq .
@@ -718,7 +780,11 @@ Metrics Server与其他工具的对比
 
 
 
+
+
+
 3. kube-prometheus
+3.1 kube-prometheus
 kube-prometheus-0.15.0
 kube-prometheus-0.16.0
 
@@ -767,7 +833,6 @@ kubectl apply -f manifests/
 
 # kubectl wait --for condition=Established --all CustomResourceDefinition --namespace=monitoring
 
-
 # 如果需要卸载： 
 kubectl delete -f manifests/setup   #直接删除了namespace
 kubectl wait --for condition=Established --all CustomResourceDefinition --namespace=monitoring
@@ -775,8 +840,8 @@ kubectl delete -f manifests/
 
 如果条件允许，在机房部署2-3个管理服务器，这样可以部署各种工具平台。而且可以管理训练网络，业务网络，数据网络，带外网络。
 
-NFS部分：
-1.NFS服务端：
+3.2 NFS部分：
+3.2.1 NFS服务端：
 apt install -y nfs-kernel-server
 # 每个节点创建共享存储文件夹：
 mkdir /nfs;
@@ -799,7 +864,7 @@ nfsstat
 #查看 rpc 执行信息，可以用于检测 rpc 运行情况
 rpcinfo
 
-2.NFS客户端：
+3.2.2 NFS客户端：
 apt install -y nfs-common
 #显示指定的 NFS 服务器(假设 IP 地址为 172.18.6.69)上 export 出来的目录
 showmount -e 172.18.6.69
@@ -1093,6 +1158,8 @@ rm -rf ~/.krew
 
 
 
+
+
 5. istio
 istio-1.27.3
 https://istio.io/latest/zh/docs/
@@ -1150,6 +1217,8 @@ nerdctl save docker.io/istio/proxyv2:1.27.3 -o proxyv2..1.27.3
 
 ip="10.0.10.148 10.0.10.155 10.0.10.173 10.0.10.210"; for i in $ip ; do scp pilot..1.27.3 $i:/Data/IMAGES/; ssh $i "nerdctl load -i /Data/IMAGES/pilot..1.27.3" ; done
 ip="10.0.10.148 10.0.10.155 10.0.10.173 10.0.10.210"; for i in $ip ; do scp proxyv2..1.27.3 $i:/Data/IMAGES/; ssh $i "nerdctl load -i /Data/IMAGES/proxyv2..1.27.3" ; done
+
+
 
 
 
@@ -1395,6 +1464,7 @@ journalctl -u containerd.service -f
 
 
 
+
 Kubeflow manifests-1.10.2 功能性问题:
 
 1. 建立 Volumes 和创建 notebook 的时候会出错。
@@ -1469,6 +1539,7 @@ docker pull busybox:1.37.0
 
 
 
+
 2. 创建 Katib Experiments 报错。
 [500] admission webhook "validator.experiment.katib.kubeflow.org" denied the request: spec.trialTemplate.trialParameters must be specified
 ......
@@ -1506,6 +1577,7 @@ kubectl -n kubeflow-user-example-com logs -f tfjob-example-xncvxxvs-worker-0 -c 
 
 
 
+
 3. Pipelines界面的提示。
 -------------------------------------------------------------------------
 Error: failed to retrieve list of pipelines. Click Details for more information.
@@ -1513,7 +1585,10 @@ Error: failed to retrieve list of pipelines. Click Details for more information.
 Cannot retrieve pipeline details. Click Details for more information.
 ......
 An error occurred
-{"error":"Failed to list pipelines in namespace kubeflow-user-example-com. Check error stack: Failed to list pipelines with context \u0026{0xc000a1a8c0}, options \u0026{10 0xc00123ee00}: InternalServerError: Failed to start transaction to list pipelines: Error 1049 (42000): Unknown database 'mlpipeline'","code":13,"message":"Failed to list pipelines in namespace kubeflow-user-example-com. Check error stack: Failed to list pipelines with context \u0026{0xc000a1a8c0}, options \u0026{10 0xc00123ee00}: InternalServerError: Failed to start transaction to list pipelines: Error 1049 (42000): Unknown database 'mlpipeline'","details":[{"@type":"type.googleapis.com/google.rpc.Status","code":13,"message":"Internal Server Error"}]}
+' {"error":"Failed to list pipelines in namespace kubeflow-user-example-com. Check error stack: Failed to list pipelines with context \u0026{0xc000a1a8c0}, options \u0026{10 0xc00123ee00}: 
+InternalServerError: Failed to start transaction to list pipelines: Error 1049 (42000): Unknown database 'mlpipeline'","code":13,"message":"Failed to list pipelines in namespace kubeflow-user-example-com. 
+Check error stack: Failed to list pipelines with context \u0026{0xc000a1a8c0}, options \u0026{10 0xc00123ee00}: InternalServerError: Failed to start transaction to list pipelines: 
+Error 1049 (42000): Unknown database 'mlpipeline'","details":[{"@type":"type.googleapis.com/google.rpc.Status","code":13,"message":"Internal Server Error"}]} '
 -------------------------------------------------------------------------
 
 分析结果:
@@ -1568,12 +1643,113 @@ kubectl logs -n kubeflow deployment/ml-pipeline-scheduledworkflow
 
 
 
+
+7. kuberay
+
+https://docs.rayai.org.cn/en/latest/cluster/kubernetes/getting-started/kuberay-operator-installation.html
+https://github.com/ray-project/kuberay
+https://docs.rayai.org.cn/en/latest/cluster/kubernetes/getting-started/kuberay-operator-installation.html
+
+
+
+7.1 KubeRay Operator Installation
+# KubeRay Operator Installation
+Step 1: Create a Kubernetes cluster
+
+Step 2: Install KubeRay operator
+kubectl create -k "github.com/ray-project/kuberay/ray-operator/config/default?ref=v1.5.0"
+# 会创建以下资源:
+---------------------------------------------------------------------------------------------------------------
+customresourcedefinition.apiextensions.k8s.io/rayclusters.ray.io created
+customresourcedefinition.apiextensions.k8s.io/rayjobs.ray.io created
+customresourcedefinition.apiextensions.k8s.io/rayservices.ray.io created
+serviceaccount/kuberay-operator created
+role.rbac.authorization.k8s.io/kuberay-operator-leader-election created
+clusterrole.rbac.authorization.k8s.io/kuberay-operator created
+rolebinding.rbac.authorization.k8s.io/kuberay-operator-leader-election created
+clusterrolebinding.rbac.authorization.k8s.io/kuberay-operator created
+service/kuberay-operator created
+deployment.apps/kuberay-operator created
+---------------------------------------------------------------------------------------------------------------
+
+
+Step 3: Validate Installation
+kubectl get pods
+
+rayproject/ray:2.46.0
+docker.io/rayproject/ray:2.46.0
+m.daocloud.io/docker.io/rayproject/ray:2.46.0
+nerdctl tag m.daocloud.io/docker.io/rayproject/ray:2.46.0 rayproject/ray:2.46.0
+nerdctl save rayproject/ray:2.46.0 -o ray:2.46.0
+ip="10.0.10.148 10.0.10.155 10.0.10.173 10.0.10.210"; for i in $ip ; do scp ray..2.46.0 $i:/Data/IMAGES/; ssh $i "nerdctl load -i /Data/IMAGES/ray..2.46.0" ; done
+
+
+7.2 RayCluster Quickstart
+# RayCluster Quickstart
+Step 1: Create a Kubernetes cluster
+
+Step 2: Deploy a KubeRay operator
+
+Step 3: Deploy a RayCluster custom resource
+
+Step 4: Run an application on a RayCluster
+
+
+
+
+7.3 RayJob Quickstart
+# RayJob Quickstart
+Step 1: Create a Kubernetes cluster with Kind
+
+Step 2: Install the KubeRay operator
+
+Step 3: Install a RayJob
+kubectl apply -f https://raw.githubusercontent.com/ray-project/kuberay/v1.5.0/ray-operator/config/samples/ray-job.sample.yaml
+
+Step 4: Verify the Kubernetes cluster status
+kubectl get rayjob
+kubectl get raycluster
+kubectl get pods
+kubectl get rayjobs.ray.io rayjob-sample -o jsonpath='{.status.jobStatus}'
+kubectl get rayjobs.ray.io rayjob-sample -o jsonpath='{.status.jobDeploymentStatus}'
+
+Step 5: Check the output of the Ray job
+kubectl logs -l=job-name=rayjob-sample
+
+Step 6: Delete the RayJob
+kubectl delete -f https://raw.githubusercontent.com/ray-project/kuberay/v1.5.0/ray-operator/config/samples/ray-job.sample.yaml
+
+Step 7: Create a RayJob with shutdownAfterJobFinishes set to true
+kubectl apply -f https://raw.githubusercontent.com/ray-project/kuberay/v1.5.0/ray-operator/config/samples/ray-job.shutdown.yaml
+
+Step 8: Check the RayJob status
+# Wait until `jobStatus` is `SUCCEEDED` and `jobDeploymentStatus` is `Complete`.
+kubectl get rayjobs.ray.io rayjob-sample-shutdown -o jsonpath='{.status.jobDeploymentStatus}'
+kubectl get rayjobs.ray.io rayjob-sample-shutdown -o jsonpath='{.status.jobStatus}'
+
+Step 9: Check if the KubeRay operator deletes the RayCluster
+kubectl get raycluster
+
+Step 10: Clean up
+# Step 10.1: Delete the RayJob
+kubectl delete -f https://raw.githubusercontent.com/ray-project/kuberay/v1.5.0/ray-operator/config/samples/ray-job.shutdown.yaml
+
+# Step 10.2: Delete the KubeRay operator
+helm uninstall kuberay-operator
+
+# Step 10.3: Delete the Kubernetes cluster
+kind delete cluster
+
+
+
+7.4 RayService Quickstart
+# RayService Quickstart
+Step 1: Create a Kubernetes cluster with Kind
+kind create cluster --image=kindest/node:v1.26.0
+
+Step 2: Install the KubeRay operator
+
+Step 3: Install a RayService
+kubectl apply -f https://raw.githubusercontent.com/ray-project/kuberay/v1.5.0/ray-operator/config/samples/ray-service.sample.yaml
+
 ```
-
-
-
-
-
-
-
-
