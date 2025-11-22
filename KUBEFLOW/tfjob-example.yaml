@@ -41,7 +41,7 @@ spec:
               spec:
                 containers:
                   - name: tensorflow  # 必须与 primaryContainerName 一致
-                    image: m.daocloud.io/docker.io/kubeflowkatib/tf-mnist-with-summaries:latest
+                    image: m.daocloud.io/docker.io/kubeflowkatib/tf-mnist-with-summaries:v1beta1-906a6b1
                     command:
                       - "python"
                       - "/opt/model.py"
