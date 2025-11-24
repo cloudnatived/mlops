@@ -45,11 +45,13 @@ transform = transforms.Compose([
 
 
 # 训练数据集
-train_dataset = torchvision.datasets.MNIST(root='./data', train=True, transform=transform, download=True)
+#train_dataset = torchvision.datasets.MNIST(root='./data', train=True, transform=transform, download=True)
+train_dataset = torchvision.datasets.MNIST(root='/Data/DEMO/MODEL/MNIST', train=True, transform=transform, download=True)
 train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True, num_workers=2)
 
 # 测试数据集
-test_dataset = torchvision.datasets.MNIST(root='./data', train=False, transform=transform, download=True)
+#test_dataset = torchvision.datasets.MNIST(root='./data', train=False, transform=transform, download=True)
+test_dataset = torchvision.datasets.MNIST(root='/Data/DEMO/MODEL/MNIST', train=False, transform=transform, download=True)
 test_loader = DataLoader(test_dataset, batch_size=64, shuffle=False, num_workers=2)
 
 # 可视化训练数据
