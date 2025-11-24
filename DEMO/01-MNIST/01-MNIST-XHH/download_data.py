@@ -6,8 +6,10 @@ from tqdm import tqdm  # 增加进度条显示
 
 # 注意，这里得到的train_data和test_data已经直接可以用于训练了！
 # 不一定要继续后面的保存图像。
-train_data = MNIST(root='./data', train=True, download=True, transform=ToTensor())
-test_data = MNIST(root='./data', train=False, download=True, transform=ToTensor())
+#train_data = MNIST(root='./data', train=True, download=True, transform=ToTensor())
+train_data = MNIST(root='/Data/DEMO/MODEL/MNIST', train=True, download=True, transform=ToTensor())
+#test_data = MNIST(root='./data', train=False, download=True, transform=ToTensor())
+test_data = MNIST(root='/Data/DEMO/MODEL/MNIST', train=False, download=True, transform=ToTensor())
 
 # 继续将手写数字图像“保存”下来
 # 输出两个文件夹，train和test，分别保存训练和测试数据。
