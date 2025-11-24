@@ -45,8 +45,10 @@ transform = transforms.Compose([
 ])
 
 # 加载数据集
-train_dataset = datasets.MNIST('./MNIST', train=True, download=True, transform=transform)
-test_dataset = datasets.MNIST('./MNIST', train=False, download=True, transform=transform)
+#train_dataset = datasets.MNIST('./MNIST', train=True, download=True, transform=transform)
+train_dataset = datasets.MNIST('/Data/DEMO/MODEL/MNIST', train=True, download=True, transform=transform)
+#test_dataset = datasets.MNIST('./MNIST', train=False, download=True, transform=transform)
+test_dataset = datasets.MNIST('/Data/DEMO/MODEL/MNIST', train=False, download=True, transform=transform)
 
 # 创建数据加载器，使用DataLoader将数据分批处理
 train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)   # 训练集，批次大小64，数据打乱
