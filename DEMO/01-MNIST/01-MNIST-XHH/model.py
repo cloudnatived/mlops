@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import torch
 from torch import nn
 # 神经网络的实现代码
