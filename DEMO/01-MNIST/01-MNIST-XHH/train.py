@@ -18,7 +18,8 @@ if __name__ == '__main__':
     # 会将"3"就会作为文件夹中图像数据的标签，和图像配对，用于后续的训练，使用起来非常的方便
     
     # 读入并构造数据集
-    train_dataset = datasets.ImageFolder(root='./mnist_images/train', transform=transform)
+    #train_dataset = datasets.ImageFolder(root='./mnist_images/train', transform=transform)
+    train_dataset = datasets.ImageFolder(root='/Data/DEMO/MODEL/MNIST/mnist_images/train', transform=transform)
     print("train_dataset length: ", len(train_dataset))
 
     train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)    # 使用trainloader,实现小批量的数据读取，设置小批量的大小，batch size=64。每个批次，包括64个数据
