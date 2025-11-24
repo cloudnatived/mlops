@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import torch                                         # 导入PyTorch库
 from torch import nn                                 # 导入PyTorch的神经网络模块
 from torch import optim                              # 导入优化器工具
