@@ -1,5 +1,8 @@
 // complex_cuda.cu
 // 复杂示例：多核函数、共享内存矩阵乘法、并行归约、原子示例、streams 与异步拷贝、NVTX 区段
+// 使用实际路径替换
+// nvcc -O3 -arch=sm_80 -lineinfo -I/usr/local/cuda-13.0/targets/x86_64-linux/include/nvtx3/nvToolsExt.h -L/usr/local/cuda/lib64 -DUSE_NVTX -o complex_cuda complex_cuda.cu -lnvToolsExt
+
 #include <cstdio>
 #include <cstdlib>
 #include <chrono>
