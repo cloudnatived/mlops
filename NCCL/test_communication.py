@@ -18,88 +18,156 @@
 # NCCL_DEBUG=TRACE torchrun --nnodes 3 --nproc-per-node=8 --rdzv_backend=c10d --rdzv_endpoint=head_node_ip:8887 check_nccl.py
 
 import argparse
+import os
 import torch
 import torch.distributed as dist
 
-parser = argparse.ArgumentParser(description='Test communication backends')
-parser.add_argument('--backend', type=str, default='nccl', choices=['nccl', 'gloo', 'mpi'])
-parser.add_argument('--skip-vllm', action='store_true', help='Skip vLLM NCCL tests')
-args = parser.parse_args()
+def setup_distributed():
+    """设置分布式环境"""
+    parser = argparse.ArgumentParser(description='Test communication backends')
+    parser.add_argument('--backend', type=str, default='nccl', choices=['nccl', 'gloo', 'mpi'])
+    parser.add_argument('--skip-vllm', action='store_true', help='Skip vLLM NCCL tests')
+    args = parser.parse_args()
+    
+    # 多节点环境使用环境变量初始化
+    if not dist.is_initialized():
+        dist.init_process_group(backend=args.backend)
+    
+    return args
 
-# 单机测试时初始化进程组
-if not dist.is_initialized():
-    dist.init_process_group(backend=args.backend, init_method='tcp://localhost:23456', rank=0, world_size=1)
-
-local_rank = dist.get_rank() % torch.cuda.device_count()
-if torch.cuda.is_available():
-    torch.cuda.set_device(local_rank)
-
-# 测试基础通信
-if torch.cuda.is_available():
-    data = torch.FloatTensor([1,] * 128).to("cuda")
+def test_basic_communication():
+    """测试基础通信"""
+    local_rank = int(os.environ.get('LOCAL_RANK', 0))
+    world_size = dist.get_world_size()
+    rank = dist.get_rank()
+    
+    print(f"Rank {rank}/{world_size}, Local Rank {local_rank}: Starting communication test")
+    
+    # 设置设备
+    if torch.cuda.is_available():
+        torch.cuda.set_device(local_rank)
+        device = torch.device(f"cuda:{local_rank}")
+    else:
+        device = torch.device("cpu")
+    
+    # 测试数据
+    data = torch.ones(128, device=device)
+    
+    # 同步所有进程
+    dist.barrier()
+    
+    # All-reduce 测试
     dist.all_reduce(data, op=dist.ReduceOp.SUM)
-    torch.cuda.synchronize()
+    
+    if torch.cuda.is_available():
+        torch.cuda.synchronize()
+    
     value = data.mean().item()
-else:
-    data = torch.FloatTensor([1,] * 128)
-    dist.all_reduce(data, op=dist.ReduceOp.SUM)
-    value = data.mean().item()
+    expected = world_size
+    
+    if rank == 0:
+        print(f"All-reduce result: {value}, Expected: {expected}")
+    
+    assert abs(value - expected) < 1e-6, f"Expected {expected}, got {value}"
+    
+    return world_size, rank, local_rank
 
-world_size = dist.get_world_size()
-assert value == world_size, f"Expected {world_size}, got {value}"
-
-print("PyTorch NCCL is successful!")
-
-# Test PyTorch GLOO
-gloo_group = dist.new_group(ranks=list(range(world_size)), backend="gloo")
-cpu_data = torch.FloatTensor([1,] * 128)
-dist.all_reduce(cpu_data, op=dist.ReduceOp.SUM, group=gloo_group)
-value = cpu_data.mean().item()
-assert value == world_size, f"Expected {world_size}, got {value}"
-
-print("PyTorch GLOO is successful!")
-
-# 如果跳过vLLM测试或者world_size<=1，则退出
-if args.skip_vllm or world_size <= 1:
-    print("Skipping vLLM tests as requested")
+def test_gloo_backend(world_size):
+    """测试GLOO后端"""
+    if world_size <= 1:
+        return
+    
+    # 创建GLOO组
+    gloo_group = dist.new_group(ranks=list(range(world_size)), backend="gloo")
+    
+    # 在CPU上测试GLOO
+    cpu_data = torch.ones(128)
+    dist.all_reduce(cpu_data, op=dist.ReduceOp.SUM, group=gloo_group)
+    value = cpu_data.mean().item()
+    
+    assert abs(value - world_size) < 1e-6, f"GLOO: Expected {world_size}, got {value}"
+    
+    if dist.get_rank() == 0:
+        print("PyTorch GLOO is successful!")
+    
     dist.destroy_process_group(gloo_group)
-    dist.destroy_process_group()
-    exit()
 
-# Test vLLM NCCL, with cuda graph
-try:
-    from vllm.distributed.device_communicators.pynccl import PyNcclCommunicator
-
-    pynccl = PyNcclCommunicator(group=gloo_group, device=local_rank)
-    # pynccl is enabled by default for 0.6.5+,
-    # but for 0.6.4 and below, we need to enable it manually.
-    # keep the code for backward compatibility when because people
-    # prefer to read the latest documentation.
-    pynccl.disabled = False
-
-    s = torch.cuda.Stream()
-    with torch.cuda.stream(s):
+def test_vllm_nccl(world_size, local_rank, skip_vllm=False):
+    """测试vLLM NCCL（可选）"""
+    if skip_vllm or world_size <= 1:
+        if dist.get_rank() == 0:
+            print("Skipping vLLM tests")
+        return
+    
+    try:
+        from vllm.distributed.device_communicators.pynccl import PyNcclCommunicator
+        
+        # 创建GLOO组用于vLLM
+        gloo_group = dist.new_group(ranks=list(range(world_size)), backend="gloo")
+        
+        pynccl = PyNcclCommunicator(group=gloo_group, device=local_rank)
+        pynccl.disabled = False
+        
+        # 测试vLLM NCCL
+        data = torch.ones(128, device=f"cuda:{local_rank}")
+        
+        # 使用CUDA stream
+        s = torch.cuda.Stream()
+        with torch.cuda.stream(s):
+            data.fill_(1)
+            out = pynccl.all_reduce(data, stream=s)
+            value = out.mean().item()
+        
+        assert abs(value - world_size) < 1e-6, f"vLLM NCCL: Expected {world_size}, got {value}"
+        
+        if dist.get_rank() == 0:
+            print("vLLM NCCL is successful!")
+        
+        # 测试CUDA Graph
+        g = torch.cuda.CUDAGraph()
+        with torch.cuda.graph(cuda_graph=g, stream=s):
+            out = pynccl.all_reduce(data, stream=torch.cuda.current_stream())
+        
         data.fill_(1)
-        out = pynccl.all_reduce(data, stream=s)
+        g.replay()
+        torch.cuda.current_stream().synchronize()
         value = out.mean().item()
-        assert value == world_size, f"Expected {world_size}, got {value}"
+        
+        assert abs(value - world_size) < 1e-6, f"vLLM CUDA Graph: Expected {world_size}, got {value}"
+        
+        if dist.get_rank() == 0:
+            print("vLLM NCCL with CUDA Graph is successful!")
+        
+        dist.destroy_process_group(gloo_group)
+        
+    except ImportError:
+        if dist.get_rank() == 0:
+            print("vLLM not available, skipping vLLM tests")
 
-    print("vLLM NCCL is successful!")
+def main():
+    """主函数"""
+    args = setup_distributed()
+    
+    try:
+        world_size, rank, local_rank = test_basic_communication()
+        
+        if rank == 0:
+            print("PyTorch NCCL is successful!")
+        
+        test_gloo_backend(world_size)
+        test_vllm_nccl(world_size, local_rank, args.skip_vllm)
+        
+        if rank == 0:
+            print("All tests completed successfully!")
+            
+    except Exception as e:
+        print(f"Rank {dist.get_rank()}: Error - {e}")
+        raise
+    
+    finally:
+        # 清理
+        if dist.is_initialized():
+            dist.destroy_process_group()
 
-    g = torch.cuda.CUDAGraph()
-    with torch.cuda.graph(cuda_graph=g, stream=s):
-        out = pynccl.all_reduce(data, stream=torch.cuda.current_stream())
-
-    data.fill_(1)
-    g.replay()
-    torch.cuda.current_stream().synchronize()
-    value = out.mean().item()
-    assert value == world_size, f"Expected {world_size}, got {value}"
-
-    print("vLLM NCCL with cuda graph is successful!")
-
-except ImportError:
-    print("vLLM not available, skipping vLLM tests")
-
-dist.destroy_process_group(gloo_group)
-dist.destroy_process_group()
+if __name__ == "__main__":
+    main()
