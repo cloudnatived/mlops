@@ -1,5 +1,7 @@
-# 这个程序的功能会先将MNIST数据下载下来，然后再保存为.png的格式。
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
+# 这个程序的功能会先将MNIST数据下载下来，然后再保存为.png的格式。
 from torchvision.datasets import MNIST
 from torchvision.transforms import ToTensor
 from tqdm import tqdm  # 增加进度条显示
