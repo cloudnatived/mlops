@@ -1,0 +1,36 @@
+# 模型配置
+model:
+  vocab_size: 30522
+  hidden_size: 768
+  num_layers: 12
+  num_heads: 12
+  intermediate_size: 3072
+  max_seq_length: 512
+  dropout_rate: 0.1
+
+# 数据配置
+data:
+  data_dir: "./data"
+  tokenizer: "./data/models/bert-base-uncased"
+  num_workers: 4  # 每GPU的工作进程数，根据CPU核心数调整
+  steps_per_epoch: 1000
+  num_samples: 10000  # 增加样本量以充分利用多GPU
+
+# 训练配置（针对V100 16GB优化）
+training:
+  batch_size: 16  # 单GPU batch size，V100 16GB可支持
+  accumulation_steps: 2  # 梯度累积，减少内存占用
+  learning_rate: 3e-5
+  weight_decay: 0.01
+  epochs: 10
+  warmup_steps: 1000
+  save_dir: "./checkpoints"
+  log_dir: "./logs"
+
+# 分布式配置（3台服务器，每台2个GPU）
+distributed:
+  nodes: 3
+  gpus_per_node: 2
+  master_addr: "172.18.8.208"  # 主节点IP
+  master_port: 29500
+  ssh_port: 22  # 默认SSH端口通常是22
