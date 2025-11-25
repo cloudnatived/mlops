@@ -13,8 +13,7 @@
 
 
 
-···
-
+```
 
 1. kubespray, kubespray-2.29.0, ingress-nginx controller-v1.14.0, rancher:v2.8.4
 1.1 kubespray, kubespray-2.29.0,
@@ -1871,3 +1870,4 @@ WARN[0000] /opt/harbor/docker-compose.yml: the attribute `version` is obsolete, 
 
 
 ```
+
