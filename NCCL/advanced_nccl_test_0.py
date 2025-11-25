@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# NCCL_advanced_nccl_test_0.py
+
 import os
 import sys
 import time
@@ -243,4 +247,5 @@ def main():
         sys.exit(1)
 
 if __name__ == "__main__":
+
     main()
