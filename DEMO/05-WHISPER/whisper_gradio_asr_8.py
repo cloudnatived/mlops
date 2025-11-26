@@ -26,7 +26,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger("whisper-asr")
 
 # ============ 配置 ============
-MODEL_DIR = "/Data/DEMO/MODEL/openai/whisper-large-v3"   # 本地模型路径
+MODEL_DIR = "/Data/MODEL/openai/whisper-large-v3"   # 本地模型路径
 CHUNK_LENGTH_S = 30                           # 分片长度
 SAMPLE_RATE = 16000                           # Whisper 输入采样率
 
