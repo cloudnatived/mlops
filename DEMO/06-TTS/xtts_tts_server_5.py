@@ -16,15 +16,15 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 # ---------------- 配置Hugging Face缓存 ----------------
-os.environ["HF_HOME"] = "/Data/DEMO/TTS/cache"
+os.environ["HF_HOME"] = "/Data/MODEL/cache"
 os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
-os.environ["TTS_HOME"] = "/Data/DEMO/TTS/cache"
+os.environ["TTS_HOME"] = "/Data/MODEL/coqui/XTTS-v2"
 
 # ---------------- 设备 & XTTS模型配置 ----------------
 device = "cuda" if torch.cuda.is_available() else "cpu"
 logger.info(f"使用设备: {device} | GPU数量: {torch.cuda.device_count()}")
 
-MODEL_PATH = "/Data/DEMO/MODEL/coqui/XTTS-v2"
+MODEL_PATH = "/Data/MODEL/coqui/XTTS-v2"
 
 try:
     model = TTS(model_path=MODEL_PATH, config_path=os.path.join(MODEL_PATH, "config.json"), progress_bar=True)
