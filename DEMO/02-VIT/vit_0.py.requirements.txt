@@ -3,7 +3,13 @@ numpy
 pandas==2.3.2
 Pillow==11.3.0
 torch==2.8.0
-transformers==4.56.0
+transformers==4.51.3
 opencv-python
 opencv-contrib-python 
 opencv-python-headless
+brotli
+groovy
+ruff
+safehttpx
+tomlkit
+typer
