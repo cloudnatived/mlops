@@ -16,7 +16,7 @@ os.environ["GRADIO_FRONTEND_SRC"] = "local"
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"使用设备: {device} | GPU数量: {torch.cuda.device_count()}")
 
-MODEL_PATH = "/Data/DEMO/CODE/YOLO/yolov13x.pt"
+MODEL_PATH = "/Data/MODEL/YOLO/yolov13x.pt"
 
 try:
     from ultralytics import YOLO
