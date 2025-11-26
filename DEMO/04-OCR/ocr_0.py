@@ -22,7 +22,7 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"使用设备: {device} | GPU数量: {torch.cuda.device_count()}")
 
 #model_name = "microsoft/trocr-base-printed"
-model_name = "/Data/DEMO/MODEL/microsoft/trocr-base-printed"
+model_name = "/Data/MODEL/microsoft/trocr-base-printed"
 
 try:
     processor = TrOCRProcessor.from_pretrained(model_name)
