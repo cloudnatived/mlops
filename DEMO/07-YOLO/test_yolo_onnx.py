@@ -2,7 +2,7 @@ import onnxruntime as ort
 import numpy as np
 import cv2
 
-ONNX_MODEL = "yolov13x.onnx"
+ONNX_MODEL = "/Data/MODEL/YOLO/yolov13x.onnx"
 IMAGE_PATH = "test.jpg"   # 换成你要测试的图片
 
 def preprocess(img_path, img_size=640):
