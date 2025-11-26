@@ -61,4 +61,4 @@ def build_engine(onnx_file_path, engine_file_path):
     return serialized_engine
 
 if __name__ == '__main__':
-    build_engine('yolov13x.onnx', 'yolov13x.trt')
+    build_engine('/Data/MODEL/YOLO/yolov13x.onnx', '/Data/MODEL/YOLO/yolov13x.trt')
