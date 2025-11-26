@@ -5,3 +5,4 @@ torch==2.8.0
 diffusers
 accelerate
 transformers
+gradio
