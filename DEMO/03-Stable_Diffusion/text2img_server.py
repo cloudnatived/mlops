@@ -15,9 +15,9 @@ accelerator = Accelerator()
 
 # 检查模型路径
 #base_model_path = "./stable-diffusion-v1-5/stable-diffusion-v1-5"
-base_model_path = "/Data/DEMO/MODEL/stable-diffusion-v1-5/stable-diffusion-v1-5"
+base_model_path = "/Data/MODEL/stable-diffusion-v1-5/stable-diffusion-v1-5"
 #refiner_model_path = "stable-diffusion-v1-5/stable-diffusion-v1-5"
-refiner_model_path = "/Data/DEMO/MODEL/stable-diffusion-v1-5/stable-diffusion-v1-5"
+refiner_model_path = "/Data/MODEL/stable-diffusion-v1-5/stable-diffusion-v1-5"
 
 print(f"基础模型路径: {base_model_path}, 存在: {os.path.exists(base_model_path)}")
 print(f"优化模型路径: {refiner_model_path}, 存在: {os.path.exists(refiner_model_path)}")
