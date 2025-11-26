@@ -1,6 +1,6 @@
 gradio==5.45.0
 librosa==0.11.0
-nump
+numpy==1.24.3
 torch==1.13.1
 torchaudio==0.13.1
 transformers==4.38.0
