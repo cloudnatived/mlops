@@ -17,7 +17,7 @@ import gradio as gr
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"使用设备: {device} | GPU数量: {torch.cuda.device_count()}")
 
-local_model_path = "/Data/DEMO/MODEL/google/vit-base-patch16-224"
+local_model_path = "/Data/MODEL/google/vit-base-patch16-224"
 if not os.path.exists(local_model_path):
     raise FileNotFoundError(f"模型路径不存在: {local_model_path}")
 
