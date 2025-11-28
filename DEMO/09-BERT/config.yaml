@@ -10,8 +10,8 @@ model:
 
 # 数据配置
 data:
-  data_dir: "./data"
-  tokenizer: "./data/models/bert-base-uncased"
+  data_dir: "/Data/MODEL/bert-base-uncased"
+  tokenizer: "/Data/MODEL/bert-base-uncased"
   num_workers: 4  # 每GPU的工作进程数，根据CPU核心数调整
   steps_per_epoch: 1000
   num_samples: 10000  # 增加样本量以充分利用多GPU
