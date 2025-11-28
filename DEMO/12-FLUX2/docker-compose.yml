@@ -1,0 +1,95 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  triton-server-1:
+    image: nvcr.io/nvidia/tritonserver:23.10-py3
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 2
+              capabilities: [gpu]
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+      - "8002:8002"
+    volumes:
+      - /shared/models:/models
+      - /shared/logs:/logs
+    command: >
+      tritonserver 
+      --model-repository=/models 
+      --log-verbose=1 
+      --strict-model-config=false
+    networks:
+      - triton-network
+
+  triton-server-2:
+    image: nvcr.io/nvidia/tritonserver:23.10-py3
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 2
+              capabilities: [gpu]
+    ports:
+      - "8003:8000"
+      - "8004:8001"
+      - "8005:8002"
+    volumes:
+      - /shared/models:/models
+      - /shared/logs:/logs
+    command: >
+      tritonserver 
+      --model-repository=/models 
+      --log-verbose=1 
+      --strict-model-config=false
+    networks:
+      - triton-network
+
+  triton-server-3:
+    image: nvcr.io/nvidia/tritonserver:23.10-py3
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 2
+              capabilities: [gpu]
+    ports:
+      - "8006:8000"
+      - "8007:8001"
+      - "8008:8002"
+    volumes:
+      - /shared/models:/models
+      - /shared/logs:/logs
+    command: >
+      tritonserver 
+      --model-repository=/models 
+      --log-verbose=1 
+      --strict-model-config=false
+    networks:
+      - triton-network
+
+  load-balancer:
+    image: nginx:alpine
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - triton-server-1
+      - triton-server-2
+      - triton-server-3
+    networks:
+      - triton-network
+
+networks:
+  triton-network:
+    driver: bridge
