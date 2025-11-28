@@ -11,7 +11,7 @@ RANK=$1
 export NCCL_SOCKET_IFNAME=enp4s1
 export NCCL_DEBUG=INFO
 
-cd /Data/DEMO/CODE/RESNET/;
+cd /Data/CODE/08-ResNet/;
 python3 cifar10_train.py \
   --rank $RANK \
   --world_size $WORLD_SIZE \
@@ -19,6 +19,6 @@ python3 cifar10_train.py \
   --epochs 100 \
   --batch_size 32 \
   --accumulation_steps 4 \
-  --data_dir ./data \
+  --data_dir /Data/MODEL/cifar-10-python \
   --save_dir ./checkpoints \
   --log_dir ./logs
