@@ -42,7 +42,8 @@ def _check_cifar10_manual_download(data_dir):
     return os.path.isfile(tar_path) or os.path.isdir(extracted_path)
 
 
-def get_dataloaders(batch_size, data_dir='./data'):
+#def get_dataloaders(batch_size, data_dir='./data'):
+def get_dataloaders(batch_size, data_dir='/Data/MODEL/cifar-10-python'):
     """
     获取 CIFAR-10 数据集
     :param batch_size: 每卡 batch size
