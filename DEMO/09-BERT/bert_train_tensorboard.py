@@ -161,7 +161,7 @@ class BertForPretraining(nn.Module):
 class BertPretrainingDataset(torch.utils.data.Dataset):
     """BERT预训练数据集"""
     def __init__(self, data_dir, tokenizer_name='bert-base-uncased', max_seq_length=512, num_samples=1000):
-        self.tokenizer = BertTokenizer.from_pretrained("/Data/DEMO/MODEL/bert-base-uncased")
+        self.tokenizer = BertTokenizer.from_pretrained("/Data/MODEL/bert-base-uncased")
         self.max_seq_length = max_seq_length
         self.examples = self._generate_dummy_data(num_samples)
     
