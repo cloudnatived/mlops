@@ -1,0 +1,50 @@
+# config.pbtxt
+name: "flux2"
+platform: "python"
+max_batch_size: 4
+
+input [
+  {
+    name: "prompt"
+    data_type: TYPE_STRING
+    dims: [ -1 ]
+  },
+  {
+    name: "num_inference_steps"
+    data_type: TYPE_INT32
+    dims: [ 1 ]
+  },
+  {
+    name: "guidance_scale"
+    data_type: TYPE_FP32
+    dims: [ 1 ]
+  }
+]
+
+output [
+  {
+    name: "generated_images"
+    data_type: TYPE_FP32
+    dims: [ -1, 3, 256, 256 ]
+  }
+]
+
+instance_group [
+  {
+    kind: KIND_GPU
+    count: 2
+    gpus: [0, 1]
+  }
+]
+
+parameters [
+  {
+    key: "EXECUTION_ENV_PATH"
+    value: {string_value: "$$TRITON_MODEL_DIRECTORY/venv.tar.gz"}
+  }
+]
+
+dynamic_batching {
+  preferred_batch_size: [1, 2, 4]
+  max_queue_delay_microseconds: 10000
+}
