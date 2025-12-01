@@ -4,3 +4,4 @@ transformers>=4.30.0
 numpy
 tensorboard
 tqdm
+mpi4py
