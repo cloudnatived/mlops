@@ -37,14 +37,19 @@ if __name__ == '__main__':
     # 进入模型的迭代循环
     for epoch in range(10):                        # 外层循环，代表了整个训练数据集的遍历次数，整个训练集要循环多少轮，设置成10次、20次或者100次都是可以的
 
-        for batch_idx, (data, label) in enumerate(train_loader):    # 内存循环使用train_loader，进行小批量的数据读取，每一次循环，都会取出64个图像数据，作为一个小批量batch
+        for batch_idx, (data, label) in enumerate(train_loader):    
+            # 内存循环使用train_loader，进行小批量的数据读取，每一次循环，都会取出64个图像数据，作为一个小批量batch
             # 内层每循环一次，就会进行一次梯度下降算法
+            # train_loader 每次迭代返回一个 mini-batch
+            # batch_size = 64，表示每次从训练集中读取 64 个样本
+            # data: 输入特征（如图像），shape = [64, C, H, W]
+            # label: 对应的真实标签，shape = [64]
             # 包括了5个步骤:
-            output = model(data)                   # 1.计算神经网络的前向传播结果
-            loss = criterion(output, label)        # 2.计算output和标签label之间的损失loss
-            loss.backward()                        # 3.使用backward计算梯度
-            optimizer.step()                       # 4.使用optimizer.step更新参数
-            optimizer.zero_grad()                  # 5.将梯度清零
+            output = model(data)                   # 1.前向传播：计算当前 mini-batch 的预测输出
+            loss = criterion(output, label)        # 2.计算预测输出与真实标签之间的损失。计算output和标签label之间的损失loss
+            loss.backward()                        # 3.反向传播：基于损失计算各参数的梯度。使用backward计算梯度
+            optimizer.step()                       # 4.参数更新：沿梯度方向更新模型权重。使用optimizer.step更新参数
+            optimizer.zero_grad()                  # 5.梯度清零：防止梯度在 batch 之间累积
                                                    # 这5个步骤，是使用pytorch框架训练模型的定式，简单记忆就可以了
 
             if batch_idx % 100 == 0:               # 每迭代100个小批量，就打印一次模型的损失，观察训练的过程
