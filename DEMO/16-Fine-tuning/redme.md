@@ -1,4 +1,9 @@
 
+
+
+
+
+```
 finetune_test/
 ├── configs/
 │   ├── gemma2_2b_config.yaml
@@ -59,3 +64,7 @@ python3 train_full.py
 docker run -it -d --shm-size=8G --gpus all --network host --cap-add SYS_ADMIN -v /Data:/Data nvcr.io/nvidia/pytorch:25.09-py3
 /Data/DEMO/14-LLaMA-Factory/finetune_test/scripts
 python3 train_full.py
+
+
+
+```
