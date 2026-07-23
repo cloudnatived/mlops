@@ -19,7 +19,17 @@ finetune_test/
 │   └── utils.py           # 工具函数
 └── run_experiments.sh     # 批量运行脚本
 
+# 在 train_lora.py 中添加
+import yaml
 
+def load_config(config_path):
+    with open(config_path, 'r') as f:
+        return yaml.safe_load(f)
+
+# 使用示例
+config = load_config("configs/gemma2_2b_config.yaml")
+lora_config = config['lora']['lora_config']
+training_args = TrainingArguments(**config['lora']['training'])
 
 google/gemma-4-E2B
 huggingface-cli download google/gemma-4-E2B --local-dir /Data/MODEL/google/gemma-4-E2B
