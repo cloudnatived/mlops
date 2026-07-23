@@ -1,0 +1,267 @@
+# ============================================
+# Gemma-2-2B 模型配置文件
+# 适用于: google/gemma-2-2b
+# 硬件: 2x V100-PCIE-16GB
+# ============================================
+
+model:
+  name: "google/gemma-2-2b"
+  type: "causal_lm"
+  torch_dtype: "float16"  # V100不支持bfloat16
+  trust_remote_code: true
+  use_cache: false  # 配合gradient_checkpointing
+
+tokenizer:
+  add_eos_token: true
+  padding_side: "right"
+  truncation_side: "right"
+  max_length: 512
+
+# ============================================
+# 全量微调配置
+# ============================================
+full_finetune:
+  enabled: true
+  output_dir: "./outputs/gemma2_2b/full"
+  
+  training:
+    num_train_epochs: 3
+    per_device_train_batch_size: 1
+    gradient_accumulation_steps: 16  # 等效batch size = 16
+    learning_rate: 2.0e-5
+    weight_decay: 0.01
+    warmup_ratio: 0.1
+    lr_scheduler_type: "cosine"
+    optim: "adamw_torch"
+    fp16: true
+    gradient_checkpointing: true
+    max_grad_norm: 1.0
+    logging_steps: 10
+    save_steps: 100
+    save_total_limit: 2
+    evaluation_strategy: "no"
+    report_to: "none"
+    dataloader_pin_memory: false
+  
+  # 显存估算
+  memory_estimate:
+    model_size: "~5.2GB (fp16)"
+    optimizer: "~2.1GB"
+    gradients: "~2.1GB"
+    activations: "~4-6GB (with checkpointing)"
+    total: "~13-15GB"
+
+# ============================================
+# LoRA 配置
+# ============================================
+lora:
+  enabled: true
+  output_dir: "./outputs/gemma2_2b/lora"
+  
+  # LoRA超参数
+  lora_config:
+    r: 8  # Rank值，可尝试 [4, 8, 16, 32]
+    lora_alpha: 16  # 缩放系数，通常为 r*2
+    lora_dropout: 0.05
+    bias: "none"
+    task_type: "CAUSAL_LM"
+    
+    # Gemma-2-2B的线性层名称（根据实际模型调整）
+    # 可以通过 model.named_modules() 查看
+    target_modules: 
+      - "q_proj"
+      - "k_proj"
+      - "v_proj"
+      - "o_proj"
+      # 2B版本可能没有gate_proj等MLP层
+      # 如果有，可以添加: "gate_proj", "up_proj", "down_proj"
+  
+  # 实验变体：仅在Q和V上应用LoRA
+  lora_qv_only:
+    target_modules: ["q_proj", "v_proj"]
+    r: 8
+    lora_alpha: 16
+  
+  # 实验变体：在所有线性层应用LoRA
+  lora_all:
+    target_modules: 
+      - "q_proj"
+      - "k_proj"
+      - "v_proj"
+      - "o_proj"
+      - "gate_proj"
+      - "up_proj"
+      - "down_proj"
+    r: 8
+    lora_alpha: 16
+  
+  training:
+    num_train_epochs: 3
+    per_device_train_batch_size: 4
+    gradient_accumulation_steps: 8  # 等效batch size = 32
+    learning_rate: 2.0e-4
+    weight_decay: 0.01
+    warmup_ratio: 0.1
+    lr_scheduler_type: "cosine"
+    optim: "paged_adamw_8bit"  # 8-bit优化器节省显存
+    fp16: true
+    gradient_checkpointing: false  # LoRA通常不需要
+    max_grad_norm: 1.0
+    logging_steps: 10
+    save_steps: 100
+    save_total_limit: 3
+    evaluation_strategy: "no"
+    report_to: "none"
+    dataloader_pin_memory: false
+
+# ============================================
+# QLoRA 配置 (4-bit量化)
+# ============================================
+qlora:
+  enabled: true
+  output_dir: "./outputs/gemma2_2b/qlora"
+  
+  # 4-bit量化配置
+  quantization:
+    load_in_4bit: true
+    bnb_4bit_quant_type: "nf4"  # 可选: "nf4", "fp4"
+    bnb_4bit_compute_dtype: "float16"
+    bnb_4bit_use_double_quant: true
+    bnb_4bit_quant_storage_dtype: "uint8"
+  
+  # LoRA配置（QLoRA使用相同的LoRA结构）
+  lora_config:
+    r: 16  # QLoRA建议用更大的rank
+    lora_alpha: 32
+    lora_dropout: 0.05
+    bias: "none"
+    task_type: "CAUSAL_LM"
+    target_modules: 
+      - "q_proj"
+      - "k_proj"
+      - "v_proj"
+      - "o_proj"
+  
+  training:
+    num_train_epochs: 3
+    per_device_train_batch_size: 8
+    gradient_accumulation_steps: 4  # 等效batch size = 32
+    learning_rate: 2.0e-4
+    weight_decay: 0.01
+    warmup_ratio: 0.1
+    lr_scheduler_type: "cosine"
+    optim: "paged_adamw_8bit"
+    fp16: true
+    gradient_checkpointing: true  # QLoRA推荐开启
+    max_grad_norm: 1.0
+    logging_steps: 10
+    save_steps: 100
+    save_total_limit: 3
+    evaluation_strategy: "no"
+    report_to: "none"
+    dataloader_pin_memory: false
+  
+  # 显存估算
+  memory_estimate:
+    model_size: "~1.3GB (4-bit)"
+    optimizer: "~0.5GB"
+    gradients: "~0.5GB"
+    activations: "~2-3GB"
+    total: "~4-6GB"
+
+# ============================================
+# P-Tuning 配置
+# ============================================
+ptuning:
+  enabled: true
+  output_dir: "./outputs/gemma2_2b/ptuning"
+  
+  # P-Tuning配置
+  ptuning_config:
+    num_virtual_tokens: 20  # 虚拟token数量，可尝试 [10, 20, 30, 50]
+    encoder_hidden_size: 128  # 编码器隐藏层大小
+    encoder_reparameterization_type: "mlp"  # 可选: "mlp", "lstm"
+    encoder_dropout: 0.1
+    task_type: "CAUSAL_LM"
+    inference_mode: false
+  
+  training:
+    num_train_epochs: 5
+    per_device_train_batch_size: 8
+    gradient_accumulation_steps: 4
+    learning_rate: 1.0e-4
+    weight_decay: 0.01
+    warmup_ratio: 0.1
+    lr_scheduler_type: "cosine"
+    optim: "adamw_torch"
+    fp16: true
+    gradient_checkpointing: false
+    max_grad_norm: 1.0
+    logging_steps: 10
+    save_steps: 100
+    save_total_limit: 2
+    evaluation_strategy: "no"
+    report_to: "none"
+    dataloader_pin_memory: false
+
+# ============================================
+# 数据配置
+# ============================================
+data:
+  train_data_path: "./data/sample_data.jsonl"
+  validation_data_path: null  # 可选
+  max_length: 512
+  num_workers: 4
+  preprocessing_num_workers: 4
+  
+  # 数据格式
+  format:
+    instruction_field: "instruction"
+    output_field: "output"
+    template: |
+      <start_of_turn>user
+      {instruction}<end_of_turn>
+      <start_of_turn>model
+      {output}<end_of_turn>
+
+# ============================================
+# 实验跟踪
+# ============================================
+experiment:
+  name: "gemma2_2b_finetune_test"
+  seed: 42
+  use_wandb: false  # 如果想用wandb，设为true
+  wandb_project: "gemma2-finetune"
+  wandb_entity: null
+  
+  # 记录指标
+  metrics:
+    - "train_loss"
+    - "learning_rate"
+    - "epoch"
+    - "gpu_memory_allocated"
+    - "gpu_memory_reserved"
+    - "train_runtime"
+
+# ============================================
+# 系统配置
+# ============================================
+system:
+  # GPU配置
+  gpus: [0, 1]  # 使用GPU 0和1
+  device_map: "auto"  # 自动分配
+  # 可选: "sequential", "balanced", "balanced_low_0"
+  
+  # DeepSpeed配置（可选）
+  deepspeed:
+    enabled: false
+    config_file: "./configs/ds_config_zero2.json"
+  
+  # 混合精度
+  mixed_precision: "fp16"  # V100不支持bf16
+  
+  # 环境变量
+  env_vars:
+    CUDA_VISIBLE_DEVICES: "0,1"
+    OMP_NUM_THREADS: "4"
+    TOKENIZERS_PARALLELISM: "false"
