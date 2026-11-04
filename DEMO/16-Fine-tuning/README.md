@@ -50,6 +50,26 @@ python3 LoRA_5_2.py  数学题回答微调（SFT）
 全量微调
 
 ```
+
+# 检查 PyTorch 和 CUDA 环境
+python - <<'PY'
+import torch
+
+print("PyTorch:", torch.__version__)
+print("CUDA:", torch.version.cuda)
+print("CUDA available:", torch.cuda.is_available())
+
+for i in range(torch.cuda.device_count()):
+    print(
+        f"GPU {i}:",
+        torch.cuda.get_device_name(i),
+        "Capability:",
+        torch.cuda.get_device_capability(i)
+    )
+    print("Memory:", torch.cuda.mem_get_info(i))
+    print("Supported architectures:", torch.cuda.get_arch_list())
+PY
+
 运行 convert_metamath_to_alpaca.py
 
 cd /Data/DEMO/Qwen2.5-Math-1.5B-Instruct
@@ -80,7 +100,7 @@ CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node=2 --master_port=29500 \
   --val_samples 200
 
 
-# 这样的是可以持续运行的。
+# zero3 很快就会OOM。
 CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node=2 --master_port=29500 \
   train_full_qwen25_math.py \
   --model_name_or_path /Data/MODEL/Qwen/Qwen2.5-Math-1.5B-Instruct \
@@ -91,10 +111,16 @@ CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node=2 --master_port=29500 \
   --per_device_batch_size 1 \
   --grad_accum 16 \
   --learning_rate 1e-5 \
-  --num_epochs 2 \
+  --num_epochs 1 \
   --val_samples 200
 
+对于你的硬件，我建议优先考虑 ZeRO-2 + CPU Optimizer Offload，而不是继续使用当前参数较激进的 ZeRO-3。
 
+原因是：
+- 1.5B 模型 FP16 参数总量约 3GB。
+- 两张 V100 各有 16GB 显存，模型参数本身并不算特别大。
+- ZeRO-2 可以分片优化器状态和梯度，不需要像 ZeRO-3 那样频繁进行参数分片和 AllGather。
+- 可以减少 ZeRO-3 参数管理和通信缓冲区带来的复杂性。
 
 ```
 
