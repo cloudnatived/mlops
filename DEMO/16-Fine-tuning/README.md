@@ -65,6 +65,21 @@ bash run_full_finetune.sh
 train_full_qwen25_math.py
 
 
+# 这样也是可以持续运行的。
+CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node=2 --master_port=29500 \
+  train_full_qwen25_math.py \
+  --model_name_or_path /Data/MODEL/Qwen/Qwen2.5-Math-1.5B-Instruct \
+  --data_path /Data/DEMO/Qwen2.5-Math-1.5B-Instruct/data/metamath_40k.jsonl \
+  --output_dir /Data/DEMO/Qwen2.5-Math-1.5B-Instruct/output/full-finetune-test \
+  --deepspeed_config /Data/DEMO/Qwen2.5-Math-1.5B-Instruct/ds_config_zero2.json \
+  --max_seq_len 64 \
+  --per_device_batch_size 1 \
+  --grad_accum 16 \
+  --learning_rate 1e-5 \
+  --num_epochs 2 \
+  --val_samples 200
+
+
 ```
 
 
