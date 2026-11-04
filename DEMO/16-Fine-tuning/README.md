@@ -1,5 +1,10 @@
 
 
+
+
+
+```
+
 python3 train_qwen_math_lora.py \
   --model_name_or_path /Data/MODEL/Qwen/Qwen2.5-Math-1.5B-Instruct \
   --data_path /Data/DEMO/Qwen2.5-Math-1.5B-Instruct/data/metamath_40k.jsonl \
@@ -16,7 +21,14 @@ python3 train_qwen_math_lora.py \
 
 
 
-```
+
+
+
+
+
+
+
+
 finetune_test/
 ├── configs/
 │   ├── gemma2_2b_config.yaml
