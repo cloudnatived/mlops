@@ -19,8 +19,16 @@ python3 train_qwen_math_lora.py \
 
 
 
+自定义评测题目，写一个文件，比如 eval_prompts.txt：
+已知 x^2 - 5x + 6 = 0，求 x 的值。
+一辆汽车每小时走 60 公里，3 小时后还剩 120 公里，求总路程。
+求方程 2x + 7 = 21 的解。
 
-
+python3 train_qwen_math_lora.py \
+  --model_name_or_path /Data/MODEL/Qwen/Qwen2.5-Math-1.5B-Instruct \
+  --data_path /Data/DEMO/Qwen2.5-Math-1.5B-Instruct/data/metamath_40k.jsonl \
+  --output_dir /Data/DEMO/Qwen2.5-Math-1.5B-Instruct/output/lora_math \
+  --eval_prompts /Data/DEMO/Qwen2.5-Math-1.5B-Instruct/eval_prompts.txt
 
 
 
