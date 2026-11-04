@@ -69,6 +69,10 @@ train_full_qwen25_math.py
 
 
 
+```
+
+
+
 finetune_test/
 ├── configs/
 │   ├── gemma2_2b_config.yaml
