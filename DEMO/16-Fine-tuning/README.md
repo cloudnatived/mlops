@@ -2,9 +2,11 @@
 
 
 
-
+LoRA
 ```
+LoRA
 
+V100上轻松运行。
 python3 train_qwen_math_lora.py \
   --model_name_or_path /Data/MODEL/Qwen/Qwen2.5-Math-1.5B-Instruct \
   --data_path /Data/DEMO/Qwen2.5-Math-1.5B-Instruct/data/metamath_40k.jsonl \
@@ -45,12 +47,20 @@ python3 convert_metamath_to_alpaca.py \
 
 bash run_full_finetune.sh
 
+
+
+
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+```
+
+
+全量微调
+
+```
 
 
 
-
-
+```
 
 
 
