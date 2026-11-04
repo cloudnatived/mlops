@@ -32,7 +32,7 @@ python3 train_qwen_math_lora.py \
 
 
 
-
+python3 LoRA_5_2.py  数学题回答微调（SFT）
 
 
 
