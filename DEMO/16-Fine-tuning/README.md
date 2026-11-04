@@ -35,6 +35,23 @@ python3 train_qwen_math_lora.py \
 python3 LoRA_5_2.py  数学题回答微调（SFT）
 
 
+运行 convert_metamath_to_alpaca.py
+
+cd /Data/DEMO/Qwen2.5-Math-1.5B-Instruct
+python3 convert_metamath_to_alpaca.py \
+  --src /Data/MODEL/meta-math/MetaMathQA/MetaMathQA-395K.json \
+  --dst data/metamath_40k.jsonl \
+  --num 40000 --seed 42
+
+bash run_full_finetune.sh
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+
+
+
 
 
 finetune_test/
