@@ -1,5 +1,18 @@
 
 
+python3 train_qwen_math_lora.py \
+  --model_name_or_path /Data/MODEL/Qwen/Qwen2.5-Math-1.5B-Instruct \
+  --data_path /Data/DEMO/Qwen2.5-Math-1.5B-Instruct/data/metamath_40k.jsonl \
+  --output_dir /Data/DEMO/Qwen2.5-Math-1.5B-Instruct/output/lora_math \
+  --max_seq_len 4096 \
+  --per_device_batch_size 1 \
+  --grad_accum 8 \
+  --learning_rate 1e-4 \
+  --num_epochs 2 \
+  --val_samples 1000 \
+  --seed 42
+
+
 
 
 
