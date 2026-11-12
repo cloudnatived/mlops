@@ -154,7 +154,7 @@ CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node=2 --master_port=29500 \
 
 accelerate
 ```
-# 双卡不能跑完
+# 这个能在V100上跑完
 CUDA_VISIBLE_DEVICES=0,1 accelerate launch \
   --num_machines 1 \
   --num_processes 1 \
