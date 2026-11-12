@@ -1,5 +1,29 @@
 
 
+下载数据集
+```
+# 下载数据集
+meta-math/MetaMathQA
+export HF_ENDPOINT=https://hf-mirror.com
+huggingface-cli download meta-math/MetaMathQA --local-dir /Data/MODEL/meta-math/MetaMathQA
+hf download meta-math/MetaMathQA --local-dir /Data/MODEL/meta-math/MetaMathQA
+hf download meta-math/MetaMathQA --repo-type dataset --local-dir /Data/MODEL/meta-math/MetaMathQA    # 正确的命令
+
+nvidia/OpenMathInstruct-2
+export HF_ENDPOINT=https://hf-mirror.com
+hf download nvidia/OpenMathInstruct-2 --repo-type dataset --local-dir /Data/MODEL/nvidia/OpenMathInstruct-2    # 正确的命令
+
+AI-MO/NuminaMath-CoT
+export HF_ENDPOINT=https://hf-mirror.com
+hf download AI-MO/NuminaMath-CoT --repo-type dataset --local-dir /Data/MODEL/AI-MO/NuminaMath-CoT    # 正确的命令
+
+open-r1/OpenR1-Math-220k
+export HF_ENDPOINT=https://hf-mirror.com
+hf download open-r1/OpenR1-Math-220k --repo-type dataset --local-dir /Data/MODEL/open-r1/OpenR1-Math-220k    # 正确的命令
+hf download open-r1/OpenR1-Math-220k --repo-type dataset --local-dir /Data/MODEL/open-r1/OpenR1-Math-220k --local-dir-use-symlinks False --resume-download    # 参数不支持
+
+```
+
 
 
 LoRA
@@ -173,6 +197,8 @@ CUDA_VISIBLE_DEVICES=0,1 accelerate launch \
 ```
 
 
+
+之前的
 
 ```
 
