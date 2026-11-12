@@ -122,6 +122,54 @@ CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node=2 --master_port=29500 \
 - ZeRO-2 可以分片优化器状态和梯度，不需要像 ZeRO-3 那样频繁进行参数分片和 AllGather。
 - 可以减少 ZeRO-3 参数管理和通信缓冲区带来的复杂性。
 
+
+
+
+```
+
+
+accelerate
+```
+# 双卡不能跑完
+CUDA_VISIBLE_DEVICES=0,1 accelerate launch \
+  --num_machines 1 \
+  --num_processes 1 \
+  --dynamo_backend no \
+  --mixed_precision fp16 \
+  accelerate_train.py \
+  --model_name /Data/MODEL/Qwen/Qwen2.5-Math-1.5B-Instruct \
+  --max_steps 4 \
+  --max_length 2 \
+  --per_device_batch_size 1 \
+  --learning_rate 1e-5 \
+  --warmup_steps 1 \
+  --weight_decay 0.1 \
+  --gradient_accumulation_steps 1 \
+  --logging_steps 10 \
+  --shuffle_buffer 100 \
+  --seed 42 \
+  --output_dir ./accelerate-qwen-math-full-ft
+
+# 能跑完
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True    # 参数不支持
+CUDA_VISIBLE_DEVICES=0,1 accelerate launch \
+  --num_machines 1 \
+  --num_processes 1 \
+  --dynamo_backend no \
+  --mixed_precision fp16 \
+  accelerate_train.py \
+  --model_name /Data/MODEL/Qwen/Qwen2.5-Math-1.5B-Instruct \
+  --max_steps 2 \
+  --max_length 8 \
+  --per_device_batch_size 1 \
+  --learning_rate 1e-5 \
+  --warmup_steps 1 \
+  --weight_decay 0.1 \
+  --gradient_accumulation_steps 1 \
+  --logging_steps 10 \
+  --shuffle_buffer 100 \
+  --seed 42 \
+  --output_dir ./accelerate-qwen-math-full-ft
 ```
 
 
