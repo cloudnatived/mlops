@@ -36,7 +36,7 @@ hf download Ultralytics/YOLO11 --local-dir /Data/MODEL/Ultralytics/YOLO11/
 export HF_ENDPOINT=https://hf-mirror.com
 hf download Genius-Society/tt100k --repo-type dataset --local-dir /Data/MODEL/Genius-Society/tt100k
 
-
+https://github.com/ultralytics/ultralytics/blob/main/ultralytics/cfg/datasets/TT100K.yaml
 
 
 ```
