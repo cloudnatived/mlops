@@ -1,6 +1,6 @@
 
 
-下载数据集
+下载数据集，处理数据集
 ```
 # 下载数据集
 meta-math/MetaMathQA
@@ -21,6 +21,23 @@ open-r1/OpenR1-Math-220k
 export HF_ENDPOINT=https://hf-mirror.com
 hf download open-r1/OpenR1-Math-220k --repo-type dataset --local-dir /Data/MODEL/open-r1/OpenR1-Math-220k    # 正确的命令
 hf download open-r1/OpenR1-Math-220k --repo-type dataset --local-dir /Data/MODEL/open-r1/OpenR1-Math-220k --local-dir-use-symlinks False --resume-download    # 参数不支持
+
+
+python3 convert_metamath_to_alpaca.py
+用法:
+  python3 convert_metamath_to_alpaca.py \
+    --src /Data/MODEL/meta-math/MetaMathQA/MetaMathQA-395K.json \
+    --dst /Data/DEMO/Qwen2.5-Math-1.5B-Instruct/data/metamath_40k.jsonl \
+    --num 40000 --seed 42
+
+export HF_ENDPOINT=https://hf-mirror.com
+hf download Ultralytics/YOLO11 --local-dir /Data/MODEL/Ultralytics/YOLO11/
+
+export HF_ENDPOINT=https://hf-mirror.com
+hf download Genius-Society/tt100k --repo-type dataset --local-dir /Data/MODEL/Genius-Society/tt100k
+
+
+
 
 ```
 
