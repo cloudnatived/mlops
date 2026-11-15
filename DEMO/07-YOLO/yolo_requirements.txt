@@ -1,0 +1,13 @@
+# Ultralytics 训练框架（会自带 torch / opencv / matplotlib 等）
+ultralytics>=8.3.0,<9.0
+
+# 数据转换与自检需要（ultralytics 一般已带入，显式列一份更稳）
+pyyaml>=6.0
+pillow>=9.0
+tqdm>=4.64
+
+# torch 务必按 CUDA 版本单装，不要让它跟 ultralytics 一起被动安装：
+#   V100 (sm_70) + CUDA 11.8：
+#   pip install torch==2.4.1 torchvision==0.19.1 --index-url https://download.pytorch.org/whl/cu118
+#   或 CUDA 12.1：
+#   pip install torch==2.4.1 torchvision==0.19.1 --index-url https://download.pytorch.org/whl/cu121
