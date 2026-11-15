@@ -6,6 +6,9 @@ https://www.modelscope.cn/datasets/Genius-Society/tt100k/tree/master/data
 https://huggingface.co/datasets/Genius-Society/tt100k/blob/main/README.md
 https://huggingface.co/datasets/Genius-Society/tt100k/tree/main/default/train
 
+
+/Data/MODEL/YOLO11
+
 # 0 环境和 LoRA 数学自检（会下载 yolo11n.pt）
 python3 check_env.py --selftest
 
