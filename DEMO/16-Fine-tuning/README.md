@@ -38,6 +38,7 @@ hf download Genius-Society/tt100k --repo-type dataset --local-dir /Data/MODEL/Ge
 
 https://github.com/ultralytics/ultralytics/blob/main/ultralytics/cfg/datasets/TT100K.yaml
 
+yolo train model=yolo11s.pt data=TT100K.yaml imgsz=960 batch=8 epochs=100
 
 ```
 
