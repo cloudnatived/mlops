@@ -9,6 +9,7 @@ https://huggingface.co/datasets/Genius-Society/tt100k/tree/main/default/train
 
 /Data/MODEL/YOLO11
 
+docker run -it -d --shm-size=8G --gpus all --network host --cap-add SYS_ADMIN -v /Data:/Data nvcr.io/nvidia/pytorch:24.10-py3 # 适用V100
 
 pip download modelscope --dest /Data/whl
 pip install modelscope --find-links=/Data/whl --no-index
@@ -24,8 +25,13 @@ cat > /root/.config/pip/pip.conf <<EOF
 index-url = https://pypi.tuna.tsinghua.edu.cn/simple
 EOF
 
+python3 -m pip install --upgrade pip
+
 pip download -r yolo_requirements.txt --dest /Data/whl
 pip install -r yolo_requirements.txt --find-links=/Data/whl --no-index
+pip uninstall numpy -y
+pip install numpy==1.26.4
+
 
 # 0 环境和 LoRA 数学自检（会下载 yolo11n.pt）
 python3 check_env.py --selftest
