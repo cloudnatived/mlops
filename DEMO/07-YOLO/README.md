@@ -9,6 +9,24 @@ https://huggingface.co/datasets/Genius-Society/tt100k/tree/main/default/train
 
 /Data/MODEL/YOLO11
 
+
+pip download modelscope --dest /Data/whl
+pip install modelscope --find-links=/Data/whl --no-index
+
+解决 ubuntu24.04 使用pip时的信息提醒：error: externally-managed-environment
+mv /usr/lib/python3.12/EXTERNALLY-MANAGED /usr/lib/python3.12/EXTERNALLY-MANAGED.bk
+
+设置清华大学的 pip 源:
+pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple;
+mkdir -p /root/.config/pip;
+cat > /root/.config/pip/pip.conf <<EOF
+[global]
+index-url = https://pypi.tuna.tsinghua.edu.cn/simple
+EOF
+
+pip download -r yolo_requirements.txt --dest /Data/whl
+pip install -r yolo_requirements.txt --find-links=/Data/whl --no-index
+
 # 0 环境和 LoRA 数学自检（会下载 yolo11n.pt）
 python3 check_env.py --selftest
 
