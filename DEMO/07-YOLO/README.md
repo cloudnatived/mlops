@@ -38,8 +38,17 @@ python3 check_env.py --selftest
 
 # 1 数据转换（45 类，other 作 val，软链接不占额外 18G）
 python3 tt100k2yolo.py --src /data/TT100K/data --out /data/tt100k_yolo --min-instances 100
+# 标准做法：45 类基准子集、other 作 val、软链接引图
 python3 tt100k2yolo.py --src /Data/MODEL/tt100k_data --out /Data/MODEL/tt100k_yolo --min-instances 100
 python3 tt100k2yolo.py --src /Data/MODEL/tt100k_data --out /Data/MODEL/tt100k_yolo --min-instances 10000
+
+# 先做个小数据集验证全流程（8 核机器强烈建议先跑这个，几分钟）
+python tt100k2yolo.py --src /Data/MODEL/tt100k_data --out //Data/MODEL/tt100k_mini \
+    --min-instances 100 --limit 400 --limit-val 150 --limit-test 100
+
+# 想跑 221 类全量、并且把解码成本降下来（长边预缩到 1024）
+python tt100k2yolo.py --src //Data/MODEL/tt100k_data --out /Data/MODEL/tt100k_yolo221 \
+    --all-classes --link-mode resize --resize-long-side 1024
 
 # 2 LoRA 冒烟（10% 数据、8 epoch、单卡）
 python3 train_lora.py --data /data/tt100k_yolo/data.yaml --device 0 --batch 16 --nbs 16 --epochs 8 --fraction 0.1
