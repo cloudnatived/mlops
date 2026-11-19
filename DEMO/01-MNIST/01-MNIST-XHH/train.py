@@ -44,13 +44,15 @@ if __name__ == '__main__':
             # batch_size = 64，表示每次从训练集中读取 64 个样本
             # data: 输入特征（如图像），shape = [64, C, H, W]
             # label: 对应的真实标签，shape = [64]
-            # 包括了5个步骤:
-            output = model(data)                   # 1.前向传播：计算当前 mini-batch 的预测输出
-            loss = criterion(output, label)        # 2.计算预测输出与真实标签之间的损失。计算output和标签label之间的损失loss
+            # 前向 → 损失 → 梯度清零 → 反向传播 → 参数更新。
+            # train_loader 包括了5个步骤:
+            output = model(data)                   # 1.前向传播。计算当前 mini-batch 的预测输出
+            loss = criterion(output, label)        # 2.计算损失。计算output和标签label之间的损失loss。计算预测输出与真实标签之间的损失。
             loss.backward()                        # 3.反向传播：基于损失计算各参数的梯度。使用backward计算梯度
             optimizer.step()                       # 4.参数更新：沿梯度方向更新模型权重。使用optimizer.step更新参数
             optimizer.zero_grad()                  # 5.梯度清零：防止梯度在 batch 之间累积
                                                    # 这5个步骤，是使用pytorch框架训练模型的定式，简单记忆就可以了
+            
 
             if batch_idx % 100 == 0:               # 每迭代100个小批量，就打印一次模型的损失，观察训练的过程
                 print(f"Epoch {epoch + 1}/10 "
